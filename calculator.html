@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Birth Chart Calculator — exact degrees, houses & aspects | WayShowers88</title>
+  <meta name="description" content="Cast your natal chart free — exact planetary degrees, Placidus or Whole Sign houses, every major aspect explained in plain English. Computed in your browser; nothing tracked, nothing sent.">
+  <meta property="og:title" content="Free Birth Chart Calculator — WayShowers88">
+  <meta property="og:description" content="Your Sun, Moon, Rising and the whole sky you were born under — free, precise, explained in plain English.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cinzel:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0B1524;
+      --bg2:     #0E1B2E;
+      --bg3:     #12233A;
+      --bg4:     #16293F;
+      --gold:    #E8A659;
+      --gold-lt: #F6C889;
+      --gold-dk: #C77B3B;
+      --text:    #F0E4C8;
+      --dim:     #A7AFC0;
+      --blue:    #4E89A4;
+      --red:     #D98A6A;
+      --border:  #1E2F47;
+      --border2: #2A3E5C;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lora', serif;
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 40% at 50% -5%, rgba(78,137,164,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 20% at 50% 0%, rgba(232,166,89,0.06) 0%, transparent 50%);
+    }
+
+    /* ── TOP BAR (site nav, mirrors moon-clock) ── */
+    #top-bar {
+      position: fixed; inset: 0 0 auto 0; z-index: 60;
+      padding: 18px 0; transition: all .4s ease;
+    }
+    #top-bar.scrolled {
+      background: rgba(7,12,21,.82); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border); padding: 12px 0;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .wordmark {
+      font-family: 'Montserrat', sans-serif; font-weight: 300; letter-spacing: .3em;
+      font-size: 15px; color: var(--text); text-decoration: none; white-space: nowrap;
+    }
+    .wordmark b { font-weight: 400; color: var(--gold); }
+    .nav-links { display: flex; gap: 30px; list-style: none; align-items: center; }
+    .nav-links a {
+      font-family: 'Montserrat', sans-serif; font-size: 11.5px; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--dim); text-decoration: none;
+      transition: color .3s; white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--gold-lt); }
+    .nav-cta { border: 1px solid rgba(232,166,89,.45); border-radius: 999px; padding: 9px 20px; color: var(--gold-lt) !important; }
+    .nav-cta:hover { background: rgba(232,166,89,.1); }
+    @media (max-width: 720px) { .nav-links { gap: 0; } .nav-links li:not(:last-child) { display: none; } }
+
+    /* ── PAGE HERO ── */
+    .page-hero {
+      text-align: center;
+      padding: 7rem 1.5rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .lh-wrap {
+      display: inline-block;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 18px rgba(232,166,89,0.25));
+    }
+
+    .channel-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.35em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      line-height: 1.15;
+    }
+
+    .tagline {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--dim);
+      margin-top: 0.5rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 2rem 1.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    }
+
+    .form-intro {
+      font-size: 0.85rem;
+      color: var(--dim);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .fg { display: flex; flex-direction: column; gap: 0.4rem; }
+    .fg.full { grid-column: 1 / -1; }
+    .fg.triple { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; align-items: end; }
+
+    label {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    input {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: 'Lora', serif;
+      font-size: 0.93rem;
+      font-weight: 300;
+      padding: 0.65rem 0.9rem;
+      width: 100%;
+      transition: border-color 0.18s, background 0.18s;
+      -webkit-appearance: none;
+    }
+
+    input:focus { outline: none; border-color: var(--gold); background: var(--bg4); }
+    input::placeholder { color: var(--dim); font-size: 0.88rem; }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.45) sepia(0.5); cursor: pointer; }
+
+    .loc-row { display: flex; gap: 0.6rem; align-items: stretch; }
+    .loc-row input { flex: 1; }
+
+    .btn-lookup {
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--gold);
+      cursor: pointer;
+      font-family: 'Lora', serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 0 1rem;
+      white-space: nowrap;
+      transition: all 0.18s;
+      flex-shrink: 0;
+    }
+    .btn-lookup:hover { border-color: var(--gold); background: rgba(232,166,89,0.1); }
+
+    .coords-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 0.6rem;
+    }
+
+    .coords-sub { font-size: 0.72rem; color: var(--dim); margin-bottom: 0.35rem; }
+
+    .fn { font-size: 0.75rem; color: var(--dim); font-style: italic; margin-top: 0.4rem; line-height: 1.5; }
+
+    .tz-note {
+      font-size: 0.75rem;
+      color: var(--dim);
+      font-style: italic;
+      margin-top: 0.3rem;
+      line-height: 1.5;
+    }
+
+    .btn-calc {
+      background: linear-gradient(135deg, #E8A659 0%, #a07828 100%);
+      border: none;
+      border-radius: 9px;
+      color: #120d00;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      margin-top: 1.75rem;
+      padding: 0.95rem 2rem;
+      width: 100%;
+      transition: opacity 0.18s, transform 0.12s, box-shadow 0.18s;
+      box-shadow: 0 4px 20px rgba(232,166,89,0.2);
+    }
+    .btn-calc:hover { opacity: 0.92; box-shadow: 0 6px 28px rgba(232,166,89,0.3); }
+    .btn-calc:active { transform: scale(0.99); }
+    .btn-calc:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    #status {
+      text-align: center;
+      font-size: 0.83rem;
+      color: var(--dim);
+      font-style: italic;
+      min-height: 1.6rem;
+      margin-top: 0.75rem;
+      transition: color 0.2s;
+    }
+    #status.err { color: var(--red); font-style: normal; }
+
+    /* Location confirm card */
+    .loc-confirm {
+      background: rgba(232,166,89,0.07);
+      border: 1px solid rgba(232,166,89,0.2);
+      border-radius: 7px;
+      padding: 0.65rem 1rem;
+      margin-top: 0.65rem;
+      font-size: 0.85rem;
+      color: var(--gold-lt);
+      line-height: 1.5;
+    }
+    .loc-confirm .dst-note {
+      color: var(--dim);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+    .dst-link {
+      color: var(--gold);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+      font-size: 0.75rem;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .tz-override-row {
+      display: none;
+      margin-top: 0.6rem;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .tz-override-row label { font-size: 0.75rem; color: var(--dim); text-transform: none; letter-spacing: 0; }
+    .tz-override-row input { width: 90px; padding: 0.4rem 0.6rem; font-size: 0.88rem; }
+
+    /* ── RESULTS ── */
+    #results { display: none; }
+
+    .results-header {
+      text-align: center;
+      padding: 0.5rem 0 2rem;
+    }
+    .results-header h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.45rem;
+      font-weight: 400;
+      color: var(--gold-lt);
+      letter-spacing: 0.05em;
+    }
+    .results-header .sub {
+      font-size: 0.83rem;
+      color: var(--dim);
+      margin-top: 0.3rem;
+    }
+
+    /* Rising sign spotlight */
+    .rising-card {
+      background: linear-gradient(135deg, rgba(232,166,89,0.1) 0%, rgba(232,166,89,0.04) 100%);
+      border: 1px solid rgba(232,166,89,0.3);
+      border-radius: 10px;
+      padding: 1rem 1.4rem;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .rising-card .lbl {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .rising-card .val {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      color: var(--gold-lt);
+      margin-top: 0.15rem;
+    }
+    .rising-card .sym { font-size: 2rem; color: var(--gold); }
+
+    /* Table cards */
+    .tcard {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.6rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .tcard-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding: 0.85rem 1.3rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(232,166,89,0.04);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding: 0.6rem 1.3rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.015);
+      font-weight: 400;
+    }
+
+    td {
+      padding: 0.62rem 1.3rem;
+      font-size: 0.9rem;
+      border-bottom: 1px solid rgba(30,42,72,0.7);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(232,166,89,0.03); }
+
+    .p-sym { font-size: 1.05rem; color: var(--gold); margin-right: 0.45rem; }
+    .p-name { font-weight: 400; }
+    .retro { font-size: 0.68rem; color: var(--red); font-style: italic; margin-left: 0.3rem; vertical-align: middle; }
+    .sign-cell { color: var(--text); }
+    .sign-sym { margin-right: 0.35rem; }
+    .deg-cell { font-family: 'Courier New', monospace; font-size: 0.83rem; color: var(--gold-lt); }
+    .house-cell { color: var(--blue); font-size: 0.85rem; }
+
+    /* House table special rows */
+    tr.asc-row td { background: rgba(232,166,89,0.05); }
+    tr.mc-row td { background: rgba(78,137,164,0.05); }
+    .house-num { font-family: 'Cinzel', serif; font-size: 0.82rem; }
+
+    /* Note box */
+    .chart-note {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid rgba(232,166,89,0.5);
+      border-radius: 8px;
+      padding: 1rem 1.3rem;
+      font-size: 0.79rem;
+      color: var(--dim);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .chart-note strong { color: var(--text); font-weight: 500; }
+
+    /* ── LUMINARY DOORWAY ── */
+    .doorway {
+      background: linear-gradient(150deg, rgba(139,111,168,0.14) 0%, rgba(232,166,89,0.10) 100%);
+      border: 1px solid rgba(139,111,168,0.4);
+      border-radius: 12px;
+      padding: 1.8rem 1.6rem 1.7rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .dw-eyebrow {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #B49CC9;
+      margin-bottom: 0.9rem;
+    }
+    .dw-line {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.45rem;
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.4;
+      color: var(--text);
+      max-width: 34em;
+      margin: 0 auto 0.9rem;
+    }
+    .dw-line strong { font-style: normal; font-weight: 500; color: var(--gold-lt); }
+    .dw-sub {
+      font-size: 0.83rem;
+      color: var(--dim);
+      line-height: 1.7;
+      max-width: 40em;
+      margin: 0 auto 1.2rem;
+    }
+    .dw-btn {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: linear-gradient(120deg, var(--gold-lt), var(--gold) 55%, var(--gold-dk));
+      padding: 0.85rem 1.8rem;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 0 26px rgba(232,166,89,0.3);
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+    .dw-btn:hover { box-shadow: 0 0 42px rgba(246,200,137,0.5); transform: translateY(-1px); }
+
+    /* ── THRESHOLD LETTER (email) ── */
+    .threshold {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 1.7rem 1.6rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .threshold .dw-eyebrow { color: var(--gold); }
+    .tl-row {
+      display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap;
+      margin-top: 1.1rem;
+    }
+    .tl-row input[type="email"] {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      padding: 0.8rem 1.4rem;
+      min-width: 260px;
+    }
+    .tl-row input[type="email"]:focus { outline: none; border-color: var(--gold); }
+    .tl-row button {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      background: transparent;
+      border: 1px solid rgba(232,166,89,0.45);
+      border-radius: 999px;
+      padding: 0.8rem 1.6rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .tl-row button:hover { background: rgba(232,166,89,0.1); }
+    .tl-note { font-size: 0.72rem; color: var(--dim); margin-top: 0.8rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--dim);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+    }
+    footer .fn { font-family: 'Cinzel', serif; color: var(--gold); font-size: 0.82rem; font-style: normal; margin-bottom: 0.3rem; }
+
+    /* ── PRINT / SAVE AS PDF ── */
+    .btn-save {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--dim);
+      cursor: pointer;
+      font-family: 'Lora', serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 0.5rem 1rem;
+      margin: 0 auto 1.5rem;
+      transition: all 0.18s;
+    }
+    .btn-save:hover { border-color: var(--gold); color: var(--gold); }
+
+    @media print {
+      header, .page-hero, .form-card, .btn-save, .wheel-legend, footer, .cta-card, .doorway, .threshold, .ac-list, .explain-hint { display: none !important; }
+      body { background: #fff; color: #111; }
+      main { padding: 0; max-width: 100%; }
+      .results-header h2 { color: #111; }
+      .results-header .sub { color: #555; }
+      .rising-card { border: 1px solid #ccc; background: #f9f9f9; }
+      .rising-card .lbl, .rising-card .val, .rising-card .sym { color: #111; }
+      .tcard { border: 1px solid #ccc; box-shadow: none; }
+      .tcard-title { color: #555; background: #f5f5f5; }
+      th { color: #777; border-bottom: 1px solid #ddd; }
+      td { border-bottom: 1px solid #eee; color: #111; }
+      .p-sym, .sign-sym { color: #333; }
+      .deg-cell { color: #333; }
+      .house-cell { color: #446688; }
+      .chart-note { border-left: 3px solid #aaa; background: #f5f5f5; color: #555; }
+      .wheel-card { break-inside: avoid; }
+      .wheel-svg-wrap svg { max-width: 400px; }
+    }
+
+    /* ── CITY AUTOCOMPLETE ── */
+    .ac-wrap { position: relative; flex: 1; }
+    .ac-wrap input { width: 100%; }
+    .ac-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+      z-index: 50;
+      max-height: 240px;
+      overflow-y: auto;
+      display: none;
+    }
+    .ac-item {
+      padding: 0.55rem 0.95rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(30,42,72,0.5);
+    }
+    .ac-item:last-child { border-bottom: none; }
+    .ac-item:hover, .ac-item.sel { background: rgba(232,166,89,0.12); color: var(--gold-lt); }
+    .ac-item .ac-sub { font-size: 0.72rem; color: var(--dim); display: block; }
+
+    /* ── BIG THREE CARDS ── */
+    .big3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.9rem;
+      margin-bottom: 1.8rem;
+    }
+    .b3card {
+      background: linear-gradient(135deg, rgba(232,166,89,0.1) 0%, rgba(232,166,89,0.04) 100%);
+      border: 1px solid rgba(232,166,89,0.3);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      text-align: center;
+    }
+    .b3card .sym { font-size: 1.9rem; color: var(--gold); line-height: 1.2; }
+    .b3card .lbl {
+      font-size: 0.66rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      margin-top: 0.3rem;
+    }
+    .b3card .val {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      color: var(--gold-lt);
+      margin-top: 0.15rem;
+    }
+    .b3card .sub { font-size: 0.72rem; color: var(--dim); font-style: italic; margin-top: 0.35rem; line-height: 1.45; }
+    @media (max-width: 580px) {
+      .big3 { grid-template-columns: 1fr; }
+    }
+
+    /* ── ASPECT TABLE ── */
+    .asp-name { font-family: 'Cinzel', serif; font-size: 0.8rem; }
+    .asp-flow { color: #6fa3c7; }
+    .asp-chal { color: #d4795f; }
+    .asp-conj { color: var(--gold-lt); }
+    .asp-meaning { font-size: 0.8rem; color: var(--dim); font-style: italic; line-height: 1.5; }
+    .asp-orb { font-family: 'Courier New', monospace; font-size: 0.76rem; color: var(--dim); white-space: nowrap; }
+
+    /* ── CHANNEL CTA ── */
+    .cta-card {
+      background: linear-gradient(135deg, rgba(232,166,89,0.12) 0%, rgba(78,137,164,0.08) 100%);
+      border: 1px solid rgba(232,166,89,0.35);
+      border-radius: 12px;
+      padding: 1.5rem 1.5rem 1.6rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .cta-card .cta-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.02rem;
+      color: var(--gold-lt);
+      letter-spacing: 0.05em;
+    }
+    .cta-card p { font-size: 0.85rem; color: var(--dim); margin-top: 0.45rem; line-height: 1.65; }
+    .cta-btn {
+      display: inline-block;
+      margin-top: 0.9rem;
+      background: linear-gradient(135deg, #E8A659 0%, #a07828 100%);
+      color: #120d00;
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity 0.18s;
+    }
+    .cta-btn:hover { opacity: 0.9; }
+
+    /* ── HOUSE SYSTEM TOGGLE ── */
+    .hs-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-top: 1.4rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--border);
+    }
+    .hs-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .hs-toggle {
+      display: inline-flex;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .hs-btn {
+      background: none;
+      border: none;
+      color: var(--dim);
+      cursor: pointer;
+      font-family: 'Lora', serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 0.45rem 1rem;
+      transition: all 0.15s;
+    }
+    .hs-btn.active {
+      background: rgba(232,166,89,0.16);
+      color: var(--gold-lt);
+    }
+    .hs-hint { font-size: 0.73rem; color: var(--dim); font-style: italic; flex-basis: 100%; line-height: 1.5; }
+
+    /* ── EXPLAINER ROWS ── */
+    tr.p-row { cursor: pointer; }
+    tr.p-row .p-name::after {
+      content: ' ⓘ';
+      font-size: 0.65rem;
+      color: var(--dim);
+      opacity: 0.7;
+    }
+    tr.explain-row td {
+      background: rgba(78,137,164,0.05);
+      font-size: 0.82rem;
+      color: var(--dim);
+      font-style: italic;
+      line-height: 1.65;
+      padding: 0.7rem 1.3rem 0.85rem;
+      border-left: 2px solid rgba(232,166,89,0.4);
+    }
+    tr.explain-row td strong { color: var(--gold-lt); font-weight: 500; font-style: normal; }
+    .explain-hint {
+      font-size: 0.73rem;
+      color: var(--dim);
+      font-style: italic;
+      padding: 0.5rem 1.3rem 0.7rem;
+    }
+    .wleg-line { width: 14px; height: 2px; flex-shrink: 0; }
+
+    /* ── ZODIAC WHEEL ── */
+    .wheel-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem 1.2rem 1.5rem;
+      margin-bottom: 1.6rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .wheel-card .tcard-title { padding: 0 0 1rem; border-bottom: none; background: none; }
+    .wheel-svg-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .wheel-svg-wrap svg { width: 100%; height: auto; display: block; }
+    .wheel-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      margin-top: 0.9rem;
+      font-size: 0.72rem;
+      color: var(--dim);
+    }
+    .wleg { display: flex; align-items: center; gap: 0.35rem; }
+    .wleg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── ATMOSPHERE — drifting starfield behind the header ── */
+    header { overflow: hidden; }
+    header::before, header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-repeat: repeat;
+    }
+    header::before {
+      background-image:
+        radial-gradient(1.2px 1.2px at 22% 28%, rgba(246,200,137,0.9) 50%, transparent 51%),
+        radial-gradient(1px 1px at 68% 18%, rgba(232,228,217,0.8) 50%, transparent 51%),
+        radial-gradient(1.4px 1.4px at 45% 62%, rgba(232,166,89,0.7) 50%, transparent 51%),
+        radial-gradient(0.9px 0.9px at 84% 48%, rgba(232,228,217,0.7) 50%, transparent 51%),
+        radial-gradient(1px 1px at 8% 75%, rgba(246,200,137,0.6) 50%, transparent 51%);
+      background-size: 280px 200px;
+      animation: twinkle 7s ease-in-out infinite alternate;
+      opacity: 0.55;
+    }
+    header::after {
+      background-image:
+        radial-gradient(1px 1px at 35% 40%, rgba(232,228,217,0.7) 50%, transparent 51%),
+        radial-gradient(1.3px 1.3px at 78% 70%, rgba(246,200,137,0.8) 50%, transparent 51%),
+        radial-gradient(0.8px 0.8px at 55% 12%, rgba(232,228,217,0.6) 50%, transparent 51%),
+        radial-gradient(1px 1px at 12% 55%, rgba(78,137,164,0.7) 50%, transparent 51%);
+      background-size: 360px 260px;
+      animation: twinkle 11s ease-in-out 2.5s infinite alternate;
+      opacity: 0.4;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.22; }
+      to   { opacity: 0.65; }
+    }
+    header > * { position: relative; z-index: 1; }
+
+    /* ── RESULTS REVEAL — staggered rise on calculate ── */
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes wheelIn {
+      from { opacity: 0; transform: rotate(-7deg) scale(0.95); }
+      to   { opacity: 1; transform: none; }
+    }
+    #results.reveal .results-header { animation: rise 0.55s cubic-bezier(0.2,0.7,0.3,1) both; }
+    #results.reveal .b3card:nth-child(1) { animation: rise 0.6s 0.08s cubic-bezier(0.2,0.7,0.3,1) both; }
+    #results.reveal .b3card:nth-child(2) { animation: rise 0.6s 0.18s cubic-bezier(0.2,0.7,0.3,1) both; }
+    #results.reveal .b3card:nth-child(3) { animation: rise 0.6s 0.28s cubic-bezier(0.2,0.7,0.3,1) both; }
+    #results.reveal .wheel-card { animation: rise 0.65s 0.34s cubic-bezier(0.2,0.7,0.3,1) both; }
+    #results.reveal .wheel-svg-wrap svg { animation: wheelIn 1.1s 0.4s cubic-bezier(0.2,0.7,0.3,1) both; transform-origin: center; }
+    #results.reveal .tcard { animation: rise 0.65s 0.5s cubic-bezier(0.2,0.7,0.3,1) both; }
+    #results.reveal .chart-note, #results.reveal .cta-card { animation: rise 0.65s 0.6s cubic-bezier(0.2,0.7,0.3,1) both; }
+
+    /* ── MICRO-INTERACTIONS ── */
+    .b3card { transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s; }
+    .b3card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(232,166,89,0.55);
+      box-shadow: 0 8px 28px rgba(232,166,89,0.13);
+    }
+    .btn-calc:hover { transform: translateY(-1px); }
+    .btn-calc:active { transform: scale(0.99); }
+    .hs-btn, .btn-lookup, .ac-item, .dst-link { min-height: 44px; }
+    .ac-item { display: flex; flex-direction: column; justify-content: center; }
+    .hs-btn { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+
+    /* ── ACCESSIBILITY ── */
+    :focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    button, input, .ac-item { touch-action: manipulation; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 580px) {
+      h1 { font-size: 1.55rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .fg.triple { grid-template-columns: 1fr; }
+      th, td { padding-left: 0.9rem; padding-right: 0.9rem; }
+      /* 16px inputs prevent iOS Safari auto-zoom on focus */
+      input { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ TOP BAR ═══════════════ -->
+<header id="top-bar">
+  <div class="wrap nav">
+    <a class="wordmark" href="index.html">WAYSHOWERS<b>88</b></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="moon-clock.html">Moon Clock</a></li>
+      <li><a href="index.html#watch">Watch</a></li>
+      <li><a class="nav-cta" href="index.html#readings">Readings ✦</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- ═══════════════ PAGE HERO ═══════════════ -->
+<section class="page-hero">
+  <div class="lh-wrap">
+    <svg width="50" height="70" viewBox="0 0 50 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Rays -->
+      <line x1="25" y1="7"  x2="5"  y2="1"  stroke="#E8A659" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+      <line x1="25" y1="7"  x2="45" y2="1"  stroke="#E8A659" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+      <line x1="25" y1="9"  x2="1"  y2="15" stroke="#E8A659" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+      <line x1="25" y1="9"  x2="49" y2="15" stroke="#E8A659" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+      <!-- Cap -->
+      <polygon points="17,8 33,8 30,2 20,2" fill="#E8A659"/>
+      <!-- Lantern glass -->
+      <rect x="17" y="8" width="16" height="11" rx="1" fill="#0E1B2E" stroke="#E8A659" stroke-width="1.4"/>
+      <!-- Light glow -->
+      <rect x="19" y="10" width="12" height="7" rx="1" fill="#F6C889" opacity="0.85"/>
+      <!-- Catwalk -->
+      <rect x="14" y="19" width="22" height="3" rx="1" fill="#E8A659"/>
+      <!-- Tower body -->
+      <path d="M17 22 L12 60 L38 60 L33 22 Z" fill="#0E1B2E" stroke="#1E2F47" stroke-width="1.2"/>
+      <!-- Stripe accents -->
+      <line x1="16"  y1="32" x2="34"  y2="32" stroke="#E8A659" stroke-width="0.7" opacity="0.25"/>
+      <line x1="14.5" y1="43" x2="35.5" y2="43" stroke="#E8A659" stroke-width="0.7" opacity="0.25"/>
+      <line x1="13"  y1="54" x2="37"  y2="54" stroke="#E8A659" stroke-width="0.7" opacity="0.25"/>
+      <!-- Window -->
+      <rect x="20" y="35" width="10" height="6" rx="1.5" fill="#F6C889" opacity="0.55"/>
+      <!-- Base -->
+      <rect x="7" y="60" width="36" height="7" rx="2.5" fill="#E8A659"/>
+      <!-- Ground glow -->
+      <ellipse cx="25" cy="69" rx="22" ry="3" fill="#E8A659" opacity="0.12"/>
+    </svg>
+  </div>
+  <div class="channel-label">WayShowers88</div>
+  <h1>Birth Chart Calculator</h1>
+  <p class="tagline">The lighthouse is here to help you navigate the way.</p>
+</section>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main>
+
+  <!-- FORM -->
+  <div class="form-card">
+    <p class="form-intro">
+      Enter your birth details below to generate your natal chart. For your birth location, type the name of the nearest major city — if your exact town isn't listed, use the closest large city or state capital. An accurate birth time is needed for house placements and your Rising sign.
+    </p>
+
+    <div class="form-grid">
+
+      <!-- Date -->
+      <div class="fg">
+        <label for="bDate">Date of Birth</label>
+        <input type="date" id="bDate">
+      </div>
+
+      <!-- Time -->
+      <div class="fg">
+        <label for="bTime">Time of Birth (local)</label>
+        <input type="time" id="bTime">
+        <span class="fn">Enter the time from your birth certificate in local time. Your browser may show AM/PM or 24-hour — either is fine, both are read correctly. If unknown, enter 12:00 and disregard the House column.</span>
+      </div>
+
+      <!-- Location -->
+      <div class="fg full">
+        <label>Birth Location</label>
+        <div class="loc-row">
+          <div class="ac-wrap">
+            <input type="text" id="cityInput" placeholder="Start typing the nearest major city…" autocomplete="off" />
+            <div class="ac-list" id="acList"></div>
+          </div>
+          <button class="btn-lookup" onclick="geocodeCity()">Search Online</button>
+        </div>
+        <span class="fn">Suggestions appear as you type — just tap your city. If it isn't listed, try the nearest large city or state capital, or press Search Online.</span>
+        <div id="locConfirm" class="loc-confirm" style="display:none;"></div>
+        <div class="tz-override-row" id="tzOverrideRow">
+          <label for="utcOverride">Override timezone (UTC offset):</label>
+          <input type="number" id="utcOverride" step="0.5" min="-12" max="14">
+          <span class="fn" style="margin:0;">e.g. +11 for AEDT, -4 for EDT</span>
+        </div>
+        <!-- Hidden calculation fields -->
+        <input type="hidden" id="lat">
+        <input type="hidden" id="lon">
+        <input type="hidden" id="utcOffset">
+        <input type="hidden" id="ianaZone">
+      </div>
+
+    </div>
+
+    <!-- House system -->
+    <div class="hs-row">
+      <span class="hs-label">House System</span>
+      <div class="hs-toggle">
+        <button type="button" class="hs-btn active" id="hsPlacidus" onclick="setHouseSystem('placidus')">Placidus</button>
+        <button type="button" class="hs-btn" id="hsWhole" onclick="setHouseSystem('whole')">Whole Sign</button>
+      </div>
+      <span class="hs-hint" id="hsHint">Placidus is what most chart websites use — pick this if you're comparing with another site. Whole Sign is the ancient system where each house is one full sign. Your planets stay the same either way; only house numbers can shift.</span>
+    </div>
+
+    <button class="btn-calc" id="calcBtn" onclick="calculateChart()">Calculate My Birth Chart</button>
+    <div id="status"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="results-header">
+      <h2 id="rTitle">Natal Chart</h2>
+      <div class="sub" id="rSub"></div>
+    </div>
+
+    <button class="btn-save" onclick="window.print()">⬇ Save as PDF</button>
+
+    <!-- Big Three spotlight -->
+    <div class="big3">
+      <div class="b3card">
+        <div class="sym" id="b3SunSym">☉</div>
+        <div class="lbl">Sun Sign</div>
+        <div class="val" id="b3SunVal">—</div>
+        <div class="sub">your core self — who you're becoming</div>
+      </div>
+      <div class="b3card">
+        <div class="sym" id="b3MoonSym">☽</div>
+        <div class="lbl">Moon Sign</div>
+        <div class="val" id="b3MoonVal">—</div>
+        <div class="sub">your inner world — how you feel</div>
+      </div>
+      <div class="b3card">
+        <div class="sym" id="risingSymbol">♈</div>
+        <div class="lbl">Rising Sign</div>
+        <div class="val" id="risingVal">—</div>
+        <div class="sub">the face you show the world</div>
+      </div>
+    </div>
+
+    <!-- Zodiac Wheel -->
+    <div class="wheel-card" id="wheelCard">
+      <div class="tcard-title">Natal Chart Wheel</div>
+      <div class="wheel-svg-wrap" id="wheelSVG"></div>
+      <div class="wheel-legend">
+        <span class="wleg"><span class="wleg-dot" style="background:#D98A6A;"></span>Fire</span>
+        <span class="wleg"><span class="wleg-dot" style="background:#8FA98C;"></span>Earth</span>
+        <span class="wleg"><span class="wleg-dot" style="background:#4E89A4;"></span>Air</span>
+        <span class="wleg"><span class="wleg-dot" style="background:#8B6FA8;"></span>Water</span>
+        <span class="wleg"><span class="wleg-dot" style="background:#F6C889;"></span>Planet</span>
+        <span class="wleg"><span class="wleg-dot" style="background:#D98A6A;"></span>Retrograde ℞</span>
+        <span class="wleg"><span class="wleg-line" style="background:#4E89A4;"></span>Flowing aspect</span>
+        <span class="wleg"><span class="wleg-line" style="background:#D98A6A;"></span>Challenging aspect</span>
+      </div>
+    </div>
+
+    <!-- Aspects table -->
+    <div class="tcard">
+      <div class="tcard-title">Major Aspects</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Aspect</th>
+            <th>What it means for you</th>
+            <th>Orb</th>
+          </tr>
+        </thead>
+        <tbody id="aspectTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Planets table -->
+    <div class="tcard">
+      <div class="tcard-title">Planetary Positions</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Planet</th>
+            <th>Sign</th>
+            <th>Degree</th>
+            <th>House</th>
+          </tr>
+        </thead>
+        <tbody id="planetTbody"></tbody>
+      </table>
+      <div class="explain-hint">✦ Tap any row to see what that placement means.</div>
+    </div>
+
+    <!-- Houses table -->
+    <div class="tcard">
+      <div class="tcard-title" id="houseTitle">House Cusps</div>
+      <table>
+        <thead>
+          <tr>
+            <th>House</th>
+            <th>Sign</th>
+            <th>Cusp Degree</th>
+          </tr>
+        </thead>
+        <tbody id="houseTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="chart-note" id="chartNote"></div>
+
+    <!-- Luminary doorway — the sky ahead, in THEIR chart -->
+    <div class="doorway" id="doorway" style="display:none;">
+      <div class="dw-eyebrow">✦ The Sky Ahead — In Your Chart</div>
+      <p class="dw-line" id="dwLine"></p>
+      <p class="dw-sub" id="dwSub"></p>
+      <a class="dw-btn" href="index.html#readings">The Luminary reads it for you →</a>
+    </div>
+
+    <!-- The Threshold Letter — soft email ask -->
+    <div class="threshold" id="threshold">
+      <div class="dw-eyebrow">✦ The Threshold Letter</div>
+      <p class="dw-sub" style="margin-bottom:0;">A short letter at each threshold — every New and Full Moon — with what the sky is doing and what it's asking. Free, occasional, written by hand. Your chart stays in your browser; only your email travels.</p>
+      <form class="tl-row" id="tlForm">
+        <input type="email" id="tlEmail" placeholder="your@email.com" required>
+        <button type="submit">Receive the letter</button>
+      </form>
+      <div class="tl-note" id="tlNote">No spam, no selling of anything you didn't ask for. Leave whenever you like.</div>
+    </div>
+
+    <!-- Channel CTA -->
+    <div class="cta-card">
+      <div class="cta-title">✦ Now you have your chart — learn what it means</div>
+      <p>Your placements are a map, and every map needs a guide. Join me on WayShowers88 for astrology, tarot and conscious self-development — made for exactly where you are on the path.</p>
+      <a class="cta-btn" href="https://www.youtube.com/@WayShowers88" target="_blank" rel="noopener">Visit WayShowers88 →</a>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="fn">▲ WayShowers88</div>
+  <div>The lighthouse is here to help you navigate the way. · <a href="index.html" style="color:inherit;">back to the lighthouse</a> · ✦ 88 ✦</div>
+</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script src="astronomy.browser.min.js"></script>
+
+<script>
+// ─────────────────────────────────────────
+//  CONSTANTS & LOOKUP TABLES
+// ─────────────────────────────────────────
+
+const SIGNS = [
+  'Aries','Taurus','Gemini','Cancer','Leo','Virgo',
+  'Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'
+];
+// ︎ = U+FE0E text-variation-selector — forces non-emoji rendering in SVG
+const SIGN_SYM = ['♈︎','♉︎','♊︎','♋︎','♌︎','♍︎','♎︎','♏︎','♐︎','♑︎','♒︎','♓︎'];
+const PLANET_SYM = {
+  Sun:'☉', Moon:'☽', Mercury:'☿', Venus:'♀', Mars:'♂',
+  Jupiter:'♃', Saturn:'♄', Uranus:'⛢', Neptune:'♆', Pluto:'♇', Chiron:'⚷',
+  'North Node':'☊', 'South Node':'☋', 'Lilith':'⚸'
+};
+
+// ── Beginner explainers ──
+const PLANET_MEANING = {
+  Sun:        "your core identity and life force — who you are becoming",
+  Moon:       "how you feel, nurture yourself, and emotionally recharge",
+  Mercury:    "how you think, learn and communicate",
+  Venus:      "how you love, attract, and what you value",
+  Mars:       "your drive, desire, and how you take action",
+  Jupiter:    "where you expand, grow, and find your luck",
+  Saturn:     "where you meet lessons, structure and mastery",
+  Uranus:     "where you break the rules and awaken",
+  Neptune:    "your dreams, intuition, and where the veil is thin",
+  Pluto:      "where you transform through death and rebirth",
+  Chiron:     "your deepest wound — and your healing gift",
+  'North Node':"your soul's direction of growth in this lifetime",
+  'South Node':"the gifts and patterns you carry in from the past",
+  'Lilith':   "your wild, untamed and unapologetic power"
+};
+// Short essence words for aspect sentences
+const PLANET_WORD = {
+  Sun:'your identity', Moon:'your emotions', Mercury:'your mind', Venus:'your love nature',
+  Mars:'your drive', Jupiter:'your growth', Saturn:'your discipline', Uranus:'your rebel spirit',
+  Neptune:'your dreams', Pluto:'your power', Chiron:'your healing journey', 'North Node':'your destiny'
+};
+const ASPECT_VERB = {
+  Conjunction: 'merge and amplify one another',
+  Sextile:     'open easy doors for each other',
+  Square:      'create friction that pushes you to grow',
+  Trine:       'flow together effortlessly',
+  Opposition:  'pull in opposite directions, asking for balance'
+};
+const SIGN_STYLE = [
+  "bold, direct and pioneering",            // Aries
+  "steady, sensual and grounded",           // Taurus
+  "curious, quick and communicative",       // Gemini
+  "protective, intuitive and deeply feeling", // Cancer
+  "radiant, expressive and warm-hearted",   // Leo
+  "precise, devoted and discerning",        // Virgo
+  "harmonising, fair and relationship-focused", // Libra
+  "intense, private and transformative",    // Scorpio
+  "adventurous, optimistic and truth-seeking", // Sagittarius
+  "ambitious, disciplined and enduring",    // Capricorn
+  "visionary, independent and unconventional", // Aquarius
+  "dreamy, compassionate and boundless"     // Pisces
+];
+const HOUSE_MEANING = [
+  "your sense of self, identity, and how others first see you",
+  "money, possessions and self-worth",
+  "communication, siblings and the everyday mind",
+  "home, roots and family",
+  "creativity, romance and play",
+  "daily routines, work and wellbeing",
+  "partnership and one-to-one relationships",
+  "intimacy, shared resources and deep transformation",
+  "travel, beliefs and higher learning",
+  "career, reputation and public life",
+  "friendship, community and future visions",
+  "the unconscious, spirituality and what lies hidden"
+];
+const HOUSE_NAMES = [
+  'I — Ascendant','II','III','IV','V','VI',
+  'VII — Descendant','VIII','IX','X','XI','XII'
+];
+
+const DEG = Math.PI / 180;
+const RAD = 180 / Math.PI;
+
+// ─────────────────────────────────────────
+//  UTILITY
+// ─────────────────────────────────────────
+
+function n360(a) { return ((a % 360) + 360) % 360; }
+
+function signFromLon(lon) {
+  lon = n360(lon);
+  const idx = Math.floor(lon / 30);
+  const deg = lon - idx * 30;
+  return { name: SIGNS[idx], sym: SIGN_SYM[idx], deg };
+}
+
+function fmtDeg(deg) {
+  const d = Math.floor(deg);
+  const m = Math.floor((deg - d) * 60);
+  return `${d}° ${String(m).padStart(2,'0')}'`;
+}
+
+function setStatus(msg, isErr) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = isErr ? 'err' : '';
+}
+
+// ─────────────────────────────────────────
+//  GEOCODING  (OpenStreetMap Nominatim)
+// ─────────────────────────────────────────
+
+// ─────────────────────────────────────────
+//  BUILT-IN CITY DATABASE
+//  Works fully offline — no network needed
+//  Fields: n=name, lat, lon, tz=standard UTC offset, d=display label
+// ─────────────────────────────────────────
+const CITY_DB = [
+  // ── Australia ──
+  {n:"Adelaide",        lat:-34.9285,lon:138.6007,tz:9.5,  d:"Adelaide, South Australia, AU"},
+  {n:"Alice Springs",   lat:-23.6980,lon:133.8807,tz:9.5,  d:"Alice Springs, Northern Territory, AU"},
+  {n:"Brisbane",        lat:-27.4679,lon:153.0281,tz:10,   d:"Brisbane, Queensland, AU"},
+  {n:"Cairns",          lat:-16.9186,lon:145.7781,tz:10,   d:"Cairns, Queensland, AU"},
+  {n:"Canberra",        lat:-35.2809,lon:149.1300,tz:10,   d:"Canberra, ACT, AU"},
+  {n:"Darwin",          lat:-12.4634,lon:130.8456,tz:9.5,  d:"Darwin, Northern Territory, AU"},
+  {n:"Gold Coast",      lat:-28.0167,lon:153.4000,tz:10,   d:"Gold Coast, Queensland, AU"},
+  {n:"Hobart",          lat:-42.8821,lon:147.3272,tz:10,   d:"Hobart, Tasmania, AU"},
+  {n:"Mackay",          lat:-21.1411,lon:149.1860,tz:10,   d:"Mackay, Queensland, AU"},
+  {n:"Melbourne",       lat:-37.8136,lon:144.9631,tz:10,   d:"Melbourne, Victoria, AU"},
+  {n:"Newcastle",       lat:-32.9283,lon:151.7817,tz:10,   d:"Newcastle, New South Wales, AU"},
+  {n:"Perth",           lat:-31.9505,lon:115.8605,tz:8,    d:"Perth, Western Australia, AU"},
+  {n:"Rockhampton",     lat:-23.3791,lon:150.5100,tz:10,   d:"Rockhampton, Queensland, AU"},
+  {n:"Sunshine Coast",  lat:-26.6500,lon:153.0667,tz:10,   d:"Sunshine Coast, Queensland, AU"},
+  {n:"Sydney",          lat:-33.8688,lon:151.2093,tz:10,   d:"Sydney, New South Wales, AU"},
+  {n:"Toowoomba",       lat:-27.5598,lon:151.9507,tz:10,   d:"Toowoomba, Queensland, AU"},
+  {n:"Townsville",      lat:-19.2564,lon:146.8183,tz:10,   d:"Townsville, Queensland, AU"},
+  {n:"Wollongong",      lat:-34.4278,lon:150.8931,tz:10,   d:"Wollongong, New South Wales, AU"},
+  // ── New Zealand ──
+  {n:"Auckland",        lat:-36.8485,lon:174.7633,tz:12,   d:"Auckland, NZ"},
+  {n:"Christchurch",    lat:-43.5321,lon:172.6362,tz:12,   d:"Christchurch, NZ"},
+  {n:"Dunedin",         lat:-45.8788,lon:170.5028,tz:12,   d:"Dunedin, NZ"},
+  {n:"Wellington",      lat:-41.2866,lon:174.7756,tz:12,   d:"Wellington, NZ"},
+  // ── USA ──
+  {n:"Anchorage",       lat:61.2181, lon:-149.9003,tz:-9,  d:"Anchorage, Alaska, US"},
+  {n:"Atlanta",         lat:33.7490, lon:-84.3880, tz:-5,  d:"Atlanta, Georgia, US"},
+  {n:"Austin",          lat:30.2672, lon:-97.7431, tz:-6,  d:"Austin, Texas, US"},
+  {n:"Boston",          lat:42.3601, lon:-71.0589, tz:-5,  d:"Boston, Massachusetts, US"},
+  {n:"Charlotte",       lat:35.2271, lon:-80.8431, tz:-5,  d:"Charlotte, North Carolina, US"},
+  {n:"Chicago",         lat:41.8781, lon:-87.6298, tz:-6,  d:"Chicago, Illinois, US"},
+  {n:"Dallas",          lat:32.7767, lon:-96.7970, tz:-6,  d:"Dallas, Texas, US"},
+  {n:"Denver",          lat:39.7392, lon:-104.9903,tz:-7,  d:"Denver, Colorado, US"},
+  {n:"Detroit",         lat:42.3314, lon:-83.0458, tz:-5,  d:"Detroit, Michigan, US"},
+  {n:"Honolulu",        lat:21.3069, lon:-157.8583,tz:-10, d:"Honolulu, Hawaii, US"},
+  {n:"Houston",         lat:29.7604, lon:-95.3698, tz:-6,  d:"Houston, Texas, US"},
+  {n:"Las Vegas",       lat:36.1699, lon:-115.1398,tz:-8,  d:"Las Vegas, Nevada, US"},
+  {n:"Los Angeles",     lat:34.0522, lon:-118.2437,tz:-8,  d:"Los Angeles, California, US"},
+  {n:"Miami",           lat:25.7617, lon:-80.1918, tz:-5,  d:"Miami, Florida, US"},
+  {n:"Minneapolis",     lat:44.9778, lon:-93.2650, tz:-6,  d:"Minneapolis, Minnesota, US"},
+  {n:"Nashville",       lat:36.1627, lon:-86.7816, tz:-6,  d:"Nashville, Tennessee, US"},
+  {n:"New Orleans",     lat:29.9511, lon:-90.0715, tz:-6,  d:"New Orleans, Louisiana, US"},
+  {n:"New York",        lat:40.7128, lon:-74.0060, tz:-5,  d:"New York City, US"},
+  {n:"Philadelphia",    lat:39.9526, lon:-75.1652, tz:-5,  d:"Philadelphia, Pennsylvania, US"},
+  {n:"Phoenix",         lat:33.4484, lon:-112.0740,tz:-7,  d:"Phoenix, Arizona, US"},
+  {n:"Portland",        lat:45.5051, lon:-122.6750,tz:-8,  d:"Portland, Oregon, US"},
+  {n:"Salt Lake City",  lat:40.7608, lon:-111.8910,tz:-7,  d:"Salt Lake City, Utah, US"},
+  {n:"San Antonio",     lat:29.4241, lon:-98.4936, tz:-6,  d:"San Antonio, Texas, US"},
+  {n:"San Diego",       lat:32.7157, lon:-117.1611,tz:-8,  d:"San Diego, California, US"},
+  {n:"San Francisco",   lat:37.7749, lon:-122.4194,tz:-8,  d:"San Francisco, California, US"},
+  {n:"Seattle",         lat:47.6062, lon:-122.3321,tz:-8,  d:"Seattle, Washington, US"},
+  {n:"Washington",      lat:38.9072, lon:-77.0369, tz:-5,  d:"Washington D.C., US"},
+  // ── Canada ──
+  {n:"Calgary",         lat:51.0447, lon:-114.0719,tz:-7,  d:"Calgary, Alberta, CA"},
+  {n:"Edmonton",        lat:53.5461, lon:-113.4938,tz:-7,  d:"Edmonton, Alberta, CA"},
+  {n:"Halifax",         lat:44.6488, lon:-63.5752, tz:-4,  d:"Halifax, Nova Scotia, CA"},
+  {n:"Montreal",        lat:45.5017, lon:-73.5673, tz:-5,  d:"Montreal, Quebec, CA"},
+  {n:"Ottawa",          lat:45.4215, lon:-75.6972, tz:-5,  d:"Ottawa, Ontario, CA"},
+  {n:"Toronto",         lat:43.6532, lon:-79.3832, tz:-5,  d:"Toronto, Ontario, CA"},
+  {n:"Vancouver",       lat:49.2827, lon:-123.1207,tz:-8,  d:"Vancouver, British Columbia, CA"},
+  {n:"Winnipeg",        lat:49.8951, lon:-97.1384, tz:-6,  d:"Winnipeg, Manitoba, CA"},
+  // ── UK ──
+  {n:"Birmingham",      lat:52.4862, lon:-1.8904,  tz:0,   d:"Birmingham, England, GB"},
+  {n:"Bristol",         lat:51.4545, lon:-2.5879,  tz:0,   d:"Bristol, England, GB"},
+  {n:"Edinburgh",       lat:55.9533, lon:-3.1883,  tz:0,   d:"Edinburgh, Scotland, GB"},
+  {n:"Glasgow",         lat:55.8642, lon:-4.2518,  tz:0,   d:"Glasgow, Scotland, GB"},
+  {n:"Leeds",           lat:53.8008, lon:-1.5491,  tz:0,   d:"Leeds, England, GB"},
+  {n:"Liverpool",       lat:53.4084, lon:-2.9916,  tz:0,   d:"Liverpool, England, GB"},
+  {n:"London",          lat:51.5074, lon:-0.1278,  tz:0,   d:"London, England, GB"},
+  {n:"Manchester",      lat:53.4808, lon:-2.2426,  tz:0,   d:"Manchester, England, GB"},
+  // ── Europe ──
+  {n:"Amsterdam",       lat:52.3676, lon:4.9041,   tz:1,   d:"Amsterdam, Netherlands"},
+  {n:"Athens",          lat:37.9838, lon:23.7275,  tz:2,   d:"Athens, Greece"},
+  {n:"Barcelona",       lat:41.3851, lon:2.1734,   tz:1,   d:"Barcelona, Spain"},
+  {n:"Berlin",          lat:52.5200, lon:13.4050,  tz:1,   d:"Berlin, Germany"},
+  {n:"Brussels",        lat:50.8503, lon:4.3517,   tz:1,   d:"Brussels, Belgium"},
+  {n:"Bucharest",       lat:44.4268, lon:26.1025,  tz:2,   d:"Bucharest, Romania"},
+  {n:"Budapest",        lat:47.4979, lon:19.0402,  tz:1,   d:"Budapest, Hungary"},
+  {n:"Copenhagen",      lat:55.6761, lon:12.5683,  tz:1,   d:"Copenhagen, Denmark"},
+  {n:"Dublin",          lat:53.3498, lon:-6.2603,  tz:0,   d:"Dublin, Ireland"},
+  {n:"Frankfurt",       lat:50.1109, lon:8.6821,   tz:1,   d:"Frankfurt, Germany"},
+  {n:"Helsinki",        lat:60.1699, lon:24.9384,  tz:2,   d:"Helsinki, Finland"},
+  {n:"Lisbon",          lat:38.7223, lon:-9.1393,  tz:0,   d:"Lisbon, Portugal"},
+  {n:"Madrid",          lat:40.4168, lon:-3.7038,  tz:1,   d:"Madrid, Spain"},
+  {n:"Milan",           lat:45.4654, lon:9.1859,   tz:1,   d:"Milan, Italy"},
+  {n:"Moscow",          lat:55.7558, lon:37.6173,  tz:3,   d:"Moscow, Russia"},
+  {n:"Munich",          lat:48.1351, lon:11.5820,  tz:1,   d:"Munich, Germany"},
+  {n:"Oslo",            lat:59.9139, lon:10.7522,  tz:1,   d:"Oslo, Norway"},
+  {n:"Paris",           lat:48.8566, lon:2.3522,   tz:1,   d:"Paris, France"},
+  {n:"Prague",          lat:50.0755, lon:14.4378,  tz:1,   d:"Prague, Czech Republic"},
+  {n:"Rome",            lat:41.9028, lon:12.4964,  tz:1,   d:"Rome, Italy"},
+  {n:"Saint Petersburg",lat:59.9311, lon:30.3609,  tz:3,   d:"Saint Petersburg, Russia"},
+  {n:"Stockholm",       lat:59.3293, lon:18.0686,  tz:1,   d:"Stockholm, Sweden"},
+  {n:"Vienna",          lat:48.2082, lon:16.3738,  tz:1,   d:"Vienna, Austria"},
+  {n:"Warsaw",          lat:52.2297, lon:21.0122,  tz:1,   d:"Warsaw, Poland"},
+  {n:"Zurich",          lat:47.3769, lon:8.5417,   tz:1,   d:"Zurich, Switzerland"},
+  // ── Middle East ──
+  {n:"Abu Dhabi",       lat:24.4539, lon:54.3773,  tz:4,   d:"Abu Dhabi, UAE"},
+  {n:"Amman",           lat:31.9454, lon:35.9284,  tz:2,   d:"Amman, Jordan"},
+  {n:"Baghdad",         lat:33.3152, lon:44.3661,  tz:3,   d:"Baghdad, Iraq"},
+  {n:"Beirut",          lat:33.8938, lon:35.5018,  tz:2,   d:"Beirut, Lebanon"},
+  {n:"Doha",            lat:25.2854, lon:51.5310,  tz:3,   d:"Doha, Qatar"},
+  {n:"Dubai",           lat:25.2048, lon:55.2708,  tz:4,   d:"Dubai, UAE"},
+  {n:"Istanbul",        lat:41.0082, lon:28.9784,  tz:3,   d:"Istanbul, Turkey"},
+  {n:"Jerusalem",       lat:31.7683, lon:35.2137,  tz:2,   d:"Jerusalem, Israel"},
+  {n:"Kuwait City",     lat:29.3759, lon:47.9774,  tz:3,   d:"Kuwait City, Kuwait"},
+  {n:"Riyadh",          lat:24.7136, lon:46.6753,  tz:3,   d:"Riyadh, Saudi Arabia"},
+  {n:"Tehran",          lat:35.6892, lon:51.3890,  tz:3.5, d:"Tehran, Iran"},
+  {n:"Tel Aviv",        lat:32.0853, lon:34.7818,  tz:2,   d:"Tel Aviv, Israel"},
+  // ── Asia ──
+  {n:"Bangalore",       lat:12.9716, lon:77.5946,  tz:5.5, d:"Bangalore, India"},
+  {n:"Bangkok",         lat:13.7563, lon:100.5018, tz:7,   d:"Bangkok, Thailand"},
+  {n:"Beijing",         lat:39.9042, lon:116.4074, tz:8,   d:"Beijing, China"},
+  {n:"Chennai",         lat:13.0827, lon:80.2707,  tz:5.5, d:"Chennai, India"},
+  {n:"Colombo",         lat:6.9271,  lon:79.8612,  tz:5.5, d:"Colombo, Sri Lanka"},
+  {n:"Delhi",           lat:28.7041, lon:77.1025,  tz:5.5, d:"New Delhi, India"},
+  {n:"Dhaka",           lat:23.8103, lon:90.4125,  tz:6,   d:"Dhaka, Bangladesh"},
+  {n:"Guangzhou",       lat:23.1291, lon:113.2644, tz:8,   d:"Guangzhou, China"},
+  {n:"Ho Chi Minh",     lat:10.8231, lon:106.6297, tz:7,   d:"Ho Chi Minh City, Vietnam"},
+  {n:"Hong Kong",       lat:22.3193, lon:114.1694, tz:8,   d:"Hong Kong"},
+  {n:"Hyderabad",       lat:17.3850, lon:78.4867,  tz:5.5, d:"Hyderabad, India"},
+  {n:"Jakarta",         lat:-6.2088, lon:106.8456, tz:7,   d:"Jakarta, Indonesia"},
+  {n:"Karachi",         lat:24.8607, lon:67.0011,  tz:5,   d:"Karachi, Pakistan"},
+  {n:"Kathmandu",       lat:27.7172, lon:85.3240,  tz:5.75,d:"Kathmandu, Nepal"},
+  {n:"Kolkata",         lat:22.5726, lon:88.3639,  tz:5.5, d:"Kolkata, India"},
+  {n:"Kuala Lumpur",    lat:3.1390,  lon:101.6869, tz:8,   d:"Kuala Lumpur, Malaysia"},
+  {n:"Lahore",          lat:31.5497, lon:74.3436,  tz:5,   d:"Lahore, Pakistan"},
+  {n:"Manila",          lat:14.5995, lon:120.9842, tz:8,   d:"Manila, Philippines"},
+  {n:"Mumbai",          lat:19.0760, lon:72.8777,  tz:5.5, d:"Mumbai, India"},
+  {n:"Osaka",           lat:34.6937, lon:135.5023, tz:9,   d:"Osaka, Japan"},
+  {n:"Phnom Penh",      lat:11.5564, lon:104.9282, tz:7,   d:"Phnom Penh, Cambodia"},
+  {n:"Seoul",           lat:37.5665, lon:126.9780, tz:9,   d:"Seoul, South Korea"},
+  {n:"Shanghai",        lat:31.2304, lon:121.4737, tz:8,   d:"Shanghai, China"},
+  {n:"Singapore",       lat:1.3521,  lon:103.8198, tz:8,   d:"Singapore"},
+  {n:"Taipei",          lat:25.0330, lon:121.5654, tz:8,   d:"Taipei, Taiwan"},
+  {n:"Tokyo",           lat:35.6762, lon:139.6503, tz:9,   d:"Tokyo, Japan"},
+  {n:"Ulaanbaatar",     lat:47.8864, lon:106.9057, tz:8,   d:"Ulaanbaatar, Mongolia"},
+  {n:"Yangon",          lat:16.8661, lon:96.1951,  tz:6.5, d:"Yangon, Myanmar"},
+  // ── Africa ──
+  {n:"Accra",           lat:5.6037,  lon:-0.1870,  tz:0,   d:"Accra, Ghana"},
+  {n:"Addis Ababa",     lat:9.0320,  lon:38.7469,  tz:3,   d:"Addis Ababa, Ethiopia"},
+  {n:"Cairo",           lat:30.0444, lon:31.2357,  tz:2,   d:"Cairo, Egypt"},
+  {n:"Cape Town",       lat:-33.9249,lon:18.4241,  tz:2,   d:"Cape Town, South Africa"},
+  {n:"Casablanca",      lat:33.5731, lon:-7.5898,  tz:0,   d:"Casablanca, Morocco"},
+  {n:"Dar es Salaam",   lat:-6.7924, lon:39.2083,  tz:3,   d:"Dar es Salaam, Tanzania"},
+  {n:"Johannesburg",    lat:-26.2041,lon:28.0473,  tz:2,   d:"Johannesburg, South Africa"},
+  {n:"Kampala",         lat:0.3476,  lon:32.5825,  tz:3,   d:"Kampala, Uganda"},
+  {n:"Khartoum",        lat:15.5007, lon:32.5599,  tz:2,   d:"Khartoum, Sudan"},
+  {n:"Lagos",           lat:6.5244,  lon:3.3792,   tz:1,   d:"Lagos, Nigeria"},
+  {n:"Nairobi",         lat:-1.2921, lon:36.8219,  tz:3,   d:"Nairobi, Kenya"},
+  {n:"Tunis",           lat:36.8190, lon:10.1658,  tz:1,   d:"Tunis, Tunisia"},
+  // ── Americas ──
+  {n:"Bogotá",          lat:4.7110,  lon:-74.0721, tz:-5,  d:"Bogotá, Colombia"},
+  {n:"Buenos Aires",    lat:-34.6037,lon:-58.3816, tz:-3,  d:"Buenos Aires, Argentina"},
+  {n:"Caracas",         lat:10.4806, lon:-66.9036, tz:-4,  d:"Caracas, Venezuela"},
+  {n:"Guatemala City",  lat:14.6349, lon:-90.5069, tz:-6,  d:"Guatemala City, Guatemala"},
+  {n:"Havana",          lat:23.1136, lon:-82.3666, tz:-5,  d:"Havana, Cuba"},
+  {n:"Lima",            lat:-12.0464,lon:-77.0428, tz:-5,  d:"Lima, Peru"},
+  {n:"Mexico City",     lat:19.4326, lon:-99.1332, tz:-6,  d:"Mexico City, Mexico"},
+  {n:"Panama City",     lat:8.9936,  lon:-79.5197, tz:-5,  d:"Panama City, Panama"},
+  {n:"Quito",           lat:-0.1807, lon:-78.4678, tz:-5,  d:"Quito, Ecuador"},
+  {n:"Rio de Janeiro",  lat:-22.9068,lon:-43.1729, tz:-3,  d:"Rio de Janeiro, Brazil"},
+  {n:"Santiago",        lat:-33.4489,lon:-70.6693, tz:-3,  d:"Santiago, Chile"},
+  {n:"São Paulo",       lat:-23.5505,lon:-46.6333, tz:-3,  d:"São Paulo, Brazil"},
+  // ── Pacific ──
+  {n:"Fiji",            lat:-18.1248,lon:178.4501, tz:12,  d:"Suva, Fiji"},
+  {n:"Suva",            lat:-18.1248,lon:178.4501, tz:12,  d:"Suva, Fiji"},
+  {n:"Port Moresby",    lat:-9.4438, lon:147.1803, tz:10,  d:"Port Moresby, Papua New Guinea"},
+  {n:"Noumea",          lat:-22.2758,lon:166.4580, tz:11,  d:"Noumea, New Caledonia"},
+];
+
+// IANA timezone for each city — lets the browser resolve the exact historical
+// offset (including daylight saving) for any birth date automatically.
+const CITY_TZ = {
+  "Adelaide":"Australia/Adelaide","Alice Springs":"Australia/Darwin","Brisbane":"Australia/Brisbane",
+  "Cairns":"Australia/Brisbane","Canberra":"Australia/Sydney","Darwin":"Australia/Darwin",
+  "Gold Coast":"Australia/Brisbane","Hobart":"Australia/Hobart","Mackay":"Australia/Brisbane",
+  "Melbourne":"Australia/Melbourne","Newcastle":"Australia/Sydney","Perth":"Australia/Perth",
+  "Rockhampton":"Australia/Brisbane","Sunshine Coast":"Australia/Brisbane","Sydney":"Australia/Sydney",
+  "Toowoomba":"Australia/Brisbane","Townsville":"Australia/Brisbane","Wollongong":"Australia/Sydney",
+  "Auckland":"Pacific/Auckland","Christchurch":"Pacific/Auckland","Dunedin":"Pacific/Auckland","Wellington":"Pacific/Auckland",
+  "Anchorage":"America/Anchorage","Atlanta":"America/New_York","Austin":"America/Chicago","Boston":"America/New_York",
+  "Charlotte":"America/New_York","Chicago":"America/Chicago","Dallas":"America/Chicago","Denver":"America/Denver",
+  "Detroit":"America/Detroit","Honolulu":"Pacific/Honolulu","Houston":"America/Chicago","Las Vegas":"America/Los_Angeles",
+  "Los Angeles":"America/Los_Angeles","Miami":"America/New_York","Minneapolis":"America/Chicago","Nashville":"America/Chicago",
+  "New Orleans":"America/Chicago","New York":"America/New_York","Philadelphia":"America/New_York","Phoenix":"America/Phoenix",
+  "Portland":"America/Los_Angeles","Salt Lake City":"America/Denver","San Antonio":"America/Chicago","San Diego":"America/Los_Angeles",
+  "San Francisco":"America/Los_Angeles","Seattle":"America/Los_Angeles","Washington":"America/New_York",
+  "Calgary":"America/Edmonton","Edmonton":"America/Edmonton","Halifax":"America/Halifax","Montreal":"America/Toronto",
+  "Ottawa":"America/Toronto","Toronto":"America/Toronto","Vancouver":"America/Vancouver","Winnipeg":"America/Winnipeg",
+  "Birmingham":"Europe/London","Bristol":"Europe/London","Edinburgh":"Europe/London","Glasgow":"Europe/London",
+  "Leeds":"Europe/London","Liverpool":"Europe/London","London":"Europe/London","Manchester":"Europe/London",
+  "Amsterdam":"Europe/Amsterdam","Athens":"Europe/Athens","Barcelona":"Europe/Madrid","Berlin":"Europe/Berlin",
+  "Brussels":"Europe/Brussels","Bucharest":"Europe/Bucharest","Budapest":"Europe/Budapest","Copenhagen":"Europe/Copenhagen",
+  "Dublin":"Europe/Dublin","Frankfurt":"Europe/Berlin","Helsinki":"Europe/Helsinki","Lisbon":"Europe/Lisbon",
+  "Madrid":"Europe/Madrid","Milan":"Europe/Rome","Moscow":"Europe/Moscow","Munich":"Europe/Berlin",
+  "Oslo":"Europe/Oslo","Paris":"Europe/Paris","Prague":"Europe/Prague","Rome":"Europe/Rome",
+  "Saint Petersburg":"Europe/Moscow","Stockholm":"Europe/Stockholm","Vienna":"Europe/Vienna","Warsaw":"Europe/Warsaw",
+  "Zurich":"Europe/Zurich",
+  "Abu Dhabi":"Asia/Dubai","Amman":"Asia/Amman","Baghdad":"Asia/Baghdad","Beirut":"Asia/Beirut",
+  "Doha":"Asia/Qatar","Dubai":"Asia/Dubai","Istanbul":"Europe/Istanbul","Jerusalem":"Asia/Jerusalem",
+  "Kuwait City":"Asia/Kuwait","Riyadh":"Asia/Riyadh","Tehran":"Asia/Tehran","Tel Aviv":"Asia/Jerusalem",
+  "Bangalore":"Asia/Kolkata","Bangkok":"Asia/Bangkok","Beijing":"Asia/Shanghai","Chennai":"Asia/Kolkata",
+  "Colombo":"Asia/Colombo","Delhi":"Asia/Kolkata","Dhaka":"Asia/Dhaka","Guangzhou":"Asia/Shanghai",
+  "Ho Chi Minh":"Asia/Ho_Chi_Minh","Hong Kong":"Asia/Hong_Kong","Hyderabad":"Asia/Kolkata","Jakarta":"Asia/Jakarta",
+  "Karachi":"Asia/Karachi","Kathmandu":"Asia/Kathmandu","Kolkata":"Asia/Kolkata","Kuala Lumpur":"Asia/Kuala_Lumpur",
+  "Lahore":"Asia/Karachi","Manila":"Asia/Manila","Mumbai":"Asia/Kolkata","Osaka":"Asia/Tokyo",
+  "Phnom Penh":"Asia/Phnom_Penh","Seoul":"Asia/Seoul","Shanghai":"Asia/Shanghai","Singapore":"Asia/Singapore",
+  "Taipei":"Asia/Taipei","Tokyo":"Asia/Tokyo","Ulaanbaatar":"Asia/Ulaanbaatar","Yangon":"Asia/Yangon",
+  "Accra":"Africa/Accra","Addis Ababa":"Africa/Addis_Ababa","Cairo":"Africa/Cairo","Cape Town":"Africa/Johannesburg",
+  "Casablanca":"Africa/Casablanca","Dar es Salaam":"Africa/Dar_es_Salaam","Johannesburg":"Africa/Johannesburg",
+  "Kampala":"Africa/Kampala","Khartoum":"Africa/Khartoum","Lagos":"Africa/Lagos","Nairobi":"Africa/Nairobi",
+  "Tunis":"Africa/Tunis",
+  "Bogotá":"America/Bogota","Buenos Aires":"America/Argentina/Buenos_Aires","Caracas":"America/Caracas",
+  "Guatemala City":"America/Guatemala","Havana":"America/Havana","Lima":"America/Lima","Mexico City":"America/Mexico_City",
+  "Panama City":"America/Panama","Quito":"America/Guayaquil","Rio de Janeiro":"America/Sao_Paulo",
+  "Santiago":"America/Santiago","São Paulo":"America/Sao_Paulo",
+  "Fiji":"Pacific/Fiji","Suva":"Pacific/Fiji","Port Moresby":"Pacific/Port_Moresby","Noumea":"Pacific/Noumea"
+};
+
+function cityLookup(query) {
+  const q = query.toLowerCase().trim();
+  // Split on comma: "brisbane, australia" → city="brisbane", hint="australia"
+  const parts = q.split(',');
+  const cityQ = parts[0].trim();
+  const hint  = (parts[1] || '').trim();
+
+  let matches = CITY_DB.filter(c => {
+    const name = c.n.toLowerCase();
+    const nameOk = name.startsWith(cityQ) || name.includes(cityQ);
+    if (!nameOk) return false;
+    if (hint) return c.d.toLowerCase().includes(hint);
+    return true;
+  });
+
+  // Prefer exact starts-with over contains
+  matches.sort((a, b) => {
+    const aS = a.n.toLowerCase().startsWith(cityQ) ? 0 : 1;
+    const bS = b.n.toLowerCase().startsWith(cityQ) ? 0 : 1;
+    return aS - bS;
+  });
+
+  return matches[0] || null;
+}
+
+function showLocConfirm(displayName, tz, zone) {
+  const el = document.getElementById('locConfirm');
+  el.style.display = 'block';
+  if (zone) {
+    el.innerHTML = `<strong>✓ ${displayName}</strong><br>
+      <div class="dst-note">Timezone: <strong>${zone.replace(/_/g,' ')}</strong> — the correct offset for your birth date
+        (including daylight saving) is worked out automatically.
+        <button class="dst-link" onclick="toggleTZOverride(${tz})">Set manually →</button>
+      </div>`;
+  } else {
+    const tzStr = `UTC${tz >= 0 ? '+' : ''}${tz}`;
+    el.innerHTML = `<strong>✓ ${displayName}</strong><br>
+      <div class="dst-note">Standard timezone: <strong>${tzStr}</strong> &nbsp;·&nbsp;
+        If you were born during daylight saving (summer time) the offset may be ±1 hr.
+        <button class="dst-link" onclick="toggleTZOverride(${tz})">Adjust →</button>
+      </div>`;
+  }
+}
+
+function toggleTZOverride(defaultTZ) {
+  const row = document.getElementById('tzOverrideRow');
+  const isHidden = row.style.display === 'none' || row.style.display === '';
+  row.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden) {
+    const ov = document.getElementById('utcOverride');
+    if (!ov.value) ov.value = defaultTZ;
+    ov.focus();
+  }
+}
+
+async function geocodeCity() {
+  const city = document.getElementById('cityInput').value.trim();
+  if (!city) { setStatus('Enter a city name first.', true); return; }
+  setStatus('Looking up location…');
+
+  // ── Local database (fully offline) ─────────────────────────────
+  const found = cityLookup(city);
+  if (found) {
+    const zone = CITY_TZ[found.n] || '';
+    document.getElementById('lat').value = found.lat.toFixed(4);
+    document.getElementById('lon').value = found.lon.toFixed(4);
+    document.getElementById('utcOffset').value = found.tz;
+    document.getElementById('ianaZone').value = zone;
+    document.getElementById('tzOverrideRow').style.display = 'none';
+    showLocConfirm(found.d, found.tz, zone);
+    setStatus('');
+    return;
+  }
+
+  // ── Fallback: Open-Meteo if online ─────────────────────────────
+  try {
+    const cityOnly = city.split(',')[0].trim();
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityOnly)}&count=5&language=en&format=json`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    if (data.results && data.results.length > 0) {
+      const r = data.results[0];
+      document.getElementById('lat').value = r.latitude.toFixed(4);
+      document.getElementById('lon').value = r.longitude.toFixed(4);
+      const zone = r.timezone || '';
+      const roughTZ = Math.round(r.longitude / 15 * 2) / 2;
+      document.getElementById('utcOffset').value = roughTZ;
+      document.getElementById('ianaZone').value = zone;
+      const label = [r.name, r.admin1, r.country].filter(Boolean).join(', ');
+      showLocConfirm(label, roughTZ, zone);
+      setStatus('');
+      return;
+    }
+  } catch { /* offline */ }
+
+  setStatus(`"${city}" wasn't found. Try the nearest large city or state capital — e.g. type "Brisbane" for anywhere in SE Queensland.`, true);
+}
+
+// ─────────────────────────────────────────
+//  CITY AUTOCOMPLETE
+// ─────────────────────────────────────────
+
+let acSel = -1;
+
+function acMatches(q) {
+  q = q.toLowerCase().trim();
+  if (q.length < 2) return [];
+  const starts = [], contains = [];
+  for (const c of CITY_DB) {
+    const name = c.n.toLowerCase(), disp = c.d.toLowerCase();
+    if (name.startsWith(q)) starts.push(c);
+    else if (name.includes(q) || disp.includes(q)) contains.push(c);
+  }
+  return starts.concat(contains).slice(0, 8);
+}
+
+function acSelectCity(c) {
+  const zone = CITY_TZ[c.n] || '';
+  document.getElementById('cityInput').value = c.d;
+  document.getElementById('lat').value = c.lat.toFixed(4);
+  document.getElementById('lon').value = c.lon.toFixed(4);
+  document.getElementById('utcOffset').value = c.tz;
+  document.getElementById('ianaZone').value = zone;
+  document.getElementById('tzOverrideRow').style.display = 'none';
+  document.getElementById('acList').style.display = 'none';
+  showLocConfirm(c.d, c.tz, zone);
+  setStatus('');
+}
+
+function acRender(list) {
+  const el = document.getElementById('acList');
+  if (!list.length) { el.style.display = 'none'; return; }
+  el.innerHTML = list.map((c, i) =>
+    `<div class="ac-item${i === acSel ? ' sel' : ''}" data-i="${i}">${c.n}<span class="ac-sub">${c.d}</span></div>`
+  ).join('');
+  el.style.display = 'block';
+  for (const item of el.children) {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      acSelectCity(list[+item.dataset.i]);
+    });
+  }
+}
+
+(function initAutocomplete() {
+  const input = document.getElementById('cityInput');
+  if (!input) return;
+  let current = [];
+  input.addEventListener('input', () => {
+    acSel = -1;
+    current = acMatches(input.value);
+    acRender(current);
+  });
+  input.addEventListener('keydown', e => {
+    if (document.getElementById('acList').style.display !== 'block') return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); acSel = Math.min(acSel + 1, current.length - 1); acRender(current); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); acSel = Math.max(acSel - 1, 0); acRender(current); }
+    else if (e.key === 'Enter')  { e.preventDefault(); if (current.length) acSelectCity(current[Math.max(acSel, 0)]); }
+    else if (e.key === 'Escape') { document.getElementById('acList').style.display = 'none'; }
+  });
+  input.addEventListener('blur', () => {
+    setTimeout(() => { document.getElementById('acList').style.display = 'none'; }, 150);
+  });
+})();
+
+// ─────────────────────────────────────────
+//  JULIAN DAY
+// ─────────────────────────────────────────
+
+function toJD(y, m, d, hUTC) {
+  if (m <= 2) { y -= 1; m += 12; }
+  const A = Math.floor(y / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) +
+         Math.floor(30.6001 * (m + 1)) +
+         d + hUTC / 24 + B - 1524.5;
+}
+
+// ─────────────────────────────────────────
+//  OBLIQUITY
+// ─────────────────────────────────────────
+
+function obliquity(T) {
+  return 23.439291111 - 0.013004167*T - 0.000000164*T*T + 0.000000504*T*T*T;
+}
+
+// ─────────────────────────────────────────
+//  GMST  (degrees)
+// ─────────────────────────────────────────
+
+function gmst(jd) {
+  const T = (jd - 2451545.0) / 36525.0;
+  let g = 280.46061837 + 360.98564736629*(jd - 2451545.0) + T*T*(0.000387933 - T/38710000.0);
+  return n360(g);
+}
+
+// ─────────────────────────────────────────
+//  HOUSE CUSPS — Placidus (default) or Whole Sign
+//  Placidus: verified against Swiss Ephemeris to < 0.005° on all cusps.
+//  Whole Sign: H1 = 0° of the ASC's sign, each house = next whole sign.
+//  Above |lat| 66° Placidus is undefined → automatic Whole Sign fallback.
+//  Returns [H1 … H12] with ._asc ._mc ._ic ._system attached.
+// ─────────────────────────────────────────
+
+// RA (deg) → ecliptic longitude of the ecliptic point with that RA
+function lonFromRA(ra, eps) {
+  return n360(Math.atan2(Math.sin(ra * DEG), Math.cos(ra * DEG) * Math.cos(eps * DEG)) * RAD);
+}
+
+function computeHouses(jdUT, lat, lon, system) {
+  const T    = (jdUT - 2451545.0) / 36525.0;
+  const eps  = obliquity(T);
+  const epsR = eps * DEG;
+  const ce   = Math.cos(epsR), se = Math.sin(epsR);
+  const latR = lat * DEG;
+
+  const ramc  = n360(gmst(jdUT) + lon);
+  const ramcR = ramc * DEG;
+
+  // MC — ecliptic longitude on the meridian
+  const mc = lonFromRA(ramc, eps);
+
+  // ASC
+  let asc = Math.atan2(-Math.cos(ramcR), se * Math.tan(latR) + ce * Math.sin(ramcR)) * RAD;
+  asc = n360(asc);
+  // ASC must lie 0–180° ahead of the MC in zodiacal order
+  const ascMc = n360(asc - mc);
+  if (ascMc >= 180 || ascMc <= 0) asc = n360(asc + 180);
+
+  // Placidus breaks inside polar circles → fall back to Whole Sign
+  let sys = system;
+  let fellBack = false;
+  if (sys === 'placidus' && Math.abs(lat) > 66.0) { sys = 'whole'; fellBack = true; }
+
+  let cusps;
+
+  if (sys === 'placidus') {
+    // Iterative semi-arc solution for intermediate cusps
+    function placCusp(offset, f, nocturnal) {
+      let ra = n360(ramc + offset);
+      for (let i = 0; i < 100; i++) {
+        const lam = lonFromRA(ra, eps);
+        const dec = Math.asin(Math.sin(epsR) * Math.sin(lam * DEG));
+        let x = Math.tan(latR) * Math.tan(dec);
+        if (x > 1) x = 1; if (x < -1) x = -1;
+        const ad = Math.asin(x) * RAD;              // ascensional difference
+        const sa = nocturnal ? (90 - ad) : (90 + ad); // semi-arc
+        const raNew = nocturnal ? n360(ramc + 180 - f * sa) : n360(ramc + f * sa);
+        const delta = Math.abs(n360(raNew - ra + 180) - 180);
+        ra = raNew;
+        if (delta < 1e-7) break;
+      }
+      return lonFromRA(ra, eps);
+    }
+    const h11 = placCusp(30,  1/3, false);
+    const h12 = placCusp(60,  2/3, false);
+    const h2  = placCusp(120, 2/3, true);
+    const h3  = placCusp(150, 1/3, true);
+
+    cusps = [
+      asc, h2, h3, n360(mc + 180), n360(h11 + 180), n360(h12 + 180),
+      n360(asc + 180), n360(h2 + 180), n360(h3 + 180), mc, h11, h12
+    ];
+  } else {
+    // Whole Sign — H1 starts at 0° of the ASC's sign
+    const ascSign = Math.floor(asc / 30);
+    cusps = [];
+    for (let i = 0; i < 12; i++) cusps.push(((ascSign + i) % 12) * 30);
+  }
+
+  cusps._mc       = mc;
+  cusps._ic       = n360(mc + 180);
+  cusps._asc      = asc;
+  cusps._system   = sys;
+  cusps._fellBack = fellBack;
+
+  return cusps;
+}
+
+// ─────────────────────────────────────────
+//  WHICH HOUSE IS A PLANET IN?
+// ─────────────────────────────────────────
+
+function getHouse(lon, cusps) {
+  lon = n360(lon);
+  for (let i = 0; i < 12; i++) {
+    const start = cusps[i];
+    const end   = cusps[(i + 1) % 12];
+    const inH   = start <= end
+      ? (lon >= start && lon < end)
+      : (lon >= start || lon < end);
+    if (inH) return i + 1;
+  }
+  return 1;
+}
+
+// ─────────────────────────────────────────
+//  CHIRON — geocentric, multi-epoch osculating elements (JPL Horizons)
+//  One element set per decade 1920–2060, propagated from the nearest epoch,
+//  combined with Earth's true position so retrograde motion is real.
+//  Verified against JPL Horizons: max error 0.09° over 1950–2050.
+// ─────────────────────────────────────────
+
+// [epochJD, e, a(AU), i, Ω, ω, M, n(deg/day)] — JPL Horizons solution #171
+const CHIRON_EL = [
+  [2422324.5,.3814673793829977,13.62558242,6.911331849041924,209.6559550626764,338.3213641358532,177.0560818734770,.01959619920726],
+  [2425977.5,.3782821053232447,13.68487063,6.899652239968870,209.6152634833748,338.0969591119450,248.6932062419783,.01946898532240],
+  [2429629.5,.3795938952965690,13.65069567,6.908980489584969,209.5322427610255,338.3829678440003,319.7467654317099,.01954214420037],
+  [2433282.5,.3814134994819837,13.70910733,6.925534377686985,209.4907629615748,339.8696712838829,30.43046705101185,.01941738620839],
+  [2436934.5,.3797869905544903,13.70460425,6.929811999312256,209.3629019757911,340.0341962802810,101.4277080212838,.01942695723309],
+  [2440587.5,.3819307828350839,13.64188827,6.941639275979839,209.3916861168690,339.5195729702232,173.4817849276335,.01956106300954],
+  [2444239.5,.3814786953655434,13.66165068,6.936032592447804,209.4643066797150,339.3051650938076,245.2476611996436,.01951863499756],
+  [2447892.5,.3819000559319170,13.72185163,6.927586892925747,209.3723141960969,339.0047941499066,316.7909504346407,.01939033860013],
+  [2451544.5,.3793436641487489,13.60508499,6.941567066390530,209.3966743654090,339.1421856872306,27.98731727222489,.01964049315181],
+  [2455197.5,.3787647185400090,13.70396187,6.929687774615418,209.3379786541921,339.8998515900784,98.66873814298671,.01942832345555],
+  [2458849.5,.3793971889323760,13.67967128,6.942364300001374,209.2317966307737,339.8193623578708,169.8894442936067,.01948008579541],
+  [2462502.5,.3818143239483313,13.64913170,6.948259700031055,209.3015279965078,339.6252504665544,241.6520791684290,.01954549428173],
+  [2466154.5,.3824365013964279,13.73511041,6.933113734317171,209.3263292580651,339.0155502317454,313.6250855312420,.01936226881595],
+  [2469807.5,.3804275263124505,13.65610766,6.937352431623435,209.2362205492684,339.5363929536989,24.36121841718470,.01953053069280],
+  [2473459.5,.3791576364403770,13.64910423,6.928874356396081,209.3480445535021,339.4383740043060,95.96720495271940,.01954555352707]
+];
+
+// Heliocentric ecliptic-J2000 rectangular position from nearest element set
+function chironHelioVec(jd) {
+  let best = CHIRON_EL[0];
+  for (const el of CHIRON_EL) if (Math.abs(jd - el[0]) < Math.abs(jd - best[0])) best = el;
+  const [ep, e, a, inc, OM, W, MA, nn] = best;
+
+  const M = n360(MA + nn * (jd - ep)) * DEG;
+  let E = M;
+  for (let k = 0; k < 80; k++) {
+    const d = (M + e * Math.sin(E) - E) / (1 - e * Math.cos(E));
+    E += d;
+    if (Math.abs(d) < 1e-13) break;
+  }
+  const xv = a * (Math.cos(E) - e);
+  const yv = a * Math.sqrt(1 - e * e) * Math.sin(E);
+  const r  = Math.hypot(xv, yv), nu = Math.atan2(yv, xv);
+  const u  = W * DEG + nu, O = OM * DEG, iR = inc * DEG;
+  return {
+    x: r * (Math.cos(u) * Math.cos(O) - Math.sin(u) * Math.sin(O) * Math.cos(iR)),
+    y: r * (Math.cos(u) * Math.sin(O) + Math.sin(u) * Math.cos(O) * Math.cos(iR)),
+    z: r * Math.sin(u) * Math.sin(iR)
+  };
+}
+
+// Geocentric ecliptic-of-date longitude (this is what astrologers use)
+function chironLon(dateUTC) {
+  const t  = Astronomy.MakeTime(dateUTC);
+  const jd = t.ut + 2451545.0;
+  const ch = chironHelioVec(jd);
+  // Earth heliocentric (equatorial J2000) → ecliptic J2000
+  const eq  = Astronomy.HelioVector(Astronomy.Body.Earth, t);
+  const obl = 23.4392911 * DEG, ce = Math.cos(obl), se = Math.sin(obl);
+  const ex = eq.x, ey = eq.y * ce + eq.z * se;
+  let lon = n360(Math.atan2(ch.y - ey, ch.x - ex) * RAD);
+  // precess J2000 → ecliptic of date
+  const T = (jd - 2451545.0) / 36525.0;
+  return n360(lon + 1.396971 * T + 0.0003086 * T * T);
+}
+
+// ─────────────────────────────────────────
+//  MEAN LUNAR NODE & BLACK MOON LILITH (mean apogee)
+//  Verified against Swiss Ephemeris: node < 0.005°, Lilith < 0.15°
+// ─────────────────────────────────────────
+
+function meanNodeLon(jd) {
+  const T = (jd - 2451545.0) / 36525.0;
+  return n360(125.0445479 - 1934.1362891*T + 0.0020754*T*T + T*T*T/467441 - T*T*T*T/60616000);
+}
+
+function meanLilithLon(jd) {
+  const T = (jd - 2451545.0) / 36525.0;
+  // mean lunar apogee = mean perigee + 180°
+  return n360(180 + 83.3532465 + 4069.0137287*T - 0.0103200*T*T - T*T*T/80053 + T*T*T*T/18999000);
+}
+
+// ─────────────────────────────────────────
+//  TIMEZONE — historical UTC offset (DST-aware) via the browser's tz database
+//  Given a local wall-clock time in an IANA zone, returns the UTC offset in hours.
+// ─────────────────────────────────────────
+
+function zoneOffsetHours(zone, y, m, d, hh, mm) {
+  try {
+    const dtf = new Intl.DateTimeFormat('en-US', {
+      timeZone: zone, hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    const want = Date.UTC(y, m - 1, d, hh, mm);
+    let guess = want;
+    for (let i = 0; i < 3; i++) {
+      const p = {};
+      for (const part of dtf.formatToParts(new Date(guess))) p[part.type] = part.value;
+      const asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+      const diff = want - asUTC;
+      if (diff === 0) break;
+      guess += diff;
+    }
+    return (want - guess) / 3600000;
+  } catch (e) { return NaN; }
+}
+
+// ─────────────────────────────────────────
+//  HOUSE SYSTEM STATE
+// ─────────────────────────────────────────
+
+let houseSystem = 'placidus';
+
+function setHouseSystem(sys) {
+  houseSystem = sys;
+  document.getElementById('hsPlacidus').classList.toggle('active', sys === 'placidus');
+  document.getElementById('hsWhole').classList.toggle('active', sys === 'whole');
+  try { localStorage.setItem('ws88_hs', sys); } catch(e) {}
+  // Re-render instantly if a chart is already on screen
+  if (document.getElementById('results').style.display === 'block') calculateChart();
+}
+
+// ─────────────────────────────────────────
+//  RETROGRADE  (compare day-before / day-after)
+// ─────────────────────────────────────────
+
+function isRetrograde(body, astroTime) {
+  try {
+    const ms = 86400000;
+    const t1 = Astronomy.MakeTime(new Date(astroTime.date.getTime() - ms));
+    const t2 = Astronomy.MakeTime(new Date(astroTime.date.getTime() + ms));
+    const e1 = Astronomy.Ecliptic(Astronomy.GeoVector(body, t1, true)).elon;
+    const e2 = Astronomy.Ecliptic(Astronomy.GeoVector(body, t2, true)).elon;
+    let d = e2 - e1;
+    if (d > 180) d -= 360;
+    if (d < -180) d += 360;
+    return d < 0;
+  } catch { return false; }
+}
+
+function isChironRetro(dateUTC) {
+  const ms = 86400000;
+  const l1 = chironLon(new Date(dateUTC.getTime() - ms));
+  const l2 = chironLon(new Date(dateUTC.getTime() + ms));
+  let d = l2 - l1;
+  if (d > 180) d -= 360;
+  if (d < -180) d += 360;
+  return d < 0;
+}
+
+// ─────────────────────────────────────────
+//  MAIN CALCULATE
+// ─────────────────────────────────────────
+
+async function calculateChart() {
+  const dateStr   = document.getElementById('bDate').value;
+  const timeStr   = document.getElementById('bTime').value || '12:00';
+  const latVal    = parseFloat(document.getElementById('lat').value);
+  const lonVal    = parseFloat(document.getElementById('lon').value);
+
+  if (!dateStr) { setStatus('Please enter a birth date.', true); return; }
+
+  // ── Resolve the UTC offset ────────────────────────────────────
+  // Priority: manual override → IANA zone (exact historical DST) → standard offset
+  const overrideRow = document.getElementById('tzOverrideRow');
+  const overrideVal = parseFloat(document.getElementById('utcOverride').value);
+  const baseOff     = parseFloat(document.getElementById('utcOffset').value);
+  const zone        = document.getElementById('ianaZone').value;
+
+  let utcOff;
+  if (overrideRow.style.display === 'flex' && !isNaN(overrideVal)) {
+    utcOff = overrideVal;
+  } else if (zone) {
+    const [zy, zm, zd] = dateStr.split('-').map(Number);
+    const [zh, zmin]   = (timeStr || '12:00').split(':').map(Number);
+    const z = zoneOffsetHours(zone, zy, zm, zd, zh, zmin);
+    utcOff = isNaN(z) ? baseOff : z;
+  } else {
+    utcOff = baseOff;
+  }
+  if (isNaN(latVal) || isNaN(lonVal)) {
+    setStatus('Please look up your birth location first — type a city name and click Look Up.', true); return;
+  }
+  if (isNaN(utcOff)) {
+    setStatus('Please look up your birth location so the timezone can be set automatically.', true); return;
+  }
+
+  const btn = document.getElementById('calcBtn');
+  btn.disabled = true;
+  setStatus('Calculating your birth chart…');
+  document.getElementById('results').style.display = 'none';
+
+  await new Promise(r => setTimeout(r, 30));
+
+  try {
+    const [yr, mo, dy] = dateStr.split('-').map(Number);
+    const [lh, lm]     = timeStr.split(':').map(Number);
+    const localHrs     = lh + lm / 60;
+
+    // Convert local time → UTC
+    let utcHrs  = localHrs - utcOff;
+    let utcYear = yr, utcMonth = mo, utcDay = dy;
+
+    if (utcHrs < 0) {
+      utcHrs += 24;
+      // go back one calendar day
+      const prev = new Date(yr, mo - 1, dy - 1);
+      utcYear = prev.getFullYear(); utcMonth = prev.getMonth() + 1; utcDay = prev.getDate();
+    } else if (utcHrs >= 24) {
+      utcHrs -= 24;
+      const next = new Date(yr, mo - 1, dy + 1);
+      utcYear = next.getFullYear(); utcMonth = next.getMonth() + 1; utcDay = next.getDate();
+    }
+
+    const utcH = Math.floor(utcHrs);
+    const utcM = Math.round((utcHrs - utcH) * 60);
+    const utcDate = new Date(Date.UTC(utcYear, utcMonth - 1, utcDay, utcH, utcM, 0));
+
+    const astroTime = Astronomy.MakeTime(utcDate);
+    const jdUT      = toJD(utcYear, utcMonth, utcDay, utcH + utcM / 60);
+
+    // ── Planetary positions ───────────────────────────────────────
+    const BODIES = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune','Pluto'];
+    const positions = [];
+
+    for (const name of BODIES) {
+      const body = Astronomy.Body[name];
+      const vec  = Astronomy.GeoVector(body, astroTime, true);
+      const lon  = n360(Astronomy.Ecliptic(vec).elon);
+      const retro = (name !== 'Sun' && name !== 'Moon') ? isRetrograde(body, astroTime) : false;
+      positions.push({ name, lon, retro });
+    }
+
+    // Chiron
+    positions.push({
+      name:  'Chiron',
+      lon:   chironLon(utcDate),
+      retro: isChironRetro(utcDate)
+    });
+
+    // Lunar Nodes & Black Moon Lilith (mean positions)
+    const nodeLon = meanNodeLon(jdUT);
+    positions.push({ name: 'North Node', lon: nodeLon,            retro: false, noAspect: false });
+    positions.push({ name: 'South Node', lon: n360(nodeLon + 180), retro: false, noAspect: true });
+    positions.push({ name: 'Lilith',     lon: meanLilithLon(jdUT), retro: false, noAspect: true });
+
+    // ── House cusps ──────────────────────────────────────────────
+    const cusps = computeHouses(jdUT, latVal, lonVal, houseSystem);
+
+    // ── Assign houses ────────────────────────────────────────────
+    for (const p of positions) p.house = getHouse(p.lon, cusps);
+
+    // ── Render ───────────────────────────────────────────────────
+    renderResults(positions, cusps, { dateStr, timeStr, lat: latVal, lon: lonVal, utcOff });
+    renderDoorway(cusps);
+
+    // Save birth details to localStorage so the form is pre-filled next visit
+    try {
+      localStorage.setItem('ws88_chart', JSON.stringify({
+        date:   dateStr,
+        time:   timeStr,
+        city:   document.getElementById('cityInput').value,
+        lat:    document.getElementById('lat').value,
+        lon:    document.getElementById('lon').value,
+        utcOff: document.getElementById('utcOffset').value,
+        zone:   document.getElementById('ianaZone').value
+      }));
+    } catch(e) {}
+
+    setStatus('');
+    const results = document.getElementById('results');
+    results.style.display = 'block';
+    // Re-trigger the staggered reveal animation on every calculation
+    results.classList.remove('reveal');
+    void results.offsetWidth;
+    results.classList.add('reveal');
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (err) {
+    console.error(err);
+    setStatus('Something went wrong — please check your inputs and try again.', true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────
+//  LUMINARY DOORWAY — the next lunation, in THEIR houses
+// ─────────────────────────────────────────
+
+const HOUSE_THEME = [
+  'the house of self — how you arrive, begin, and are seen',
+  'the house of worth — money, body, what you can rely on',
+  'the house of voice — words, siblings, the daily mind',
+  'the house of roots — home, family, the private self',
+  'the house of joy — creation, romance, the inner child',
+  'the house of craft — work, health, the daily devotions',
+  'the house of the other — partnership, mirrors, one-to-one',
+  'the house of depths — intimacy, shared resources, rebirth',
+  'the house of the far horizon — belief, journeys, meaning',
+  'the house of the mountain — calling, reputation, the climb',
+  'the house of the many — friends, community, the long dream',
+  'the house of the veil — endings, solitude, what dissolves'
+];
+const ORDINAL = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
+
+function renderDoorway(cusps) {
+  const card = document.getElementById('doorway');
+  try {
+    const now = new Date();
+    const full = Astronomy.SearchMoonPhase(180, now, 40).date;
+    const nw   = Astronomy.SearchMoonPhase(0,   now, 40).date;
+    const isFull = full < nw;
+    const when   = isFull ? full : nw;
+    const moonLon = n360(Astronomy.EclipticGeoMoon(Astronomy.MakeTime(when)).lon);
+    const sign  = signFromLon(moonLon);
+    const house = getHouse(moonLon, cusps);
+    const dateFmt = when.toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
+    document.getElementById('dwLine').innerHTML =
+      `On ${dateFmt}, the <strong>${isFull ? 'Full' : 'New'} Moon in ${sign.name}</strong> lands in your <strong>${ORDINAL[house - 1]} house</strong> — ${HOUSE_THEME[house - 1]}.`;
+    document.getElementById('dwSub').textContent =
+      'That is the where. The Luminary is the what: a hand-written report of this exact moon in your exact chart — what it stirs, what it closes, what it asks of you next.';
+    card.style.display = 'block';
+  } catch (e) {
+    console.error('doorway:', e);
+    card.style.display = 'none';
+  }
+}
+
+// ─────────────────────────────────────────
+//  THRESHOLD LETTER — email capture
+//  KIT_FORM_ACTION: paste the Kit (ConvertKit) form action URL here
+//  once the account exists; empty string = mailto fallback.
+// ─────────────────────────────────────────
+
+const KIT_FORM_ACTION = '';
+
+document.getElementById('tlForm').addEventListener('submit', async function (ev) {
+  ev.preventDefault();
+  const email = document.getElementById('tlEmail').value.trim();
+  if (!email) return;
+  const note = document.getElementById('tlNote');
+  if (KIT_FORM_ACTION) {
+    try {
+      const fd = new FormData();
+      fd.append('email_address', email);
+      await fetch(KIT_FORM_ACTION, { method: 'POST', body: fd, mode: 'no-cors' });
+      note.textContent = '✦ Welcome across the threshold — check your inbox to confirm.';
+      document.getElementById('tlEmail').value = '';
+    } catch (e) {
+      note.textContent = 'Something slipped — please try once more.';
+    }
+  } else {
+    window.location.href = 'mailto:wildsagefire@gmail.com'
+      + '?subject=' + encodeURIComponent('The Threshold Letter — count me in')
+      + '&body=' + encodeURIComponent('Please add me to the Threshold Letter.\n\nEmail: ' + email);
+    note.textContent = '✦ Your email app should open — send it as-is and you’re on the list.';
+  }
+});
+
+// ─────────────────────────────────────────
+//  RESTORE SAVED BIRTH DETAILS
+// ─────────────────────────────────────────
+
+// header state (matches the rest of the site)
+const topBar = document.getElementById('top-bar');
+window.addEventListener('scroll', () => topBar.classList.toggle('scrolled', window.scrollY > 30), { passive: true });
+
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const saved = localStorage.getItem('ws88_chart');
+    if (!saved) return;
+    const d = JSON.parse(saved);
+    if (d.date)   document.getElementById('bDate').value     = d.date;
+    if (d.time)   document.getElementById('bTime').value     = d.time;
+    if (d.city)   document.getElementById('cityInput').value = d.city;
+    if (d.lat)    document.getElementById('lat').value       = d.lat;
+    if (d.lon)    document.getElementById('lon').value       = d.lon;
+    if (d.utcOff) document.getElementById('utcOffset').value = d.utcOff;
+    if (d.zone)   document.getElementById('ianaZone').value  = d.zone;
+    // Show the location confirm card if we have a city saved
+    if (d.city && d.utcOff) {
+      showLocConfirm(d.city, parseFloat(d.utcOff), d.zone || '');
+    }
+  } catch(e) {}
+  // Restore preferred house system
+  try {
+    const hs = localStorage.getItem('ws88_hs');
+    if (hs === 'whole' || hs === 'placidus') setHouseSystem(hs);
+  } catch(e) {}
+});
+
+// ─────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────
+
+// ─────────────────────────────────────────
+//  ZODIAC WHEEL
+// ─────────────────────────────────────────
+
+// ─────────────────────────────────────────
+//  ASPECTS
+// ─────────────────────────────────────────
+
+const ASPECTS = [
+  { name:'Conjunction', angle:0,   orb:8, col:'#E8A659', dash:''      },
+  { name:'Sextile',     angle:60,  orb:4, col:'#8FA98C', dash:'4 3'   },
+  { name:'Square',      angle:90,  orb:6, col:'#D98A6A', dash:''      },
+  { name:'Trine',       angle:120, orb:6, col:'#4E89A4', dash:''      },
+  { name:'Opposition',  angle:180, orb:8, col:'#D98A6A', dash:'7 4'   }
+];
+
+function findAspects(positions) {
+  const pts = positions.filter(p => !p.noAspect);
+  const out = [];
+  for (let i = 0; i < pts.length; i++) {
+    for (let j = i + 1; j < pts.length; j++) {
+      const sep = Math.abs(n360(pts[i].lon - pts[j].lon + 180) - 180);
+      for (const a of ASPECTS) {
+        if (Math.abs(sep - a.angle) <= a.orb) {
+          out.push({ a: pts[i], b: pts[j], asp: a, orb: Math.abs(sep - a.angle) });
+          break;
+        }
+      }
+    }
+  }
+  return out;
+}
+
+function renderWheel(positions, cusps) {
+  const W = 480, H = 480;
+  const cx = W / 2, cy = H / 2;
+  const rOuter  = 215;  // outer edge of zodiac sign ring
+  const rZodiac = 170;  // inner edge of zodiac ring / outer edge of planet area
+  const rPlanet = 148;  // planet glyph placement radius
+  const rInner  = 96;   // inner boundary circle (house area)
+  const rHLabel = 122;  // house number labels
+
+  const ascLon  = cusps._asc !== undefined ? cusps._asc : cusps[0];
+
+  // Ecliptic longitude → SVG angle (degrees, clockwise from right)
+  // ASC maps to 180° (left/9 o'clock). Counter-clockwise chart = decreasing SVG angle.
+  function svgAng(lon) { return ((180 - (lon - ascLon)) % 360 + 360) % 360; }
+
+  // SVG angle → [x, y] at radius r
+  function polar(a, r) {
+    const rad = a * Math.PI / 180;
+    return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+  }
+
+  // Element colour by sign index (0=Aries … 11=Pisces): Fire/Earth/Air/Water pattern
+  const ELEM_STROKE = [
+    '#D98A6A','#8FA98C','#4E89A4','#8B6FA8',
+    '#D98A6A','#8FA98C','#4E89A4','#8B6FA8',
+    '#D98A6A','#8FA98C','#4E89A4','#8B6FA8'
+  ];
+  const ELEM_FILL = [
+    'rgba(201,97,74,0.13)','rgba(107,140,80,0.13)','rgba(78,137,164,0.13)','rgba(132,100,184,0.13)',
+    'rgba(201,97,74,0.13)','rgba(107,140,80,0.13)','rgba(78,137,164,0.13)','rgba(132,100,184,0.13)',
+    'rgba(201,97,74,0.13)','rgba(107,140,80,0.13)','rgba(78,137,164,0.13)','rgba(132,100,184,0.13)'
+  ];
+
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+
+  // ── Background fills ─────────────────────────────────────────────
+  s += `<circle cx="${cx}" cy="${cy}" r="${rOuter+4}" fill="#0B1524"/>`;
+
+  // ── 12 Zodiac sign wedges ────────────────────────────────────────
+  // Each sign spans 30° of ecliptic. In SVG, counter-clockwise = sweep-flag 0.
+  for (let i = 0; i < 12; i++) {
+    const a1 = svgAng(i * 30);           // start of sign i in SVG degrees
+    const a2 = svgAng((i + 1) * 30);     // end   of sign i (always a1 - 30)
+
+    // Four corners of the annular wedge
+    const [ox1,oy1] = polar(a1, rOuter);
+    const [ox2,oy2] = polar(a2, rOuter);
+    const [ix2,iy2] = polar(a2, rZodiac);
+    const [ix1,iy1] = polar(a1, rZodiac);
+
+    // Outer arc: sweep=0 (counter-clockwise), inner arc return: sweep=1
+    s += `<path d="M ${ox1} ${oy1} A ${rOuter} ${rOuter} 0 0 0 ${ox2} ${oy2} L ${ix2} ${iy2} A ${rZodiac} ${rZodiac} 0 0 1 ${ix1} ${iy1} Z" fill="${ELEM_FILL[i]}" stroke="${ELEM_STROKE[i]}" stroke-width="0.6"/>`;
+
+    // Sign glyph at wedge midpoint
+    const midA = svgAng(i * 30 + 15);
+    const midR = (rZodiac + rOuter) / 2;
+    const [gx, gy] = polar(midA, midR);
+    s += `<text x="${gx}" y="${gy}" text-anchor="middle" dominant-baseline="central" font-size="14" fill="${ELEM_STROKE[i]}" font-family="serif" opacity="0.95">${SIGN_SYM[i]}</text>`;
+  }
+
+  // ── Degree ticks on inner zodiac ring ────────────────────────────
+  for (let d = 0; d < 360; d++) {
+    if (d % 30 === 0) continue;           // sign boundaries drawn by wedge strokes
+    const isMajor = d % 10 === 0;
+    const tick = isMajor ? 7 : (d % 5 === 0 ? 4 : 2);
+    const a = svgAng(d);
+    const [t1x,t1y] = polar(a, rZodiac);
+    const [t2x,t2y] = polar(a, rZodiac - tick);
+    s += `<line x1="${t1x}" y1="${t1y}" x2="${t2x}" y2="${t2y}" stroke="#2A3E5C" stroke-width="0.5" opacity="${isMajor ? 0.8 : 0.4}"/>`;
+  }
+
+  // ── Inner background circle (house area) ────────────────────────
+  s += `<circle cx="${cx}" cy="${cy}" r="${rZodiac}" fill="#0B1524" stroke="#1E2F47" stroke-width="0.8"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${rInner}"  fill="#0E1B2E" stroke="#1E2F47" stroke-width="0.8"/>`;
+
+  // ── House cusp lines ─────────────────────────────────────────────
+  const ANGULAR = [0, 3, 6, 9]; // H1=ASC, H4=IC, H7=DESC, H10=MC
+  for (let i = 0; i < 12; i++) {
+    const isAngular = ANGULAR.includes(i);
+    const a = svgAng(cusps[i]);
+    const [h1x,h1y] = polar(a, rInner);
+    const [h2x,h2y] = polar(a, rZodiac);
+    s += `<line x1="${h1x}" y1="${h1y}" x2="${h2x}" y2="${h2y}" stroke="${isAngular ? '#E8A659' : '#3d5080'}" stroke-width="${isAngular ? 1.8 : 1.0}" opacity="${isAngular ? 1.0 : 0.85}"/>`;
+    // Tiny cusp tick on zodiac ring
+    const [tk1x,tk1y] = polar(a, rZodiac+1);
+    const [tk2x,tk2y] = polar(a, rZodiac+8);
+    if (isAngular) s += `<line x1="${tk1x}" y1="${tk1y}" x2="${tk2x}" y2="${tk2y}" stroke="#E8A659" stroke-width="1.5"/>`;
+  }
+
+  // ── House number labels ──────────────────────────────────────────
+  for (let i = 0; i < 12; i++) {
+    const cA = cusps[i];
+    const cB = cusps[(i + 1) % 12];
+    // Counter-clockwise arc from cA to cB in ecliptic
+    const arc = n360(cB - cA);
+    const midLon = n360(cA + arc / 2);
+    const [lx,ly] = polar(svgAng(midLon), rHLabel);
+    s += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#4E89A4" font-family="Cinzel,serif" opacity="0.85">${i + 1}</text>`;
+  }
+
+  // ── ASC / DESC / MC / IC axis lines and labels ───────────────────
+  const mcLon  = cusps._mc  !== undefined ? cusps._mc  : cusps[9];
+  const icLon  = cusps._ic  !== undefined ? cusps._ic  : cusps[3];
+  const AXES = [
+    { angle: 180,             lbl: 'ASC', col: '#E8A659' },
+    { angle: 0,               lbl: 'DSC', col: '#E8A659' },
+    { angle: svgAng(mcLon),   lbl: 'MC',  col: '#4E89A4' },
+    { angle: svgAng(icLon),   lbl: 'IC',  col: '#4E89A4' },
+  ];
+  for (const ax of AXES) {
+    const [la1x,la1y] = polar(ax.angle, rInner);
+    const [la2x,la2y] = polar(ax.angle, rZodiac + 4);
+    s += `<line x1="${la1x}" y1="${la1y}" x2="${la2x}" y2="${la2y}" stroke="${ax.col}" stroke-width="1" opacity="0.5"/>`;
+    const [lblx,lbly] = polar(ax.angle, rOuter + 17);
+    s += `<text x="${lblx}" y="${lbly}" text-anchor="middle" dominant-baseline="central" font-size="9" fill="${ax.col}" font-family="Cinzel,serif" letter-spacing="0.05em" opacity="0.9">${ax.lbl}</text>`;
+  }
+
+  // ── Aspect lines (drawn inside the inner circle, under the glyphs) ──
+  for (const asp of findAspects(positions)) {
+    if (asp.asp.angle === 0) continue; // conjunctions self-evident from glyph proximity
+    const [x1,y1] = polar(svgAng(asp.a.lon), rInner - 3);
+    const [x2,y2] = polar(svgAng(asp.b.lon), rInner - 3);
+    const op = Math.max(0.18, 0.6 - asp.orb * 0.06); // tighter orb = stronger line
+    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${asp.asp.col}" stroke-width="0.9"${asp.asp.dash ? ` stroke-dasharray="${asp.asp.dash}"` : ''} opacity="${op.toFixed(2)}"/>`;
+  }
+
+  // ── Planet glyphs ────────────────────────────────────────────────
+  // Spread overlapping planets so glyphs don't stack
+  const PAD = 9; // minimum angular gap between glyphs (degrees)
+  const glyphs = positions.map(p => ({ ...p, dispAng: svgAng(p.lon) }));
+
+  // Sort by display angle, then iteratively separate overlaps
+  glyphs.sort((a, b) => a.dispAng - b.dispAng);
+  for (let pass = 0; pass < 8; pass++) {
+    let moved = false;
+    for (let i = 0; i < glyphs.length; i++) {
+      const j = (i + 1) % glyphs.length;
+      let diff = glyphs[j].dispAng - glyphs[i].dispAng;
+      if (diff < 0) diff += 360;
+      if (diff < PAD && diff >= 0) {
+        const push = (PAD - diff) / 2 + 0.2;
+        glyphs[i].dispAng = (glyphs[i].dispAng - push + 360) % 360;
+        glyphs[j].dispAng = (glyphs[j].dispAng + push)       % 360;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+
+  for (const p of glyphs) {
+    const [gx,gy] = polar(p.dispAng, rPlanet);
+    const col = p.retro ? '#D98A6A' : '#F6C889';
+    s += `<text x="${gx}" y="${gy}" text-anchor="middle" dominant-baseline="central" font-size="13" fill="${col}" font-family="serif">${PLANET_SYM[p.name] || '?'}</text>`;
+
+    // Connector tick from glyph to its true ecliptic position on the zodiac ring
+    const trueA = svgAng(p.lon);
+    const [tk1x,tk1y] = polar(trueA, rZodiac - 2);
+    const [tk2x,tk2y] = polar(trueA, rZodiac - 11);
+    s += `<line x1="${tk1x}" y1="${tk1y}" x2="${tk2x}" y2="${tk2y}" stroke="${col}" stroke-width="0.6" opacity="0.45"/>`;
+  }
+
+  // ── Outer ring border ────────────────────────────────────────────
+  s += `<circle cx="${cx}" cy="${cy}" r="${rOuter}" fill="none" stroke="#E8A659" stroke-width="1.2" opacity="0.45"/>`;
+  s += `</svg>`;
+  return s;
+}
+
+function renderResults(positions, cusps, meta) {
+  // Header
+  document.getElementById('rTitle').textContent = 'Natal Chart';
+  const utcLabel = meta.utcOff >= 0 ? `UTC+${meta.utcOff}` : `UTC${meta.utcOff}`;
+  document.getElementById('rSub').textContent =
+    `${meta.dateStr}  ·  ${meta.timeStr} local (${utcLabel})  ·  ${meta.lat.toFixed(2)}°, ${meta.lon.toFixed(2)}°`;
+
+  // Wheel
+  document.getElementById('wheelSVG').innerHTML = renderWheel(positions, cusps);
+
+  // Big Three — Sun, Moon, Rising
+  const asc  = signFromLon(cusps._asc);
+  document.getElementById('risingSymbol').textContent = asc.sym;
+  document.getElementById('risingVal').textContent    = `${asc.name}  ${fmtDeg(asc.deg)}`;
+  const sunP  = positions.find(p => p.name === 'Sun');
+  const moonP = positions.find(p => p.name === 'Moon');
+  if (sunP) {
+    const s = signFromLon(sunP.lon);
+    document.getElementById('b3SunSym').textContent = s.sym;
+    document.getElementById('b3SunVal').textContent = `${s.name}  ${fmtDeg(s.deg)}`;
+  }
+  if (moonP) {
+    const s = signFromLon(moonP.lon);
+    document.getElementById('b3MoonSym').textContent = s.sym;
+    document.getElementById('b3MoonVal').textContent = `${s.name}  ${fmtDeg(s.deg)}`;
+  }
+
+  // Major aspects — plain-English list, tightest orbs first
+  const atbody = document.getElementById('aspectTbody');
+  atbody.innerHTML = '';
+  const aspects = findAspects(positions).sort((a, b) => a.orb - b.orb);
+  for (const x of aspects) {
+    const cls = x.asp.name === 'Conjunction' ? 'asp-conj'
+              : (x.asp.name === 'Trine' || x.asp.name === 'Sextile') ? 'asp-flow' : 'asp-chal';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="asp-name ${cls}">${PLANET_SYM[x.a.name] || ''} ${x.a.name} ${x.asp.name} ${PLANET_SYM[x.b.name] || ''} ${x.b.name}</td>
+      <td class="asp-meaning">${(PLANET_WORD[x.a.name] || x.a.name)} and ${(PLANET_WORD[x.b.name] || x.b.name)} ${ASPECT_VERB[x.asp.name]}.</td>
+      <td class="asp-orb">${x.orb.toFixed(1)}°</td>
+    `;
+    atbody.appendChild(tr);
+  }
+  if (!aspects.length) {
+    atbody.innerHTML = '<tr><td colspan="3" class="asp-meaning">No major aspects within orb — a rare, free-flowing chart.</td></tr>';
+  }
+
+  // Planets table — each row expands into a plain-English explainer
+  const ptbody = document.getElementById('planetTbody');
+  ptbody.innerHTML = '';
+  for (const p of positions) {
+    const s  = signFromLon(p.lon);
+    const signIdx = Math.floor(n360(p.lon) / 30);
+
+    const tr = document.createElement('tr');
+    tr.className = 'p-row';
+    tr.innerHTML = `
+      <td><span class="p-sym">${PLANET_SYM[p.name] || ''}</span><span class="p-name">${p.name}</span>${p.retro ? '<span class="retro">℞</span>' : ''}</td>
+      <td class="sign-cell"><span class="sign-sym">${s.sym}</span>${s.name}</td>
+      <td class="deg-cell">${fmtDeg(s.deg)}</td>
+      <td class="house-cell">House ${p.house}</td>
+    `;
+
+    const ex = document.createElement('tr');
+    ex.className = 'explain-row';
+    ex.style.display = 'none';
+    const meaning = PLANET_MEANING[p.name] || '';
+    const houseTxt = HOUSE_MEANING[p.house - 1] || '';
+    ex.innerHTML = `<td colspan="4"><strong>${p.name} in ${s.name}</strong> — ${p.name === 'Sun' || p.name === 'Moon' ? 'This is' : 'This shapes'} ${meaning}, expressed in a way that is ${SIGN_STYLE[signIdx]}. Sitting in House ${p.house}, it plays out through ${houseTxt}.${p.retro ? ' Retrograde here means this energy turns inward — it asks for reflection and revisiting before it moves forward.' : ''}</td>`;
+
+    tr.addEventListener('click', () => {
+      ex.style.display = ex.style.display === 'none' ? 'table-row' : 'none';
+    });
+
+    ptbody.appendChild(tr);
+    ptbody.appendChild(ex);
+  }
+
+  // Houses table
+  const isWhole = cusps._system === 'whole';
+  document.getElementById('houseTitle').textContent =
+    `House Cusps — ${isWhole ? 'Whole Sign' : 'Placidus'} System`;
+
+  const htbody = document.getElementById('houseTbody');
+  htbody.innerHTML = '';
+  for (let i = 0; i < 12; i++) {
+    const s  = signFromLon(cusps[i]);
+    const tr = document.createElement('tr');
+    if (i === 0)  tr.className = 'asc-row';
+    if (i === 9)  tr.className = 'mc-row';
+    tr.innerHTML = `
+      <td class="house-num">${HOUSE_NAMES[i]}</td>
+      <td class="sign-cell"><span class="sign-sym">${s.sym}</span>${s.name}</td>
+      <td class="deg-cell">${isWhole ? '0° 00\'' : fmtDeg(s.deg)}</td>
+    `;
+    htbody.appendChild(tr);
+  }
+
+  // About note
+  const note = document.getElementById('chartNote');
+  const sysTxt = isWhole
+    ? `Houses use the <strong>Whole Sign</strong> system — the oldest house system in Western astrology. Each house occupies one complete sign, starting from the sign of your Ascendant.${cusps._fellBack ? ' (Your birth latitude is inside the polar circles, where Placidus is undefined, so Whole Sign is shown instead.)' : ''}`
+    : `Houses use the <strong>Placidus</strong> system — the most widely used system on chart websites, so these placements will match what you see elsewhere.`;
+  note.innerHTML = `<strong>About these calculations:</strong> Planetary positions are computed with the astronomy-engine library and verified against the Swiss Ephemeris — the engine used by professional astrology software. ${sysTxt} Lunar Nodes and Lilith are mean positions. The MC/IC axis is shown on the wheel at its true degree. ℞ indicates retrograde motion. Aspect lines: gold/blue/green = flowing, red = challenging (dashed red = opposition). An exact birth time is needed for an accurate Rising sign and house placements.`;
+}
+</script>
+</body>
+</html>
