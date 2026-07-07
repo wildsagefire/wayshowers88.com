@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Moon Clock — what sign is the Moon in right now? | WayShowers88</title>
+<meta name="description" content="A live clock for the sky's weather: which sign the Moon moves through right now, her exact degree and phase, when she changes — computed in your browser, free, always.">
+<meta property="og:title" content="The Moon Clock — the sky's weather, live">
+<meta property="og:description" content="Which sign is the Moon in right now? A living clock face that reads the real sky — free, forever.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cinzel:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   THE MOON CLOCK — a room of the WayShowers88 house (First Light brand)
+   The whole page lives in the night: the Moon's own register.
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  --night:        #0B1524;
+  --night-deep:   #070C15;
+  --night-raised: #12233A;
+  --teal:         #1F4F66;
+  --cosmos:       #171430;
+  --violet:       #8B6FA8;
+  --violet-soft:  #B49CC9;
+  --firstlight:   #FFF1D6;
+  --halo:         #F6C889;
+  --gold:         #E8A659;
+  --ember:        #C77B3B;
+  --rose:         #D98A6A;
+  --sage:         #8FA98C;
+  --seateal:      #4E89A4;
+  --mist:         #F0E4C8;
+  --cloud:        #A7AFC0;
+  --hair-dark:  rgba(240,228,200,.13);
+  --hair-gold:  rgba(232,166,89,.45);
+  --font-display:'Cormorant Garamond', serif;
+  --font-ritual:'Cinzel', serif;
+  --font-read:'Lora', serif;
+  --font-ui:'Montserrat', sans-serif;
+  --ease-reveal: cubic-bezier(.16,.84,.32,1);
+  --w-content: 1120px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(120% 80% at 70% -10%, #1B2A42 0%, transparent 55%),
+    radial-gradient(90% 60% at 12% 100%, rgba(23,20,48,.9) 0%, transparent 60%),
+    var(--night);
+  color:var(--cloud);
+  font-family:var(--font-read);
+  font-size:17px;line-height:1.75;
+  min-height:100vh;overflow-x:hidden;
+}
+::selection{background:var(--gold);color:var(--night-deep)}
+a{color:inherit}
+.wrap{max-width:var(--w-content);margin:0 auto;padding:0 28px}
+.eyebrow{
+  font-family:var(--font-ritual);font-size:12px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--gold);display:flex;align-items:center;gap:14px;justify-content:center;
+}
+.eyebrow::before,.eyebrow::after{content:"✦";font-family:var(--font-ui);letter-spacing:0}
+
+/* stars */
+.stars, .stars::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, rgba(240,228,200,.8), transparent 100%),
+    radial-gradient(1px 1px at 28% 9%,  rgba(240,228,200,.5), transparent 100%),
+    radial-gradient(1.5px 1.5px at 41% 31%, rgba(246,200,137,.7), transparent 100%),
+    radial-gradient(1px 1px at 57% 14%, rgba(240,228,200,.6), transparent 100%),
+    radial-gradient(1px 1px at 66% 38%, rgba(180,156,201,.55), transparent 100%),
+    radial-gradient(1.5px 1.5px at 79% 8%, rgba(240,228,200,.75), transparent 100%),
+    radial-gradient(1px 1px at 88% 27%, rgba(240,228,200,.5), transparent 100%),
+    radial-gradient(1px 1px at 8% 55%, rgba(240,228,200,.4), transparent 100%),
+    radial-gradient(1px 1px at 33% 72%, rgba(240,228,200,.35), transparent 100%),
+    radial-gradient(1px 1px at 71% 64%, rgba(180,156,201,.4), transparent 100%),
+    radial-gradient(1px 1px at 94% 49%, rgba(180,156,201,.4), transparent 100%);
+  animation:twinkle 6.5s ease-in-out infinite alternate;
+}
+.stars::after{
+  background-image:
+    radial-gradient(1px 1px at 19% 41%, rgba(240,228,200,.6), transparent 100%),
+    radial-gradient(1.5px 1.5px at 34% 18%, rgba(240,228,200,.45), transparent 100%),
+    radial-gradient(1px 1px at 49% 6%, rgba(246,200,137,.6), transparent 100%),
+    radial-gradient(1px 1px at 72% 24%, rgba(240,228,200,.5), transparent 100%),
+    radial-gradient(1px 1px at 61% 82%, rgba(240,228,200,.3), transparent 100%),
+    radial-gradient(1.5px 1.5px at 84% 40%, rgba(240,228,200,.65), transparent 100%);
+  animation-delay:-3.2s;
+}
+@keyframes twinkle{from{opacity:.45}to{opacity:1}}
+
+/* the 88 behind everything */
+.eightyeight{
+  position:fixed;right:-4%;bottom:-12%;z-index:0;
+  font-family:var(--font-ui);font-weight:300;
+  font-size:clamp(280px,40vw,560px);line-height:.8;
+  color:transparent;-webkit-text-stroke:1px rgba(240,228,200,.07);
+  user-select:none;pointer-events:none;letter-spacing:-.04em;
+}
+
+/* header — same lantern as home */
+header{position:fixed;inset:0 0 auto 0;z-index:60;padding:20px 0;transition:all .4s var(--ease-reveal)}
+header.scrolled{background:rgba(7,12,21,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--hair-dark);padding:13px 0}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.wordmark{font-family:var(--font-ui);font-weight:300;letter-spacing:.3em;font-size:15px;color:var(--mist);text-decoration:none;white-space:nowrap}
+.wordmark b{font-weight:400;color:var(--gold)}
+.nav-links{display:flex;gap:30px;list-style:none;align-items:center}
+.nav-links a{font-family:var(--font-ui);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--cloud);text-decoration:none;transition:color .3s;white-space:nowrap}
+.nav-links a:hover{color:var(--halo)}
+.nav-cta{border:1px solid var(--hair-gold);border-radius:999px;padding:9px 20px;color:var(--halo) !important}
+.nav-cta:hover{background:rgba(232,166,89,.1)}
+@media(max-width:720px){.nav-links{gap:0}.nav-links li:not(:last-child){display:none}}
+
+/* ── the clock room ── */
+main{position:relative;z-index:2;padding:150px 0 60px;text-align:center}
+h1{
+  font-family:var(--font-display);font-weight:400;color:var(--mist);
+  font-size:clamp(40px,6vw,68px);line-height:1.1;margin:22px 0 14px;
+}
+h1 em{font-style:italic;font-weight:300;color:var(--halo)}
+.subline{max-width:520px;margin:0 auto;font-size:16.5px}
+
+/* the dial */
+.dial-stage{position:relative;max-width:560px;margin:52px auto 0}
+.dial-stage svg{width:100%;height:auto;display:block;overflow:visible}
+.dial-glow{
+  position:absolute;inset:8%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle, rgba(246,200,137,.10) 0%, rgba(139,111,168,.07) 45%, transparent 70%);
+  filter:blur(6px);
+}
+.moon-breathe{animation:moonbreathe 5.5s ease-in-out infinite alternate}
+@keyframes moonbreathe{from{opacity:.85}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  .moon-breathe,.stars,.stars::after{animation:none !important}
+}
+
+/* readout */
+.readout{margin-top:44px}
+.ro-sign{
+  font-family:var(--font-display);font-weight:400;color:var(--mist);
+  font-size:clamp(34px,5vw,52px);line-height:1.15;
+}
+.ro-sign b{font-weight:400;color:var(--halo)}
+.ro-fact{
+  margin-top:12px;font-family:var(--font-ritual);font-size:12px;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--violet-soft);
+}
+.ro-next{margin-top:18px;font-size:16px;font-style:italic;color:var(--cloud)}
+.ro-next b{font-style:normal;font-weight:500;color:var(--mist)}
+
+/* the read */
+.read-card{
+  position:relative;max-width:640px;margin:56px auto 0;text-align:left;
+  background:rgba(18,35,58,.55);border:1px solid var(--hair-dark);border-radius:22px;
+  padding:44px 46px 40px;backdrop-filter:blur(6px);
+  box-shadow:0 24px 60px rgba(7,12,21,.5);
+}
+@media(max-width:600px){.read-card{padding:34px 26px 30px}}
+.read-card::before{
+  content:"";position:absolute;top:0;left:26px;right:26px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.read-kind{font-family:var(--font-ritual);font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--halo);margin-bottom:16px;text-align:center}
+.read-body{font-size:16.5px;color:#C6CCD9}
+.read-poem{
+  margin-top:24px;padding-top:22px;border-top:1px solid var(--hair-dark);
+  font-family:var(--font-display);font-style:italic;font-weight:300;
+  font-size:21px;line-height:1.5;color:var(--violet-soft);text-align:center;
+}
+.read-note{
+  margin-top:26px;text-align:center;
+  font-family:var(--font-ui);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(167,175,192,.55);
+}
+
+/* the tide strip */
+.tide{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin:56px auto 0;max-width:760px}
+.tide-cell{
+  flex:1 1 220px;background:rgba(18,35,58,.4);border:1px solid var(--hair-dark);
+  border-radius:18px;padding:26px 24px;
+}
+.tide-k{font-family:var(--font-ritual);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.tide-v{font-family:var(--font-display);font-size:22px;color:var(--mist);line-height:1.3}
+.tide-s{font-size:13.5px;font-style:italic;color:var(--cloud);margin-top:6px}
+
+/* the whisper — the door that opens later */
+.whisper{max-width:560px;margin:70px auto 0;font-size:15.5px;font-style:italic}
+.whisper b{font-style:normal;font-weight:500;color:var(--mist)}
+.whisper .spectrum-line{height:1px;max-width:300px;margin:26px auto 0;
+  background:linear-gradient(90deg,transparent,#D98A6A,#E8A659,#8FA98C,#4E89A4,#8B6FA8,transparent);opacity:.55}
+.ctas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:36px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-ui);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  padding:16px 32px;border-radius:999px;text-decoration:none;
+  transition:all .32s var(--ease-reveal);cursor:pointer;border:none;
+}
+.btn-beam{
+  background:linear-gradient(120deg,var(--halo),var(--gold) 55%,var(--ember));
+  color:var(--night-deep);box-shadow:0 0 34px rgba(232,166,89,.35), 0 4px 22px rgba(7,12,21,.5);
+}
+.btn-beam:hover{box-shadow:0 0 54px rgba(246,200,137,.55), 0 4px 22px rgba(7,12,21,.5);transform:translateY(-1px)}
+.btn-ghost{border:1px solid var(--hair-gold);color:var(--mist);background:transparent}
+.btn-ghost:hover{border-color:var(--gold);color:var(--halo);background:rgba(232,166,89,.06)}
+
+/* footer mini */
+footer{position:relative;z-index:2;margin-top:90px;border-top:1px solid var(--hair-dark);padding:38px 0 44px;text-align:center}
+footer p{font-family:var(--font-ui);font-size:11.5px;letter-spacing:.12em;color:rgba(167,175,192,.55)}
+footer a{color:var(--cloud);text-decoration:none;transition:color .3s}
+footer a:hover{color:var(--halo)}
+
+/* loading / no-js states */
+#loading{margin-top:52px;font-style:italic;color:var(--violet-soft)}
+noscript p{margin-top:52px}
+</style>
+</head>
+<body>
+
+<div class="stars" aria-hidden="true"></div>
+<div class="eightyeight" aria-hidden="true">88</div>
+
+<header id="top-bar">
+  <div class="wrap nav">
+    <a class="wordmark" href="index.html">WAYSHOWERS<b>88</b></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#watch">Watch</a></li>
+      <li><a href="index.html#readings">Readings</a></li>
+      <li><a class="nav-cta" href="https://wildsagefire.github.io/birth-chart/" target="_blank" rel="noopener">Begin ✦</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="eyebrow">The Moon Clock</div>
+    <h1>The sky's weather,<br><em>live.</em></h1>
+    <p class="subline">A clock face for the one hand that matters: where the Moon is, right now. She changes sign every couple of days — and the mood of the world changes with her.</p>
+
+    <div id="loading">✦ &nbsp;Reading the sky…&nbsp; ✦</div>
+    <noscript><p>The Moon Clock computes the real sky in your browser — it needs JavaScript switched on to turn.</p></noscript>
+
+    <div id="clock" hidden>
+      <div class="dial-stage">
+        <div class="dial-glow" aria-hidden="true"></div>
+        <svg id="dial" viewBox="0 0 440 440" role="img" aria-label="Zodiac dial showing the Moon's current position"></svg>
+      </div>
+
+      <div class="readout">
+        <div class="ro-sign">The Moon is in <b id="ro-sign-name">—</b></div>
+        <div class="ro-fact" id="ro-fact">—</div>
+        <div class="ro-next" id="ro-next">—</div>
+      </div>
+
+      <div class="read-card">
+        <div class="read-kind" id="read-kind">✦ &nbsp;The weather in this sign&nbsp; ✦</div>
+        <p class="read-body" id="read-body"></p>
+        <p class="read-poem" id="read-poem"></p>
+        <p class="read-note">Computed from the real sky, in your browser, this very moment — nothing tracked, nothing sent.</p>
+      </div>
+
+      <div class="tide">
+        <div class="tide-cell">
+          <div class="tide-k">Phase</div>
+          <div class="tide-v" id="tide-phase">—</div>
+          <div class="tide-s" id="tide-illum">—</div>
+        </div>
+        <div class="tide-cell">
+          <div class="tide-k">Next New Moon</div>
+          <div class="tide-v" id="tide-new">—</div>
+          <div class="tide-s">a door for beginnings</div>
+        </div>
+        <div class="tide-cell">
+          <div class="tide-k">Next Full Moon</div>
+          <div class="tide-v" id="tide-full">—</div>
+          <div class="tide-s">a lamp at full flame</div>
+        </div>
+      </div>
+
+      <div class="whisper">
+        <p>This clock reads the sky everyone shares. But the same Moon crosses a different <b>room of your life</b> than of mine — that's what your houses are. One day this clock will know yours. <b>That door opens at first light.</b></p>
+        <div class="spectrum-line"></div>
+        <div class="ctas">
+          <a class="btn btn-beam" href="https://wildsagefire.github.io/birth-chart/" target="_blank" rel="noopener">Find your houses — free</a>
+          <a class="btn btn-ghost" href="index.html#readings">The hand-written readings</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© <span id="yr">2026</span> WayShowers88 · <a href="index.html">back to the lighthouse</a> · ✦ 88 ✦</p>
+</footer>
+
+<script src="astronomy.browser.min.js"></script>
+<script>
+// header state
+const bar = document.getElementById('top-bar');
+addEventListener('scroll', () => bar.classList.toggle('scrolled', scrollY > 40), {passive:true});
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ══════════════════════════════════════════════════════════════
+   THE TWELVE READS — hand-written, WayShowers voice.
+   The weather of each sign the Moon moves through, plus one
+   poetic line. The knowledge is free; it always will be.
+   ══════════════════════════════════════════════════════════════ */
+const SIGNS = [
+  { name:'Aries', glyph:'♈︎', element:'Fire', mode:'Cardinal', color:'#D98A6A',
+    read:'The tide runs hot and fast. Feelings arrive before the reasons for them, and waiting for perfect conditions is just fear wearing patience’s coat — begin the thing, even badly, because under this Moon the doing is the medicine. Keep your fuse long with the people you love; they are not the obstacle.',
+    poem:'A match struck in the dark is still a sunrise, briefly.' },
+  { name:'Taurus', glyph:'♉︎', element:'Earth', mode:'Fixed', color:'#8FA98C',
+    read:'The sky asks you to slow to the speed of the body. Feed yourself properly, touch real things, finish nothing in a hurry — what you steady now stays steadied. Comfort is not laziness under this Moon; it is repair, and you are allowed it.',
+    poem:'The mountain does not hurry, and yet nothing is left undone.' },
+  { name:'Gemini', glyph:'♊︎', element:'Air', mode:'Mutable', color:'#E8A659',
+    read:'Words carry the weather now. Conversations start themselves, questions multiply, and the mind flits from window to window — let it. Just notice the difference between being curious and being scattered, and before the day closes, come home to one true sentence.',
+    poem:'A thousand doors swing open at once; you only need to walk through one.' },
+  { name:'Cancer', glyph:'♋︎', element:'Water', mode:'Cardinal', color:'#4E89A4',
+    read:'The Moon is home in Cancer, and everything softens. The tide pulls inward — toward kitchens, old photographs, the people who knew you before you were anyone. Tend something today. And let yourself be tended; that half is harder, and it counts double.',
+    poem:'The shell exists because something tender was worth keeping.' },
+  { name:'Leo', glyph:'♌︎', element:'Fire', mode:'Fixed', color:'#D98A6A',
+    read:'The heart wants witnessing under this Moon. Make something, show someone, take up the space you usually apologise for — warmth given generously comes back doubled here. Watch only for pride wearing courage’s colours; the real thing never needs applause to keep burning.',
+    poem:'Even the sun needs somewhere to shine — today it borrows you.' },
+  { name:'Virgo', glyph:'♍︎', element:'Earth', mode:'Mutable', color:'#8FA98C',
+    read:'The weather turns precise. The small repairs call to you — the drawer, the inbox, the promise you half-made — and tending them quiets the mind like nothing else can. Serve what you love without vanishing into the serving; you are on the list of things worth tending.',
+    poem:'Holiness hides in small things done with whole attention.' },
+  { name:'Libra', glyph:'♎︎', element:'Air', mode:'Cardinal', color:'#E8A659',
+    read:'The tide leans toward the other. Conversations want balancing, rooms want beauty, and the scales in you weigh every word twice before spending it. Seek the fair thing, not the pleasing thing — they are not always the same, and only one of them lets you sleep.',
+    poem:'Two lanterns on one bridge cast a steadier light.' },
+  { name:'Scorpio', glyph:'♏︎', element:'Water', mode:'Fixed', color:'#4E89A4',
+    read:'The water runs deep now, and it will not pretend. Whatever has been circling beneath the surface asks to be looked at — not fixed, not fled, just looked at honestly. Intensity is not an emergency under this Moon. It is information.',
+    poem:'What the depths keep, the depths transform.' },
+  { name:'Sagittarius', glyph:'♐︎', element:'Fire', mode:'Mutable', color:'#D98A6A',
+    read:'The weather opens wide. Restlessness under this Moon is a compass, not a flaw — follow the question further than you usually let yourself, read the map, book the thing. And tell the truth warmly; truth with warmth in it travels furthest.',
+    poem:'The horizon is not an ending. It is an invitation with no fine print.' },
+  { name:'Capricorn', glyph:'♑︎', element:'Earth', mode:'Cardinal', color:'#8FA98C',
+    read:'The tide turns structural. What you build under this Moon tends to hold — so choose the brick worth laying and do the unglamorous next step, the one nobody claps for. Just don’t mistake being useful for being loved. You are already both.',
+    poem:'The lighthouse stands because someone kept laying stones in the cold.' },
+  { name:'Aquarius', glyph:'♒︎', element:'Air', mode:'Fixed', color:'#E8A659',
+    read:'The weather cools and clarifies. Step back far enough and the pattern shows itself — in your life, your people, your times — and under this Moon the kindest thing you can offer is sometimes a little distance and a long view. Belong to the future without abandoning the room you’re in.',
+    poem:'From far enough up, every border disappears — and every light still shows.' },
+  { name:'Pisces', glyph:'♓︎', element:'Water', mode:'Mutable', color:'#4E89A4',
+    read:'The veil thins. Dreams get louder, music lands differently, and other people’s feelings drift through you like weather fronts — name what is yours, bless what isn’t, and hand the rest back to the sea. Rest is a spiritual practice under this Moon, not an admission of defeat.',
+    poem:'The ocean never asks the river to explain itself.' },
+];
+
+// The named stations (New, quarters, Full) hold only a tight window around
+// their exact moment; the crescents and gibbous own the long roads between.
+function phaseName(e){
+  if (e < 10 || e > 350) return 'New Moon';
+  if (e < 80)  return 'Waxing Crescent';
+  if (e <= 100) return 'First Quarter';
+  if (e < 170) return 'Waxing Gibbous';
+  if (e <= 190) return 'Full Moon';
+  if (e < 260) return 'Waning Gibbous';
+  if (e <= 280) return 'Last Quarter';
+  return 'Waning Crescent';
+}
+
+/* ── sky maths (astronomy-engine, the same core as the report engine) ── */
+function moonLon(date){ return Astronomy.EclipticGeoMoon(date).lon; }
+
+function nextIngress(now, lon){
+  // The Moon crosses into a new sign within ~2.5 days; bracket hourly, then bisect.
+  const signIdx = Math.floor(lon / 30);
+  const start = now.getTime();
+  for (let ms = start + 3600000; ms <= start + 4 * 86400000; ms += 3600000){
+    if (Math.floor(moonLon(new Date(ms)) / 30) !== signIdx){
+      let a = ms - 3600000, b = ms;
+      while (b - a > 30000){
+        const m = (a + b) / 2;
+        if (Math.floor(moonLon(new Date(m)) / 30) === signIdx) a = m; else b = m;
+      }
+      return { when: new Date(b), sign: SIGNS[(signIdx + 1) % 12] };
+    }
+  }
+  return null;
+}
+
+function fmtDay(d){
+  return new Intl.DateTimeFormat(undefined, { weekday:'short', day:'numeric', month:'short' }).format(d);
+}
+function fmtTime(d){
+  return new Intl.DateTimeFormat(undefined, { hour:'numeric', minute:'2-digit' }).format(d);
+}
+function fmtIn(ms){
+  const h = ms / 3600000;
+  if (h < 1) return 'in ' + Math.max(1, Math.round(ms / 60000)) + ' minutes';
+  if (h < 36) return 'in about ' + Math.round(h) + ' hours';
+  return 'in about ' + Math.round(h / 24) + ' days';
+}
+
+/* ── the dial ── */
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+// Dial runs clockwise from the top: 0° Aries at 12 o'clock.
+function pt(lonDeg, r, cx = 220, cy = 220){
+  const a = lonDeg * Math.PI / 180;
+  return [cx + r * Math.sin(a), cy - r * Math.cos(a)];
+}
+function arcPath(lonA, lonB, r, cx = 220, cy = 220){
+  const [x1, y1] = pt(lonA, r, cx, cy);
+  const [x2, y2] = pt(lonB, r, cx, cy);
+  return `M ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2}`;
+}
+
+/* Moon phase disc: two arcs — the outer limb and the terminator.
+   elong: 0 new → 90 first quarter → 180 full → 270 last quarter.
+   Waxing light grows on the right; waning light retreats to the left. */
+function moonDiscPath(elong, r){
+  const waxing = elong < 180;
+  const rx = Math.abs(Math.cos(elong * Math.PI / 180)) * r;
+  const crescent = (elong < 90 || elong > 270);
+  // outer limb: lit-side semicircle, top → bottom
+  const limbSweep = waxing ? 1 : 0;             // right side : left side
+  // terminator: bulges toward the lit side for crescents, away for gibbous
+  let termSweep;
+  if (waxing)  termSweep = crescent ? 0 : 1;    // via right : via left
+  else         termSweep = crescent ? 1 : 0;    // via left : via right
+  return `M 0 ${-r} A ${r} ${r} 0 0 ${limbSweep} 0 ${r} A ${rx} ${r} 0 0 ${termSweep} 0 ${-r} Z`;
+}
+
+function buildDial(lon, elong){
+  const svg = document.getElementById('dial');
+  svg.innerHTML = '';
+  const cx = 220, cy = 220;
+  const signIdx = Math.floor(lon / 30);
+
+  const defs = el('defs', {}, svg);
+  const grad = el('radialGradient', { id:'moonGlow', cx:'50%', cy:'50%', r:'50%' }, defs);
+  el('stop', { offset:'0%', 'stop-color':'#FFF1D6', 'stop-opacity':'.9' }, grad);
+  el('stop', { offset:'55%', 'stop-color':'#F6C889', 'stop-opacity':'.25' }, grad);
+  el('stop', { offset:'100%', 'stop-color':'#F6C889', 'stop-opacity':'0' }, grad);
+
+  // rings
+  el('circle', { cx, cy, r:206, fill:'none', stroke:'rgba(240,228,200,.16)', 'stroke-width':1 }, svg);
+  el('circle', { cx, cy, r:164, fill:'none', stroke:'rgba(240,228,200,.10)', 'stroke-width':1 }, svg);
+
+  // sign sectors + glyphs
+  for (let i = 0; i < 12; i++){
+    const s = SIGNS[i];
+    const current = i === signIdx;
+    // sector band between the rings
+    const bandOuter = arcPath(i * 30 + 1.2, (i + 1) * 30 - 1.2, 185);
+    el('path', {
+      d: bandOuter, fill:'none', stroke: s.color,
+      'stroke-width': 40, 'stroke-opacity': current ? .22 : .05, 'stroke-linecap':'butt'
+    }, svg);
+    // cusp tick
+    const [tx1, ty1] = pt(i * 30, 158), [tx2, ty2] = pt(i * 30, 212);
+    el('line', { x1:tx1, y1:ty1, x2:tx2, y2:ty2, stroke:'rgba(240,228,200,.22)', 'stroke-width':1 }, svg);
+    // glyph at the sector's middle
+    const [gx, gy] = pt(i * 30 + 15, 185);
+    const g = el('text', {
+      x:gx, y:gy, 'text-anchor':'middle', 'dominant-baseline':'central',
+      'font-size': current ? 22 : 17,
+      fill: current ? s.color : 'rgba(167,175,192,.55)',
+      style: current ? `filter:drop-shadow(0 0 6px ${s.color})` : ''
+    }, svg);
+    g.textContent = s.glyph;
+  }
+
+  // degree ticks every 10°
+  for (let d = 0; d < 360; d += 10){
+    if (d % 30 === 0) continue;
+    const [x1, y1] = pt(d, 158), [x2, y2] = pt(d, 164);
+    el('line', { x1, y1, x2, y2, stroke:'rgba(240,228,200,.14)', 'stroke-width':1 }, svg);
+  }
+
+  // the hand — from the heart to the Moon's true degree
+  const [hx, hy] = pt(lon, 150);
+  el('line', {
+    x1:cx, y1:cy, x2:hx, y2:hy,
+    stroke:'url(#handGrad)', 'stroke-width':1.6, 'stroke-linecap':'round'
+  }, svg);
+  const lg = el('linearGradient', { id:'handGrad', x1:cx, y1:cy, x2:hx, y2:hy, gradientUnits:'userSpaceOnUse' }, defs);
+  el('stop', { offset:'0%', 'stop-color':'#E8A659', 'stop-opacity':'.15' }, lg);
+  el('stop', { offset:'100%', 'stop-color':'#F6C889', 'stop-opacity':'.95' }, lg);
+  // marker star at the tip
+  const [sx, sy] = pt(lon, 150);
+  const star = el('text', { x:sx, y:sy, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':15, fill:'#FFF1D6', style:'filter:drop-shadow(0 0 7px #F6C889)' }, svg);
+  star.textContent = '✦';
+
+  // the Moon herself, at the heart, wearing her true phase
+  const heart = el('g', { transform:`translate(${cx} ${cy})`, class:'moon-breathe' }, svg);
+  el('circle', { cx:0, cy:0, r:96, fill:'url(#moonGlow)', opacity:.5 }, heart);
+  el('circle', { cx:0, cy:0, r:62, fill:'#101D30', stroke:'rgba(240,228,200,.25)', 'stroke-width':1 }, heart);
+  el('path', { d: moonDiscPath(elong, 62), fill:'#F0E4C8', opacity:.95 }, heart);
+  // a few quiet maria on the lit face
+  el('circle', { cx:-14, cy:-12, r:9, fill:'rgba(31,79,102,.18)' }, heart);
+  el('circle', { cx:12, cy:8, r:12, fill:'rgba(31,79,102,.14)' }, heart);
+  el('circle', { cx:-4, cy:26, r:6, fill:'rgba(31,79,102,.16)' }, heart);
+}
+
+/* ── turn the clock ── */
+function turn(){
+  const now = new Date();
+  const lon = moonLon(now);
+  const elong = Astronomy.MoonPhase(now);
+  const illum = Astronomy.Illumination(Astronomy.Body.Moon, now).phase_fraction;
+  const signIdx = Math.floor(lon / 30);
+  const sign = SIGNS[signIdx];
+  const degInSign = lon - signIdx * 30;
+  const dd = Math.floor(degInSign);
+  const mm = String(Math.floor((degInSign - dd) * 60)).padStart(2, '0');
+
+  buildDial(lon, elong);
+
+  document.getElementById('ro-sign-name').textContent = sign.name;
+  document.getElementById('ro-fact').textContent =
+    `${dd}°${mm}′ ${sign.name} · ${sign.element} · ${sign.mode}`;
+
+  const ing = nextIngress(now, lon);
+  document.getElementById('ro-next').innerHTML = ing
+    ? `She enters <b>${ing.sign.name}</b> ${fmtIn(ing.when - now)} — <b>${fmtDay(ing.when)}, ${fmtTime(ing.when)}</b> your time.`
+    : '';
+
+  document.getElementById('read-kind').textContent = `✦  The weather while the Moon walks ${sign.name}  ✦`;
+  document.getElementById('read-body').textContent = sign.read;
+  document.getElementById('read-poem').textContent = '“' + sign.poem + '”';
+
+  document.getElementById('tide-phase').textContent = phaseName(elong);
+  document.getElementById('tide-illum').textContent = Math.round(illum * 100) + '% of her face lit';
+  const nextNew = Astronomy.SearchMoonPhase(0, now, 40).date;
+  const nextFull = Astronomy.SearchMoonPhase(180, now, 40).date;
+  document.getElementById('tide-new').textContent = fmtDay(nextNew);
+  document.getElementById('tide-full').textContent = fmtDay(nextFull);
+
+  document.getElementById('loading').hidden = true;
+  document.getElementById('clock').hidden = false;
+}
+
+try {
+  turn();
+  setInterval(turn, 60000); // the sky moves; so does the clock
+} catch (err) {
+  document.getElementById('loading').textContent =
+    'The sky is being shy — the clock could not load. Refresh to try again.';
+  console.error(err);
+}
+</script>
+</body>
+</html>
