@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Reading Details — The Luminary | WayShowers88</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cinzel:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0B1524;
+      --bg2:     #0E1B2E;
+      --bg3:     #12233A;
+      --bg4:     #16293F;
+      --gold:    #E8A659;
+      --gold-lt: #F6C889;
+      --gold-dk: #C77B3B;
+      --text:    #F0E4C8;
+      --dim:     #A7AFC0;
+      --blue:    #4E89A4;
+      --red:     #D98A6A;
+      --green:   #9bb38a;
+      --border:  #1E2F47;
+      --border2: #2A3E5C;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lora', serif;
+      font-weight: 300;
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 40% at 50% -5%, rgba(78,137,164,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 20% at 50% 0%, rgba(232,166,89,0.06) 0%, transparent 50%);
+    }
+    #top-bar { position: fixed; inset: 0 0 auto 0; z-index: 60; padding: 18px 0;
+      background: rgba(7,12,21,.82); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .wordmark { font-family: 'Montserrat', sans-serif; font-weight: 300; letter-spacing: .3em;
+      font-size: 15px; color: var(--text); text-decoration: none; white-space: nowrap; }
+    .wordmark b { font-weight: 400; color: var(--gold); }
+    .nav a.home { font-family: 'Montserrat', sans-serif; font-size: 11.5px; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--dim); text-decoration: none; }
+    .nav a.home:hover { color: var(--gold-lt); }
+
+    .page-hero { text-align: center; padding: 7.5rem 1.5rem 2.2rem; }
+    .channel-label { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.35em;
+      color: var(--gold); text-transform: uppercase; margin-bottom: 0.6rem; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 400;
+      letter-spacing: 0.02em; color: var(--text); line-height: 1.15; }
+    .tagline { font-size: 0.9rem; font-style: italic; color: var(--dim); margin-top: 0.6rem; letter-spacing: 0.03em; }
+
+    main { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
+
+    .card {
+      background: linear-gradient(180deg, var(--bg2), var(--bg3));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      margin-top: 1.75rem;
+      transition: opacity .4s;
+    }
+    .card.locked { opacity: 0.35; pointer-events: none; }
+    .card h2 { font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+    .card .sub { font-size: 0.88rem; color: var(--dim); font-style: italic; margin-bottom: 1.4rem; }
+
+    label { display: block; font-family: 'Montserrat', sans-serif; font-size: 0.72rem;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); margin: 1.1rem 0 0.4rem; }
+    input[type="text"], input[type="email"], input[type="time"], select, textarea {
+      width: 100%; background: var(--bg4); border: 1px solid var(--border2); border-radius: 10px;
+      color: var(--text); font-family: 'Lora', serif; font-size: 1rem; padding: 0.7rem 0.9rem;
+      outline: none; transition: border-color .25s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--gold-dk); }
+    select { appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%23A7AFC0'/></svg>");
+      background-repeat: no-repeat; background-position: right 0.9rem center; }
+    textarea { min-height: 84px; resize: vertical; }
+    .row { display: flex; gap: 0.7rem; }
+    .row > div { flex: 1; }
+
+    .check { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.9rem; cursor: pointer; }
+    .check input { width: auto; accent-color: var(--gold); }
+    .check span { font-size: 0.9rem; color: var(--dim); }
+
+    .btn {
+      display: inline-block; width: 100%; margin-top: 1.5rem; padding: 0.95rem 1.5rem;
+      background: linear-gradient(135deg, var(--gold-dk), var(--gold)); color: #0B1524;
+      font-family: 'Montserrat', sans-serif; font-size: 0.8rem; letter-spacing: 0.22em;
+      text-transform: uppercase; font-weight: 400; border: none; border-radius: 999px;
+      cursor: pointer; text-align: center; transition: filter .25s, opacity .25s;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn.ghost { background: none; border: 1px solid rgba(232,166,89,.45); color: var(--gold-lt); }
+
+    .status { margin-top: 0.9rem; font-size: 0.88rem; min-height: 1.2em; }
+    .status.err { color: var(--red); }
+    .status.ok  { color: var(--green); }
+
+    /* autocomplete */
+    .ac-wrap { position: relative; }
+    .ac-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 40;
+      background: var(--bg4); border: 1px solid var(--border2); border-radius: 10px;
+      overflow: hidden; display: none; }
+    .ac-item { padding: 0.55rem 0.9rem; font-size: 0.92rem; cursor: pointer; color: var(--dim); }
+    .ac-item:hover, .ac-item.sel { background: var(--bg3); color: var(--text); }
+    .loc-confirm { display: none; margin-top: 0.55rem; font-size: 0.85rem; color: var(--green); }
+    .loc-confirm .tz { color: var(--dim); font-style: italic; }
+    .search-online { background: none; border: none; color: var(--blue); font-family: 'Lora', serif;
+      font-size: 0.85rem; cursor: pointer; text-decoration: underline; padding: 0; margin-top: 0.4rem; }
+
+    /* confirmation */
+    #confirmCard { display: none; text-align: center; }
+    .orn { color: var(--gold); letter-spacing: 0.6em; margin: 0.8rem 0 1.2rem; }
+    .instant { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; line-height: 1.4; margin: 0.8rem 0; }
+    .instant b { color: var(--gold-lt); font-weight: 500; }
+    .moonline { font-size: 0.95rem; color: var(--dim); font-style: italic; margin-bottom: 1.4rem; }
+    pre#payload {
+      text-align: left; background: var(--bg4); border: 1px solid var(--border2); border-radius: 10px;
+      padding: 1rem; font-size: 0.72rem; line-height: 1.5; color: var(--dim);
+      white-space: pre-wrap; word-break: break-word; margin-top: 1.4rem;
+    }
+    .fineprint { font-size: 0.8rem; color: var(--dim); margin-top: 1.2rem; font-style: italic; }
+
+    footer { text-align: center; padding: 2.5rem 1rem 3rem; border-top: 1px solid var(--border); }
+    footer .beam { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--dim); font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+
+<div id="top-bar"><div class="wrap"><div class="nav">
+  <a class="wordmark" href="/">WAYSHOWERS<b>88</b></a>
+  <a class="home" href="/">Home</a>
+</div></div></div>
+
+<div class="page-hero">
+  <div class="channel-label">✦ The Luminary</div>
+  <h1>Your Reading Begins Here</h1>
+  <div class="tagline">Three small steps, and the sky you were born under is in our hands.</div>
+</div>
+
+<main>
+
+  <!-- STEP 1 · UNLOCK -->
+  <div class="card" id="gateCard">
+    <h2>Step 1 · Your Order</h2>
+    <div class="sub">So we can match your reading to your purchase.</div>
+    <label for="orderEmail">The email you used at checkout</label>
+    <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com">
+    <label for="orderRef" id="orderRefLabel">Order reference or license key (it's on your receipt)</label>
+    <input type="text" id="orderRef" placeholder="e.g. ABC12345-XY…">
+    <button class="btn" id="unlockBtn" onclick="unlock()">Unlock My Details Form</button>
+    <div class="status" id="gateStatus"></div>
+  </div>
+
+  <!-- STEP 2 · DETAILS -->
+  <div class="card locked" id="detailsCard">
+    <h2>Step 2 · The Sky You Were Born Under</h2>
+    <div class="sub">Exactly as it appears on your birth certificate, if you have it.</div>
+
+    <label for="fullName">Your name, as you'd like it on the reading</label>
+    <input type="text" id="fullName" autocomplete="name" placeholder="e.g. Kathleen">
+
+    <label>Date of birth</label>
+    <div class="row">
+      <div><select id="dobDay"><option value="">Day</option></select></div>
+      <div><select id="dobMonth"><option value="">Month</option></select></div>
+      <div><select id="dobYear"><option value="">Year</option></select></div>
+    </div>
+
+    <label for="dobTime">Time of birth (as close as you know)</label>
+    <input type="time" id="dobTime">
+    <label class="check"><input type="checkbox" id="timeUnknown" onchange="toggleTime()">
+      <span>I don't know my birth time — contact me about what's still possible</span></label>
+
+    <label for="birthCity">Town or city you were born in</label>
+    <div class="ac-wrap">
+      <input type="text" id="birthCity" placeholder="Start typing… e.g. Melbourne" autocomplete="off">
+      <div class="ac-list" id="birthCityList"></div>
+    </div>
+    <button class="search-online" onclick="searchOnline('birth')">Small town? Search for it online →</button>
+    <div class="loc-confirm" id="birthConfirm"></div>
+
+    <label for="currentCity">Town or city you live in now</label>
+    <div class="ac-wrap">
+      <input type="text" id="currentCity" placeholder="Start typing…" autocomplete="off">
+      <div class="ac-list" id="currentCityList"></div>
+    </div>
+    <button class="search-online" onclick="searchOnline('current')">Small town? Search for it online →</button>
+    <div class="loc-confirm" id="currentConfirm"></div>
+
+    <label for="lifeNote">Anything you'd like this moon to speak to? <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+    <textarea id="lifeNote" placeholder="A few words about what's alive for you right now — it enriches the writing, and stays between us."></textarea>
+
+    <button class="btn" id="confirmBtn" onclick="confirmDetails()">Confirm My Details</button>
+    <div class="status" id="detailsStatus"></div>
+  </div>
+
+  <!-- STEP 3 · CONFIRMATION -->
+  <div class="card" id="confirmCard">
+    <h2>Step 3 · Received</h2>
+    <div class="orn">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <div class="instant" id="instantRead"></div>
+    <div class="moonline" id="moonLine"></div>
+    <div class="status" id="sendStatus">Sending your details…</div>
+    <div id="fallbackSend" style="display:none">
+      <div class="fineprint" style="color:var(--red)">The automatic send didn’t get through — no problem,
+        two backup ways below. Please send from the same email you used at checkout.</div>
+      <button class="btn" id="sendBtn" onclick="sendEmail()">Send My Details ✦ Opens Your Email App</button>
+      <button class="btn ghost" onclick="copyPayload()">Or Copy Everything &amp; Email It Yourself</button>
+      <pre id="payload"></pre>
+    </div>
+    <div class="fineprint" id="receivedNote" style="display:none">Your details are with us. The hand-finished
+      reading arrives at <strong id="replyEmail"></strong> before the moon peaks — usually within 48 hours.
+      Nothing is stored by this page itself; your details travel straight to the reading desk.</div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="beam">The lighthouse is here to help you navigate the way. ✦ We are all just walking each other home.</div>
+</footer>
+
+<script src="cities.js"></script>
+<script src="astronomy.browser.min.js"></script>
+<script>
+// ═════════════════════════════════════════════════════════════
+//  CONFIG — flip these when the Gumroad product goes live.
+//  mode 'soft'    = accept email + any order reference (matched by hand at fulfilment — the true gate)
+//  mode 'license' = verify a Gumroad license key live (enable "generate license keys" on the product);
+//                   if Gumroad can't be reached, falls back to soft acceptance and flags it.
+// ═════════════════════════════════════════════════════════════
+const GATE = { mode: 'soft', productPermalink: 'luminary' };
+const INTAKE_EMAIL = 'wayshowers88@gmail.com';
+// RELAY — sends the intake straight to the reading desk with no action from the client.
+// Web3Forms: one-time setup at https://web3forms.com — enter wayshowers88@gmail.com,
+// the access key arrives at that inbox, paste it here. Until then the page shows the
+// manual send fallback (mailto + copy), so nothing is ever lost.
+const RELAY = {
+  provider: 'web3forms',
+  endpoint: 'https://api.web3forms.com/submit',
+  accessKey: 'PENDING'   // ← paste the Web3Forms access key here
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+
+// ── populate date dropdowns ──
+(function(){
+  const d = document.getElementById('dobDay'), m = document.getElementById('dobMonth'), y = document.getElementById('dobYear');
+  for (let i=1;i<=31;i++) d.insertAdjacentHTML('beforeend', `<option value="${i}">${i}</option>`);
+  MONTHS.forEach((mo,i)=> m.insertAdjacentHTML('beforeend', `<option value="${i+1}">${mo}</option>`));
+  const thisYear = new Date().getFullYear();
+  for (let yr=thisYear; yr>=1925; yr--) y.insertAdjacentHTML('beforeend', `<option value="${yr}">${yr}</option>`);
+})();
+
+function toggleTime(){
+  const un = document.getElementById('timeUnknown').checked;
+  document.getElementById('dobTime').disabled = un;
+  if (un) document.getElementById('dobTime').value = '';
+}
+
+// ═════════════ STEP 1 · GATE ═════════════
+let gate = { email:'', ref:'', verified:false };
+
+async function unlock(){
+  const email = document.getElementById('orderEmail').value.trim();
+  const ref   = document.getElementById('orderRef').value.trim();
+  const st = document.getElementById('gateStatus');
+  st.className = 'status';
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { st.className='status err'; st.textContent='That email doesn’t look complete — use the one from your receipt.'; return; }
+  if (ref.length < 4) { st.className='status err'; st.textContent='Add the order reference or license key from your Gumroad receipt.'; return; }
+  gate = { email, ref, verified:false };
+
+  if (GATE.mode === 'license') {
+    st.textContent = 'Checking your key…';
+    try {
+      const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:`product_permalink=${encodeURIComponent(GATE.productPermalink)}&license_key=${encodeURIComponent(ref)}&increment_uses_count=false`
+      });
+      const data = await res.json();
+      if (data && data.success) { gate.verified = true; }
+      else { st.className='status err'; st.textContent='That key wasn’t recognised — check your receipt, or email us and we’ll sort it.'; return; }
+    } catch(e) { /* network/CORS — soft-accept; fulfilment matches the order by hand */ }
+  }
+
+  document.getElementById('detailsCard').classList.remove('locked');
+  document.getElementById('gateCard').style.opacity = 0.6;
+  st.className='status ok';
+  st.textContent = gate.verified ? '✓ Verified. Welcome — your form is open below.' : '✓ Thank you. Your form is open below.';
+  document.getElementById('detailsCard').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ═════════════ CITY FIELDS (autocomplete + online fallback) ═════════════
+const loc = { birth:null, current:null };   // {place, lat, lon, iana, tz}
+
+function acMatches(q){
+  q = q.toLowerCase().trim();
+  if (q.length < 2) return [];
+  const starts=[], contains=[];
+  for (const c of CITY_DB){
+    const name=c.n.toLowerCase(), disp=c.d.toLowerCase();
+    if (name.startsWith(q)) starts.push(c);
+    else if (name.includes(q) || disp.includes(q)) contains.push(c);
+  }
+  return starts.concat(contains).slice(0,8);
+}
+
+function setLoc(which, place, lat, lon, iana, tz){
+  loc[which] = { place, lat:+lat, lon:+lon, iana, tz };
+  const el = document.getElementById(which+'Confirm');
+  el.style.display='block';
+  el.innerHTML = `✓ <strong>${place}</strong> <span class="tz">· ${iana ? iana.replace(/_/g,' ') : ('UTC'+(tz>=0?'+':'')+tz)} — daylight saving handled automatically</span>`;
+}
+
+function attachCity(which){
+  const input = document.getElementById(which+'City');
+  const list  = document.getElementById(which+'CityList');
+  input.addEventListener('input', ()=>{
+    loc[which] = null;
+    document.getElementById(which+'Confirm').style.display='none';
+    const m = acMatches(input.value);
+    if (!m.length){ list.style.display='none'; return; }
+    list.innerHTML = m.map((c,i)=>`<div class="ac-item" data-i="${i}">${c.d}</div>`).join('');
+    list.style.display='block';
+    [...list.children].forEach((el,i)=> el.onclick = ()=>{
+      const c = m[i];
+      input.value = c.d;
+      list.style.display='none';
+      setLoc(which, c.d, c.lat, c.lon, CITY_TZ[c.n]||'', c.tz);
+    });
+  });
+  input.addEventListener('blur', ()=> setTimeout(()=> list.style.display='none', 200));
+}
+attachCity('birth'); attachCity('current');
+
+async function searchOnline(which){
+  const input = document.getElementById(which+'City');
+  const st = document.getElementById('detailsStatus');
+  const q = input.value.split(',')[0].trim();
+  if (q.length < 2){ st.className='status err'; st.textContent='Type the town name first, then search.'; return; }
+  st.className='status'; st.textContent='Searching…';
+  try {
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=en&format=json`);
+    const data = await res.json();
+    if (data.results && data.results.length){
+      const r = data.results[0];
+      const label = [r.name, r.admin1, r.country].filter(Boolean).join(', ');
+      input.value = label;
+      setLoc(which, label, r.latitude.toFixed(4), r.longitude.toFixed(4), r.timezone||'', Math.round(r.longitude/15*2)/2);
+      st.textContent='';
+      return;
+    }
+    st.className='status err'; st.textContent=`"${q}" wasn’t found — try the nearest bigger town, and mention the real one in the note box.`;
+  } catch(e){ st.className='status err'; st.textContent='Search didn’t reach the internet — try the nearest big city from the suggestion list.'; }
+}
+
+// ═════════════ TIMEZONE (historical, DST-aware) ═════════════
+function zoneOffsetHours(zone, y, m, d, hh, mm){
+  try {
+    const dtf = new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle:'h23',
+      year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const want = Date.UTC(y, m-1, d, hh, mm);
+    let guess = want;
+    for (let i=0;i<3;i++){
+      const p={};
+      for (const part of dtf.formatToParts(new Date(guess))) p[part.type]=part.value;
+      const asUTC = Date.UTC(+p.year, +p.month-1, +p.day, +p.hour, +p.minute);
+      const diff = want - asUTC;
+      if (diff===0) break;
+      guess += diff;
+    }
+    return (want-guess)/3600000;
+  } catch(e){ return NaN; }
+}
+
+// ═════════════ STEP 2 → 3 · CONFIRM ═════════════
+let intake = null;
+
+function confirmDetails(){
+  const st = document.getElementById('detailsStatus');
+  st.className='status err';
+  const name = document.getElementById('fullName').value.trim();
+  if (!name){ st.textContent='Add your name — the reading is addressed to you.'; return; }
+  const D=+document.getElementById('dobDay').value, M=+document.getElementById('dobMonth').value, Y=+document.getElementById('dobYear').value;
+  if (!D||!M||!Y){ st.textContent='Choose your full date of birth — day, month and year.'; return; }
+  const probe = new Date(Date.UTC(Y, M-1, D));
+  if (probe.getUTCMonth() !== M-1 || probe.getUTCDate() !== D){ st.textContent=`${MONTHS[M-1]} doesn’t have ${D} days — check the date.`; return; }
+  const timeUnknown = document.getElementById('timeUnknown').checked;
+  const time = document.getElementById('dobTime').value;
+  if (!timeUnknown && !time){ st.textContent='Add your birth time, or tick the box if you don’t know it.'; return; }
+  if (!loc.birth){ st.textContent='Pick your birthplace from the suggestions (or use the online search).'; return; }
+  if (!loc.current){ st.textContent='Pick the town you live in now from the suggestions.'; return; }
+  st.className='status'; st.textContent='';
+
+  intake = {
+    product: 'luminary',
+    name,
+    dob: `${Y}-${String(M).padStart(2,'0')}-${String(D).padStart(2,'0')}`,
+    dobWritten: `${D} ${MONTHS[M-1]} ${Y}`,
+    time: timeUnknown ? null : time,
+    timeKnown: !timeUnknown,
+    birth:   { place: loc.birth.place,   lat: loc.birth.lat,   lon: loc.birth.lon,   iana: loc.birth.iana   || null, utcStd: loc.birth.tz },
+    current: { place: loc.current.place, lat: loc.current.lat, lon: loc.current.lon, iana: loc.current.iana || null, utcStd: loc.current.tz },
+    note: document.getElementById('lifeNote').value.trim() || null,
+    order: { email: gate.email, ref: gate.ref, verified: gate.verified },
+    submitted: new Date().toISOString()
+  };
+
+  // instant read — Sun (always) + Moon (only when time is known)
+  let readHTML = '', moonHTML = '';
+  try {
+    const zone = intake.birth.iana;
+    const [hh,mm] = intake.timeKnown ? time.split(':').map(Number) : [12,0];
+    const off = zone ? zoneOffsetHours(zone, Y, M, D, hh, mm) : intake.birth.utcStd;
+    const utc = new Date(Date.UTC(Y, M-1, D, hh, mm) - (isNaN(off)?intake.birth.utcStd:off)*3600000);
+    const t = Astronomy.MakeTime(utc);
+    const sunLon = (Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Sun, t, true)).elon % 360 + 360) % 360;
+    const sunSign = SIGNS[Math.floor(sunLon/30)];
+    if (intake.timeKnown){
+      const moonLon = (Astronomy.EclipticGeoMoon(t).lon % 360 + 360) % 360;
+      const moonSign = SIGNS[Math.floor(moonLon/30)];
+      readHTML = `The chart is cast. Sun in <b>${sunSign}</b>, Moon in <b>${moonSign}</b> — we see you, ${name.split(' ')[0]}.`;
+      intake.instant = { sunSign, moonSign };
+    } else {
+      readHTML = `The chart is cast. Sun in <b>${sunSign}</b> — we see you, ${name.split(' ')[0]}. We’ll be in touch about your birth time before anything is written.`;
+      intake.instant = { sunSign };
+    }
+    // next lunation
+    const now = new Date();
+    const nm = Astronomy.SearchMoonPhase(0, now, 40).date;
+    const fm = Astronomy.SearchMoonPhase(180, now, 40).date;
+    const ev = nm < fm ? nm : fm;
+    const kind = nm < fm ? 'New Moon' : 'Full Moon';
+    const evLon = (Astronomy.EclipticGeoMoon(Astronomy.MakeTime(ev)).lon % 360 + 360) % 360;
+    const evSign = SIGNS[Math.floor(evLon/30)];
+    const local = ev.toLocaleDateString('en-GB', { day:'numeric', month:'long', timeZone: intake.current.iana || undefined });
+    moonHTML = `Your reading: the ${kind} in ${evSign}, ${local} — written by hand, arriving before the moon peaks.`;
+    intake.targetMoon = { kind, sign: evSign, exactUTC: ev.toISOString() };
+  } catch(e){
+    readHTML = `Details received, ${name.split(' ')[0]} — your chart will be cast by hand.`;
+  }
+
+  document.getElementById('instantRead').innerHTML = readHTML;
+  document.getElementById('moonLine').textContent = moonHTML;
+  document.getElementById('confirmCard').style.display='block';
+  document.getElementById('confirmCard').scrollIntoView({behavior:'smooth', block:'start'});
+  submitIntake();
+}
+
+// ═════════════ AUTOMATIC SEND (no client action) ═════════════
+async function submitIntake(){
+  const st = document.getElementById('sendStatus');
+  st.className = 'status'; st.textContent = 'Sending your details…';
+  if (RELAY.accessKey === 'PENDING') { showFallback(st); return; }
+  try {
+    const res = await fetch(RELAY.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: RELAY.accessKey,
+        subject: `LUMINARY INTAKE — ${intake.name}`,
+        from_name: 'The Luminary intake page',
+        replyto: intake.order.email,
+        name: intake.name,
+        born: `${intake.dobWritten}${intake.timeKnown ? ' at ' + intake.time : ' — TIME UNKNOWN (contact first)'}`,
+        birthplace: `${intake.birth.place} (${intake.birth.lat}, ${intake.birth.lon}) [${intake.birth.iana||''}]`,
+        now: `${intake.current.place} (${intake.current.lat}, ${intake.current.lon}) [${intake.current.iana||''}]`,
+        order: `${intake.order.email} · ref ${intake.order.ref}${intake.order.verified ? ' · key verified' : ''}`,
+        note: intake.note || '—',
+        machine_block: JSON.stringify(intake)
+      })
+    });
+    const data = await res.json().catch(()=> ({}));
+    if (res.ok && data.success) {
+      st.className = 'status ok';
+      st.textContent = '✓ Details received at the reading desk.';
+      document.getElementById('replyEmail').textContent = intake.order.email;
+      document.getElementById('receivedNote').style.display = 'block';
+      return;
+    }
+    throw new Error(data.message || ('relay responded ' + res.status));
+  } catch(e) { showFallback(st); }
+}
+
+function showFallback(st){
+  st.className = 'status err';
+  st.textContent = 'Automatic send unavailable right now.';
+  document.getElementById('payload').textContent = payloadText();
+  document.getElementById('fallbackSend').style.display = 'block';
+}
+
+// ═════════════ PAYLOAD + SEND ═════════════
+function payloadText(){
+  const i = intake;
+  const lines = [
+    'WAYSHOWERS88 · LUMINARY INTAKE',
+    '--------------------------------',
+    `Name: ${i.name}`,
+    `Born: ${i.dobWritten}${i.timeKnown ? ' at '+i.time : ' — TIME UNKNOWN (contact first)'}`,
+    `Birthplace: ${i.birth.place} (${i.birth.lat}, ${i.birth.lon}) [${i.birth.iana||('UTC'+(i.birth.utcStd>=0?'+':'')+i.birth.utcStd)}]`,
+    `Now: ${i.current.place} (${i.current.lat}, ${i.current.lon}) [${i.current.iana||('UTC'+(i.current.utcStd>=0?'+':'')+i.current.utcStd)}]`,
+    `Order: ${i.order.email} · ref ${i.order.ref}${i.order.verified?' · key verified':''}`,
+  ];
+  if (i.note) lines.push(`Note: ${i.note}`);
+  lines.push('', 'MACHINE BLOCK — do not edit below this line', JSON.stringify(i));
+  return lines.join('\n');
+}
+
+function sendEmail(){
+  const subject = `LUMINARY INTAKE — ${intake.name}`;
+  const href = `mailto:${INTAKE_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(payloadText())}`;
+  window.location.href = href;
+  const st = document.getElementById('sendStatus');
+  st.className='status ok';
+  st.textContent = 'Your email app should open with everything filled in — just press send. If nothing opened, use the copy button.';
+}
+
+function copyPayload(){
+  const st = document.getElementById('sendStatus');
+  navigator.clipboard.writeText(payloadText()).then(()=>{
+    st.className='status ok';
+    st.textContent = `✓ Copied. Paste it into an email to ${INTAKE_EMAIL} — sent from your checkout email.`;
+  }).catch(()=>{
+    st.className='status err';
+    st.textContent = 'Copy blocked by the browser — select the block below and copy it by hand.';
+  });
+}
+</script>
+</body>
+</html>
