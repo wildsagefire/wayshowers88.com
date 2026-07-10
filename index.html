@@ -1186,15 +1186,22 @@ const io = new IntersectionObserver(entries => {
 }, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
-// The Threshold Letter — no list backend yet by design; delivers straight to the lightkeeper.
-document.getElementById('letter-form').addEventListener('submit', e => {
+// The Threshold Letter — Kit list
+const KIT_FORM_ACTION = 'https://app.kit.com/forms/9667230/subscriptions';
+document.getElementById('letter-form').addEventListener('submit', async e => {
   e.preventDefault();
   const email = e.target.email.value.trim();
   if (!email) return;
-  location.href = 'mailto:wildsagefire@gmail.com'
-    + '?subject=' + encodeURIComponent('The Threshold Letter — count me in')
-    + '&body=' + encodeURIComponent('Please add me to The Threshold Letter: ' + email);
-  document.getElementById('letter-note').textContent = '✦ Sent to the lighthouse — welcome to the way.';
+  const note = document.getElementById('letter-note');
+  try {
+    const fd = new FormData();
+    fd.append('email_address', email);
+    await fetch(KIT_FORM_ACTION, { method: 'POST', body: fd, mode: 'no-cors' });
+    note.textContent = '✦ Welcome across the threshold — check your inbox to confirm.';
+    e.target.email.value = '';
+  } catch (err) {
+    note.textContent = 'Something slipped — please try once more.';
+  }
 });
 
 document.getElementById('yr').textContent = new Date().getFullYear();
