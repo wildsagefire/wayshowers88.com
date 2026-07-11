@@ -148,15 +148,13 @@
 
 <main>
 
-  <!-- STEP 1 · UNLOCK -->
+  <!-- STEP 1 · YOUR EMAIL -->
   <div class="card" id="gateCard">
-    <h2>Step 1 · Your Order</h2>
-    <div class="sub">So we can match your reading to your purchase.</div>
-    <label for="orderEmail">The email you used at checkout</label>
+    <h2>Step 1 · Where Your Reading Arrives</h2>
+    <div class="sub">Your finished reading — and nothing else — will be sent to this address. If you've already ordered on our store, use the same email you paid with.</div>
+    <label for="orderEmail">Your email</label>
     <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com">
-    <label for="orderRef" id="orderRefLabel">Order reference or license key (it's on your receipt)</label>
-    <input type="text" id="orderRef" placeholder="e.g. ABC12345-XY…">
-    <button class="btn" id="unlockBtn" onclick="unlock()">Unlock My Details Form</button>
+    <button class="btn" id="unlockBtn" onclick="unlock()">Begin ✦ Your Details</button>
     <div class="status" id="gateStatus"></div>
   </div>
 
@@ -212,14 +210,21 @@
     <div class="status" id="sendStatus">Sending your details…</div>
     <div id="fallbackSend" style="display:none">
       <div class="fineprint" style="color:var(--red)">The automatic send didn’t get through — no problem,
-        two backup ways below. Please send from the same email you used at checkout.</div>
+        two backup ways below. Send it from the email you entered above, then continue to checkout.</div>
       <button class="btn" id="sendBtn" onclick="sendEmail()">Send My Details ✦ Opens Your Email App</button>
       <button class="btn ghost" onclick="copyPayload()">Or Copy Everything &amp; Email It Yourself</button>
+      <a class="btn ghost" href="https://wayshowers88.square.site/product/the-luminary-a-hand-finished-transit-reading-of-the-next-new-or-full-moon-in-your-chart/NTBGX7AIKC4EBA3NE76RZJTN"
+         target="_blank" rel="noopener">Then Continue to Secure Checkout ✦ $44</a>
       <pre id="payload"></pre>
     </div>
-    <div class="fineprint" id="receivedNote" style="display:none">Your details are with us. The hand-finished
-      reading arrives at <strong id="replyEmail"></strong> before the moon peaks — usually within 48 hours.
-      Nothing is stored by this page itself; your details travel straight to the reading desk.</div>
+    <div id="receivedNote" style="display:none">
+      <a class="btn" href="https://wayshowers88.square.site/product/the-luminary-a-hand-finished-transit-reading-of-the-next-new-or-full-moon-in-your-chart/NTBGX7AIKC4EBA3NE76RZJTN"
+         target="_blank" rel="noopener">Continue to Secure Checkout ✦ $44</a>
+      <div class="fineprint">Payment is handled securely by Square. Your hand-finished reading arrives at
+        <strong id="replyEmail"></strong> within 48 hours of your order — always before the moon peaks.<br><br>
+        <em>Already ordered on our store? Then you're done — nothing more to do. Your reading is being cast.</em><br><br>
+        Nothing is stored by this page itself; your details travel straight to the reading desk.</div>
+    </div>
   </div>
 
 </main>
@@ -232,12 +237,11 @@
 <script src="astronomy.browser.min.js"></script>
 <script>
 // ═════════════════════════════════════════════════════════════
-//  CONFIG — flip these when the Gumroad product goes live.
-//  mode 'soft'    = accept email + any order reference (matched by hand at fulfilment — the true gate)
-//  mode 'license' = verify a Gumroad license key live (enable "generate license keys" on the product);
-//                   if Gumroad can't be reached, falls back to soft acceptance and flags it.
+//  CONFIG
+//  Flow: details FIRST, then checkout. After the intake sends, the page
+//  offers the Square checkout link. Fulfilment matches intake ↔ order by email.
 // ═════════════════════════════════════════════════════════════
-const GATE = { mode: 'soft', productPermalink: 'luminary' };
+const SQUARE_CHECKOUT = 'https://wayshowers88.square.site/product/the-luminary-a-hand-finished-transit-reading-of-the-next-new-or-full-moon-in-your-chart/NTBGX7AIKC4EBA3NE76RZJTN';
 const INTAKE_EMAIL = 'wayshowers88@gmail.com';
 // RELAY — sends the intake straight to the reading desk with no action from the client.
 // Web3Forms: one-time setup at https://web3forms.com — enter wayshowers88@gmail.com,
@@ -267,36 +271,22 @@ function toggleTime(){
   if (un) document.getElementById('dobTime').value = '';
 }
 
-// ═════════════ STEP 1 · GATE ═════════════
-let gate = { email:'', ref:'', verified:false };
+// ═════════════ STEP 1 · EMAIL ═════════════
+// Details are collected BEFORE checkout — the reading desk matches this email
+// against the Square order that follows. Buyers arriving from a receipt
+// (already paid) use the same email they paid with; the flow is identical.
+let gate = { email:'', ref:'PRE-CHECKOUT', verified:false };
 
-async function unlock(){
+function unlock(){
   const email = document.getElementById('orderEmail').value.trim();
-  const ref   = document.getElementById('orderRef').value.trim();
   const st = document.getElementById('gateStatus');
   st.className = 'status';
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { st.className='status err'; st.textContent='That email doesn’t look complete — use the one from your receipt.'; return; }
-  if (ref.length < 4) { st.className='status err'; st.textContent='Add the order reference or license key from your Gumroad receipt.'; return; }
-  gate = { email, ref, verified:false };
-
-  if (GATE.mode === 'license') {
-    st.textContent = 'Checking your key…';
-    try {
-      const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
-        method:'POST',
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:`product_permalink=${encodeURIComponent(GATE.productPermalink)}&license_key=${encodeURIComponent(ref)}&increment_uses_count=false`
-      });
-      const data = await res.json();
-      if (data && data.success) { gate.verified = true; }
-      else { st.className='status err'; st.textContent='That key wasn’t recognised — check your receipt, or email us and we’ll sort it.'; return; }
-    } catch(e) { /* network/CORS — soft-accept; fulfilment matches the order by hand */ }
-  }
-
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { st.className='status err'; st.textContent='That email doesn’t look complete — check for typos; it’s where your reading will arrive.'; return; }
+  gate = { email, ref:'PRE-CHECKOUT', verified:false };
   document.getElementById('detailsCard').classList.remove('locked');
   document.getElementById('gateCard').style.opacity = 0.6;
   st.className='status ok';
-  st.textContent = gate.verified ? '✓ Verified. Welcome — your form is open below.' : '✓ Thank you. Your form is open below.';
+  st.textContent = '✓ Thank you. Your form is open below.';
   document.getElementById('detailsCard').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
