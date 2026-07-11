@@ -180,18 +180,16 @@
 
     <label for="birthCity">Town or city you were born in</label>
     <div class="ac-wrap">
-      <input type="text" id="birthCity" placeholder="Start typing… e.g. Melbourne" autocomplete="off">
+      <input type="text" id="birthCity" placeholder="Start typing, then pick from the list… e.g. Melbourne" autocomplete="off">
       <div class="ac-list" id="birthCityList"></div>
     </div>
-    <button class="search-online" onclick="searchOnline('birth')">Small town? Search for it online →</button>
     <div class="loc-confirm" id="birthConfirm"></div>
 
     <label for="currentCity">Town or city you live in now</label>
     <div class="ac-wrap">
-      <input type="text" id="currentCity" placeholder="Start typing…" autocomplete="off">
+      <input type="text" id="currentCity" placeholder="Start typing, then pick from the list…" autocomplete="off">
       <div class="ac-list" id="currentCityList"></div>
     </div>
-    <button class="search-online" onclick="searchOnline('current')">Small town? Search for it online →</button>
     <div class="loc-confirm" id="currentConfirm"></div>
 
     <label for="lifeNote">Anything you'd like this moon to speak to? <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
@@ -213,17 +211,19 @@
         two backup ways below. Send it from the email you entered above, then continue to checkout.</div>
       <button class="btn" id="sendBtn" onclick="sendEmail()">Send My Details ✦ Opens Your Email App</button>
       <button class="btn ghost" onclick="copyPayload()">Or Copy Everything &amp; Email It Yourself</button>
-      <a class="btn ghost" href="https://wayshowers88.square.site/product/the-luminary-a-hand-finished-transit-reading-of-the-next-new-or-full-moon-in-your-chart/NTBGX7AIKC4EBA3NE76RZJTN"
-         target="_blank" rel="noopener">Then Continue to Secure Checkout ✦ $44</a>
+      <a class="btn ghost" id="squareBtnFallback" href="#" target="_blank" rel="noopener">Then Continue to Secure Checkout</a>
       <pre id="payload"></pre>
     </div>
     <div id="receivedNote" style="display:none">
-      <a class="btn" href="https://wayshowers88.square.site/product/the-luminary-a-hand-finished-transit-reading-of-the-next-new-or-full-moon-in-your-chart/NTBGX7AIKC4EBA3NE76RZJTN"
-         target="_blank" rel="noopener">Continue to Secure Checkout ✦ $44</a>
-      <div class="fineprint">Payment is handled securely by Square. Your hand-finished reading arrives at
+      <a class="btn" id="squareBtn" href="#" target="_blank" rel="noopener">Continue to Secure Checkout</a>
+      <a class="btn ghost" id="paypalBtn" href="#" target="_blank" rel="noopener" style="display:none">Or Pay with PayPal</a>
+      <div class="fineprint">Introductory price — your reading arrives as two hand-finished editions:
+        the <strong>violet edition</strong> for the screen and the <strong>parchment edition</strong> for printing and keeping.<br><br>
+        Payment is handled securely by Square<span id="orPaypal"></span>. Your reading arrives at
         <strong id="replyEmail"></strong> within 48 hours of your order — always before the moon peaks.<br><br>
         <em>Already ordered on our store? Then you're done — nothing more to do. Your reading is being cast.</em><br><br>
-        Nothing is stored by this page itself; your details travel straight to the reading desk.</div>
+        Your details travel encrypted to the reading desk's order system, are used for your reading and nothing else,
+        and are never shared.</div>
     </div>
   </div>
 
@@ -238,15 +238,19 @@
 <script>
 // ═════════════════════════════════════════════════════════════
 //  CONFIG
-//  Flow: details FIRST, then checkout. After the intake sends, the page
-//  offers the Square checkout link. Fulfilment matches intake ↔ order by email.
+//  Flow: details FIRST, then checkout. The intake travels straight into the
+//  catchment (Cloudflare Worker); the Square webhook matches the payment to it
+//  by email automatically. Web3Forms is the emergency fallback only.
 // ═════════════════════════════════════════════════════════════
-const SQUARE_CHECKOUT = 'https://wayshowers88.square.site/product/the-luminary-a-hand-finished-transit-reading-of-the-next-new-or-full-moon-in-your-chart/NTBGX7AIKC4EBA3NE76RZJTN';
+const PRICE = '$33 AUD';
+// Catchment Worker — primary intake destination.
+const CATCHMENT = 'https://wayshowers-catchment.wayshowers88.workers.dev';
+// Square payment link (Payment Links, $33 AUD) — clean checkout, no store wrapper.
+const SQUARE_CHECKOUT = 'https://square.link/u/9Q0hQYSb';
+// PayPal alternative — 'PENDING' hides the button until the link is supplied.
+const PAYPAL_LINK = 'PENDING';  // e.g. https://paypal.me/xxxx/22USD
 const INTAKE_EMAIL = 'wayshowers88@gmail.com';
-// RELAY — sends the intake straight to the reading desk with no action from the client.
-// Web3Forms: one-time setup at https://web3forms.com — enter wayshowers88@gmail.com,
-// the access key arrives at that inbox, paste it here. Until then the page shows the
-// manual send fallback (mailto + copy), so nothing is ever lost.
+// FALLBACK RELAY — only fires if the catchment is unreachable, so no order is ever lost.
 const RELAY = {
   provider: 'web3forms',
   endpoint: 'https://api.web3forms.com/submit',
@@ -263,6 +267,21 @@ const SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio
   MONTHS.forEach((mo,i)=> m.insertAdjacentHTML('beforeend', `<option value="${i+1}">${mo}</option>`));
   const thisYear = new Date().getFullYear();
   for (let yr=thisYear; yr>=1925; yr--) y.insertAdjacentHTML('beforeend', `<option value="${yr}">${yr}</option>`);
+})();
+
+// ── payment buttons from config ──
+(function(){
+  const sq = document.getElementById('squareBtn'), sqf = document.getElementById('squareBtnFallback');
+  sq.href = sqf.href = SQUARE_CHECKOUT;
+  sq.textContent = `Continue to Secure Checkout ✦ ${PRICE}`;
+  sqf.textContent = `Then Continue to Secure Checkout ✦ ${PRICE}`;
+  if (PAYPAL_LINK !== 'PENDING'){
+    const pp = document.getElementById('paypalBtn');
+    pp.href = PAYPAL_LINK;
+    pp.textContent = `Or Pay with PayPal ✦ ${PRICE}`;
+    pp.style.display = 'inline-block';
+    document.getElementById('orPaypal').textContent = ' or PayPal';
+  }
 })();
 
 function toggleTime(){
@@ -290,10 +309,13 @@ function unlock(){
   document.getElementById('detailsCard').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-// ═════════════ CITY FIELDS (autocomplete + online fallback) ═════════════
+// ═════════════ CITY FIELDS (live geocoder, local list as offline fallback) ═════════════
+// Every keystroke (debounced) searches the world gazetteer, so small towns
+// show EVERY match with its state/country — "Daisy Hill, Queensland" and
+// "Daisy Hill, Victoria" are separate choices, never a silent wrong guess.
 const loc = { birth:null, current:null };   // {place, lat, lon, iana, tz}
 
-function acMatches(q){
+function localMatches(q){
   q = q.toLowerCase().trim();
   if (q.length < 2) return [];
   const starts=[], contains=[];
@@ -302,57 +324,69 @@ function acMatches(q){
     if (name.startsWith(q)) starts.push(c);
     else if (name.includes(q) || disp.includes(q)) contains.push(c);
   }
-  return starts.concat(contains).slice(0,8);
+  return starts.concat(contains).slice(0,8)
+    .map(c => ({ label:c.d, lat:+c.lat, lon:+c.lon, iana:CITY_TZ[c.n]||'', tz:c.tz }));
 }
 
-function setLoc(which, place, lat, lon, iana, tz){
-  loc[which] = { place, lat:+lat, lon:+lon, iana, tz };
+async function geoMatches(q){
+  const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`);
+  if (!res.ok) throw new Error('geocoder ' + res.status);
+  const data = await res.json();
+  return (data.results || []).map(r => ({
+    label: [r.name, r.admin1, r.country].filter(Boolean).join(', '),
+    lat: +r.latitude.toFixed(4), lon: +r.longitude.toFixed(4),
+    iana: r.timezone || '', tz: Math.round(r.longitude/15*2)/2
+  }));
+}
+
+function setLoc(which, m){
+  loc[which] = { place:m.label, lat:m.lat, lon:m.lon, iana:m.iana, tz:m.tz };
   const el = document.getElementById(which+'Confirm');
   el.style.display='block';
-  el.innerHTML = `✓ <strong>${place}</strong> <span class="tz">· ${iana ? iana.replace(/_/g,' ') : ('UTC'+(tz>=0?'+':'')+tz)} — daylight saving handled automatically</span>`;
+  el.innerHTML = `✓ <strong>${m.label}</strong> <span class="tz">· ${m.iana ? m.iana.replace(/_/g,' ') : ('UTC'+(m.tz>=0?'+':'')+m.tz)} — daylight saving handled automatically</span>`;
 }
 
 function attachCity(which){
   const input = document.getElementById(which+'City');
   const list  = document.getElementById(which+'CityList');
+  let timer = null, seq = 0;
+
+  const render = (matches) => {
+    if (!matches.length){
+      list.innerHTML = `<div class="ac-item" style="cursor:default">Nothing found — check the spelling, or pick the nearest larger town and name the real one in the note box.</div>`;
+      list.style.display='block';
+      return;
+    }
+    list.innerHTML = matches.map((m,i)=>`<div class="ac-item" data-i="${i}">${m.label}</div>`).join('');
+    list.style.display='block';
+    [...list.children].forEach((el,i)=> el.onclick = ()=>{
+      input.value = matches[i].label;
+      list.style.display='none';
+      setLoc(which, matches[i]);
+    });
+  };
+
   input.addEventListener('input', ()=>{
     loc[which] = null;
     document.getElementById(which+'Confirm').style.display='none';
-    const m = acMatches(input.value);
-    if (!m.length){ list.style.display='none'; return; }
-    list.innerHTML = m.map((c,i)=>`<div class="ac-item" data-i="${i}">${c.d}</div>`).join('');
-    list.style.display='block';
-    [...list.children].forEach((el,i)=> el.onclick = ()=>{
-      const c = m[i];
-      input.value = c.d;
-      list.style.display='none';
-      setLoc(which, c.d, c.lat, c.lon, CITY_TZ[c.n]||'', c.tz);
-    });
+    clearTimeout(timer);
+    const q = input.value.split(',')[0].trim();
+    if (q.length < 2){ list.style.display='none'; return; }
+    timer = setTimeout(async ()=>{
+      const mySeq = ++seq;
+      try {
+        const matches = await geoMatches(q);
+        if (mySeq !== seq) return;           // a newer keystroke superseded this
+        render(matches);
+      } catch(e){                             // offline → local list still works
+        if (mySeq !== seq) return;
+        render(localMatches(q));
+      }
+    }, 280);
   });
   input.addEventListener('blur', ()=> setTimeout(()=> list.style.display='none', 200));
 }
 attachCity('birth'); attachCity('current');
-
-async function searchOnline(which){
-  const input = document.getElementById(which+'City');
-  const st = document.getElementById('detailsStatus');
-  const q = input.value.split(',')[0].trim();
-  if (q.length < 2){ st.className='status err'; st.textContent='Type the town name first, then search.'; return; }
-  st.className='status'; st.textContent='Searching…';
-  try {
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=en&format=json`);
-    const data = await res.json();
-    if (data.results && data.results.length){
-      const r = data.results[0];
-      const label = [r.name, r.admin1, r.country].filter(Boolean).join(', ');
-      input.value = label;
-      setLoc(which, label, r.latitude.toFixed(4), r.longitude.toFixed(4), r.timezone||'', Math.round(r.longitude/15*2)/2);
-      st.textContent='';
-      return;
-    }
-    st.className='status err'; st.textContent=`"${q}" wasn’t found — try the nearest bigger town, and mention the real one in the note box.`;
-  } catch(e){ st.className='status err'; st.textContent='Search didn’t reach the internet — try the nearest big city from the suggestion list.'; }
-}
 
 // ═════════════ TIMEZONE (historical, DST-aware) ═════════════
 function zoneOffsetHours(zone, y, m, d, hh, mm){
@@ -372,6 +406,69 @@ function zoneOffsetHours(zone, y, m, d, hh, mm){
     return (want-guess)/3600000;
   } catch(e){ return NaN; }
 }
+
+// ═════════════ NATAL HOUSES (ported verbatim from the Luminary engine —
+// same Placidus math, verified < 0.005° against Swiss Ephemeris, so this
+// instant read always matches the paid reading) ═════════════
+const DEG = Math.PI/180, RAD = 180/Math.PI;
+const n360 = x => ((x % 360) + 360) % 360;
+function toJD(y,m,d,hUTC){ if(m<=2){y-=1;m+=12;} const A=Math.floor(y/100); const B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+hUTC/24+B-1524.5; }
+function obliquity(T){ return 23.439291111-0.013004167*T-0.000000164*T*T+0.000000504*T*T*T; }
+function gmstDeg(jd){ const T=(jd-2451545.0)/36525.0;
+  return n360(280.46061837+360.98564736629*(jd-2451545.0)+T*T*(0.000387933-T/38710000.0)); }
+function lonFromRA(ra,eps){ return n360(Math.atan2(Math.sin(ra*DEG),Math.cos(ra*DEG)*Math.cos(eps*DEG))*RAD); }
+function computeHouses(jdUT,lat,lon){
+  const T=(jdUT-2451545.0)/36525.0, eps=obliquity(T), epsR=eps*DEG;
+  const ce=Math.cos(epsR), se=Math.sin(epsR), latR=lat*DEG;
+  const ramc=n360(gmstDeg(jdUT)+lon), ramcR=ramc*DEG;
+  const mc=lonFromRA(ramc,eps);
+  let asc=Math.atan2(-Math.cos(ramcR), se*Math.tan(latR)+ce*Math.sin(ramcR))*RAD; asc=n360(asc);
+  const ascMc=n360(asc-mc); if(ascMc>=180||ascMc<=0) asc=n360(asc+180);
+  let cusps;
+  if(Math.abs(lat)>66.0){                       // polar fallback → whole-sign
+    const ascSign=Math.floor(asc/30); cusps=[];
+    for(let i=0;i<12;i++) cusps.push(((ascSign+i)%12)*30);
+  } else {
+    function placCusp(offset,f,nocturnal){
+      let ra=n360(ramc+offset);
+      for(let i=0;i<100;i++){
+        const lam=lonFromRA(ra,eps);
+        const dec=Math.asin(Math.sin(epsR)*Math.sin(lam*DEG));
+        let x=Math.tan(latR)*Math.tan(dec); if(x>1)x=1; if(x<-1)x=-1;
+        const ad=Math.asin(x)*RAD;
+        const sa=nocturnal?(90-ad):(90+ad);
+        const raNew=nocturnal?n360(ramc+180-f*sa):n360(ramc+f*sa);
+        const delta=Math.abs(n360(raNew-ra+180)-180); ra=raNew; if(delta<1e-7)break;
+      }
+      return lonFromRA(ra,eps);
+    }
+    const h11=placCusp(30,1/3,false), h12=placCusp(60,2/3,false),
+          h2=placCusp(120,2/3,true), h3=placCusp(150,1/3,true);
+    cusps=[asc,h2,h3,n360(mc+180),n360(h11+180),n360(h12+180),
+           n360(asc+180),n360(h2+180),n360(h3+180),mc,h11,h12];
+  }
+  cusps._asc=asc;
+  return cusps;
+}
+function getHouse(lon,cusps){ lon=n360(lon);
+  for(let i=0;i<12;i++){ const s=cusps[i],e=cusps[(i+1)%12];
+    const inH=s<=e?(lon>=s&&lon<e):(lon>=s||lon<e); if(inH)return i+1; } return 1; }
+
+const ORDINAL = ['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
+const HOUSE_PHRASE = ['',
+  'the house of self and new beginnings',
+  'the house of worth and what you keep',
+  'the house of voice, mind and near horizons',
+  'the house of home, roots and belonging',
+  'the house of creation, play and the heart',
+  'the house of craft, health and daily rhythm',
+  'the house of partnership and mirrors',
+  'the house of depths, mergings and rebirth',
+  'the house of far horizons and meaning',
+  'the house of calling and the public path',
+  'the house of kinship, hopes and the future',
+  'the house of the unseen and the inner tide'];
 
 // ═════════════ STEP 2 → 3 · CONFIRM ═════════════
 let intake = null;
@@ -406,26 +503,21 @@ function confirmDetails(){
     submitted: new Date().toISOString()
   };
 
-  // instant read — Sun (always) + Moon (only when time is known)
+  // instant read — the Big 3 (Sun always; Moon + Rising when time is known)
+  // plus WHERE the next lunation lands in their natal houses: the hook only
+  // this page can give them, computed with the same math as the paid reading.
   let readHTML = '', moonHTML = '';
   try {
     const zone = intake.birth.iana;
     const [hh,mm] = intake.timeKnown ? time.split(':').map(Number) : [12,0];
     const off = zone ? zoneOffsetHours(zone, Y, M, D, hh, mm) : intake.birth.utcStd;
-    const utc = new Date(Date.UTC(Y, M-1, D, hh, mm) - (isNaN(off)?intake.birth.utcStd:off)*3600000);
+    const offH = isNaN(off) ? intake.birth.utcStd : off;
+    const utc = new Date(Date.UTC(Y, M-1, D, hh, mm) - offH*3600000);
     const t = Astronomy.MakeTime(utc);
     const sunLon = (Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Sun, t, true)).elon % 360 + 360) % 360;
     const sunSign = SIGNS[Math.floor(sunLon/30)];
-    if (intake.timeKnown){
-      const moonLon = (Astronomy.EclipticGeoMoon(t).lon % 360 + 360) % 360;
-      const moonSign = SIGNS[Math.floor(moonLon/30)];
-      readHTML = `The chart is cast. Sun in <b>${sunSign}</b>, Moon in <b>${moonSign}</b> — we see you, ${name.split(' ')[0]}.`;
-      intake.instant = { sunSign, moonSign };
-    } else {
-      readHTML = `The chart is cast. Sun in <b>${sunSign}</b> — we see you, ${name.split(' ')[0]}. We’ll be in touch about your birth time before anything is written.`;
-      intake.instant = { sunSign };
-    }
-    // next lunation
+
+    // next lunation (needed below for the house line too)
     const now = new Date();
     const nm = Astronomy.SearchMoonPhase(0, now, 40).date;
     const fm = Astronomy.SearchMoonPhase(180, now, 40).date;
@@ -434,8 +526,24 @@ function confirmDetails(){
     const evLon = (Astronomy.EclipticGeoMoon(Astronomy.MakeTime(ev)).lon % 360 + 360) % 360;
     const evSign = SIGNS[Math.floor(evLon/30)];
     const local = ev.toLocaleDateString('en-GB', { day:'numeric', month:'long', timeZone: intake.current.iana || undefined });
-    moonHTML = `Your reading: the ${kind} in ${evSign}, ${local} — written by hand, arriving before the moon peaks.`;
     intake.targetMoon = { kind, sign: evSign, exactUTC: ev.toISOString() };
+
+    if (intake.timeKnown){
+      const moonLon = (Astronomy.EclipticGeoMoon(t).lon % 360 + 360) % 360;
+      const moonSign = SIGNS[Math.floor(moonLon/30)];
+      // natal Placidus cusps → rising sign + the lunation's natal house
+      const jdUT = toJD(Y, M, D, hh + mm/60 - offH);
+      const cusps = computeHouses(jdUT, intake.birth.lat, intake.birth.lon);
+      const rising = SIGNS[Math.floor(cusps._asc/30)];
+      const house = getHouse(evLon, cusps);
+      readHTML = `The chart is cast. Sun in <b>${sunSign}</b>, Moon in <b>${moonSign}</b>, <b>${rising}</b> rising — we see you, ${name.split(' ')[0]}.`;
+      moonHTML = `The ${kind} in ${evSign} on ${local} lands in your ${ORDINAL[house]} house — ${HOUSE_PHRASE[house]}. Your reading is written by hand from exactly that, arriving before the moon peaks.`;
+      intake.instant = { sunSign, moonSign, rising, lunationHouse: house };
+    } else {
+      readHTML = `The chart is cast. Sun in <b>${sunSign}</b> — we see you, ${name.split(' ')[0]}. We’ll be in touch about your birth time before anything is written.`;
+      moonHTML = `Your reading: the ${kind} in ${evSign}, ${local} — written by hand, arriving before the moon peaks.`;
+      intake.instant = { sunSign };
+    }
   } catch(e){
     readHTML = `Details received, ${name.split(' ')[0]} — your chart will be cast by hand.`;
   }
@@ -448,9 +556,33 @@ function confirmDetails(){
 }
 
 // ═════════════ AUTOMATIC SEND (no client action) ═════════════
+// Primary: the catchment Worker — data goes straight into the order system,
+// no email is generated, and the Square webhook matches the payment to it.
+// Fallback 1: Web3Forms email to the reading desk. Fallback 2: manual send.
 async function submitIntake(){
   const st = document.getElementById('sendStatus');
   st.className = 'status'; st.textContent = 'Sending your details…';
+  if (CATCHMENT !== 'PENDING'){
+    try {
+      const res = await fetch(CATCHMENT + '/intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(intake)
+      });
+      const data = await res.json().catch(()=> ({}));
+      if (res.ok && data.ok){
+        st.className = 'status ok';
+        st.textContent = '✓ Details received at the reading desk.';
+        document.getElementById('replyEmail').textContent = intake.order.email;
+        document.getElementById('receivedNote').style.display = 'block';
+        return;
+      }
+    } catch(e){ /* fall through to the email relay */ }
+  }
+  await submitViaRelay(st);
+}
+
+async function submitViaRelay(st){
   if (RELAY.accessKey === 'PENDING') { showFallback(st); return; }
   try {
     const res = await fetch(RELAY.endpoint, {
