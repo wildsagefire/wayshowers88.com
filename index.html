@@ -297,13 +297,24 @@ header.scrolled{
 .archers-scene svg{position:absolute;inset:0;width:100%;height:100%}
 @media(max-width:900px){
   .archers-scene img{
-    position:absolute;left:0;bottom:0;width:100%;height:56%;
+    position:absolute;left:0;bottom:0;width:100%;height:44%;
     object-position:left bottom;
     -webkit-mask-image:linear-gradient(180deg,transparent,#000 30%);
     mask-image:linear-gradient(180deg,transparent,#000 30%);
   }
   .archers-scene::after{
     background:linear-gradient(180deg, rgba(7,12,21,.5) 0%, transparent 40%);
+  }
+  .hero .hero-inner{padding-top:235px}
+  /* keep the ghost CTA and the scroll hint legible over the wash */
+  .hero .btn-ghost{background:rgba(7,12,21,.6);backdrop-filter:blur(3px)}
+  .hero .scroll-hint{
+    color:rgba(255,241,214,.85);
+    text-shadow:0 1px 8px rgba(7,12,21,.95), 0 0 3px rgba(7,12,21,.9);
+  }
+  .hero .scroll-hint::after{
+    background:linear-gradient(180deg,var(--halo),transparent);
+    box-shadow:0 0 6px rgba(246,200,137,.5);
   }
 }
 
