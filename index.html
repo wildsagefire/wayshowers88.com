@@ -279,12 +279,14 @@ header.scrolled{
 .hero-moon:hover svg{filter:drop-shadow(0 0 14px rgba(246,200,137,.35))}
 @media(max-width:900px){.hero-moon{right:50%;top:11%;transform:translateX(50%) scale(.8);transform-origin:top center}}
 
-/* ── the archers — wayshowers written in stars ── */
-.archers{
-  position:absolute;left:3%;bottom:70px;width:48%;max-width:640px;height:auto;
-  z-index:1;pointer-events:none;overflow:visible;
+/* ── the archers — Akashic Sketch, loosing arrows over the horizon ── */
+.archers-scene{
+  position:absolute;left:0;bottom:0;width:46%;max-width:700px;
+  z-index:1;pointer-events:none;
 }
-@media(max-width:900px){.archers{width:74%;bottom:44px;opacity:.8}}
+.archers-scene img{width:100%;height:auto;display:block;opacity:.96}
+.archers-scene svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+@media(max-width:900px){.archers-scene{width:88%;opacity:.85}}
 
 @media (prefers-reduced-motion: reduce){
   .arrow-comet{display:none}
@@ -791,105 +793,35 @@ footer .eightyeight{font-size:280px;right:-30px;bottom:-70px;opacity:.7}
       <circle cx="5" cy="4" r="5" fill="rgba(31,79,102,.14)"/>
     </svg>
     <span class="hm-line" id="hmLine">—</span>
-    <span class="hm-sub">the moon clock ▸</span>
   </a>
 
-  <!-- the wayshowers — two Sagittarian archers, written in stars,
-       loosing arrows over the horizon toward the beam -->
-  <svg class="archers" viewBox="0 0 900 300" aria-hidden="true">
-    <defs>
-      <filter id="starGlow" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="1.4" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-
-    <!-- faint trajectories, hanging in the air -->
-    <path d="M 202 146 Q 500 -30 1360 46" fill="none" stroke="rgba(246,200,137,.14)" stroke-width="1" stroke-dasharray="2 9"/>
-    <path d="M 404 184 Q 680 40 1370 116" fill="none" stroke="rgba(246,200,137,.11)" stroke-width="1" stroke-dasharray="2 9"/>
-
-    <!-- ADRIAN — rear archer: long hair and beard, ember strokes -->
-    <g class="centaur" stroke="rgba(240,228,200,.5)" stroke-width="1.3" fill="none" stroke-linecap="round" transform="translate(90 110)">
-      <!-- horse -->
-      <path d="M 10 92 Q 40 80 78 86"/>
-      <path d="M 16 98 Q 45 106 72 99"/>
-      <path d="M 10 92 q -3 18 3 32 l -5 24"/>
-      <path d="M 22 96 q 0 16 6 28 l -2 26"/>
-      <path d="M 72 99 l 3 22 l -3 27"/>
-      <path d="M 64 100 l 8 20 l 2 28"/>
-      <path d="M 8 90 q -20 8 -26 30" stroke="rgba(199,123,59,.55)"/>
-      <path d="M 9 94 q -15 12 -18 30" stroke="rgba(199,123,59,.4)"/>
-      <!-- torso, head -->
-      <path d="M 78 86 Q 82 62 86 48"/>
-      <circle cx="92" cy="34" r="7"/>
-      <!-- long hair, flowing down the back -->
-      <path d="M 89 27 q -12 12 -14 32" stroke="rgba(199,123,59,.75)"/>
-      <path d="M 86 29 q -9 14 -9 30" stroke="rgba(199,123,59,.55)"/>
-      <!-- beard -->
-      <path d="M 97 39 q 2 7 -2 11" stroke="rgba(199,123,59,.75)"/>
-      <path d="M 94 41 q 1 6 -2 9" stroke="rgba(199,123,59,.55)"/>
-      <!-- arms: drawn to the cheek, extended to the bow -->
-      <path d="M 86 48 L 99 42"/>
-      <path d="M 86 50 L 112 36"/>
-      <!-- bow + string + arrow -->
-      <path d="M 104 16 Q 124 34 108 58" stroke="rgba(246,200,137,.8)"/>
-      <line x1="104" y1="16" x2="108" y2="58" stroke="rgba(240,228,200,.4)"/>
-      <line x1="97" y1="43" x2="122" y2="31" stroke="rgba(246,200,137,.9)"/>
-      <path d="M 122 31 l -5 -1 m 5 1 l -3 4" stroke="rgba(246,200,137,.9)"/>
-      <!-- the stars of him -->
-      <g fill="#F0E4C8" stroke="none" filter="url(#starGlow)">
-        <circle cx="10" cy="92" r="2"/><circle cx="78" cy="86" r="2.2"/>
-        <circle cx="86" cy="48" r="1.8"/><circle cx="112" cy="36" r="2"/>
-        <circle cx="92" cy="27" r="1.6"/><circle cx="13" cy="124" r="1.4"/>
-        <circle cx="75" cy="121" r="1.4"/><circle cx="-18" cy="120" r="1.6" fill="#E8A659"/>
+  <!-- the wayshowers — two Sagittarian archers, Akashic Sketch, loosing arrows over the horizon -->
+  <div class="archers-scene" aria-hidden="true">
+    <img src="hero-archers.webp" alt="" loading="eager" decoding="async">
+    <svg viewBox="0 0 1400 816" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id="cometGlow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="1.6" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path d="M 700 290 Q 1150 -120 1560 430" fill="none" stroke="rgba(246,200,137,.13)" stroke-width="1.5" stroke-dasharray="2 11"/>
+      <g class="arrow-comet">
+        <line x1="-26" y1="0" x2="-5" y2="0" stroke="rgba(246,200,137,.6)" stroke-width="2" stroke-linecap="round"/>
+        <circle r="2.8" fill="#FFF1D6" filter="url(#cometGlow)"/>
+        <animateMotion dur="10s" repeatCount="indefinite" rotate="auto"
+          path="M 700 290 Q 1150 -120 1560 430" keyPoints="0;1" keyTimes="0;0.22" calcMode="linear"/>
+        <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.02;.18;.22;1" dur="10s" repeatCount="indefinite"/>
       </g>
-    </g>
-
-    <!-- KATH — forward archer: long flowing hair, halo-gold strokes -->
-    <g class="centaur" stroke="rgba(240,228,200,.5)" stroke-width="1.3" fill="none" stroke-linecap="round" transform="translate(300 152) scale(.92)">
-      <path d="M 10 92 Q 40 80 78 86"/>
-      <path d="M 16 98 Q 45 106 72 99"/>
-      <path d="M 10 92 q -3 18 3 32 l -5 24"/>
-      <path d="M 22 96 q 0 16 6 28 l -2 26"/>
-      <path d="M 72 99 l 3 22 l -3 27"/>
-      <path d="M 64 100 l 8 20 l 2 28"/>
-      <path d="M 8 90 q -20 8 -26 30" stroke="rgba(246,200,137,.5)"/>
-      <path d="M 78 86 Q 82 62 86 48"/>
-      <circle cx="92" cy="34" r="6.5"/>
-      <!-- long blonde hair — three strokes flowing down the back -->
-      <path d="M 89 27 q -13 14 -15 38" stroke="rgba(246,200,137,.85)"/>
-      <path d="M 86 29 q -10 16 -10 36" stroke="rgba(246,200,137,.6)"/>
-      <path d="M 91 26 q -15 18 -19 44" stroke="rgba(246,200,137,.45)"/>
-      <path d="M 86 48 L 99 42"/>
-      <path d="M 86 50 L 112 36"/>
-      <path d="M 104 16 Q 124 34 108 58" stroke="rgba(246,200,137,.8)"/>
-      <line x1="104" y1="16" x2="108" y2="58" stroke="rgba(240,228,200,.4)"/>
-      <line x1="97" y1="43" x2="122" y2="31" stroke="rgba(246,200,137,.9)"/>
-      <path d="M 122 31 l -5 -1 m 5 1 l -3 4" stroke="rgba(246,200,137,.9)"/>
-      <g fill="#F0E4C8" stroke="none" filter="url(#starGlow)">
-        <circle cx="10" cy="92" r="2"/><circle cx="78" cy="86" r="2.2"/>
-        <circle cx="86" cy="48" r="1.8"/><circle cx="112" cy="36" r="2"/>
-        <circle cx="92" cy="27" r="1.6"/><circle cx="13" cy="124" r="1.4"/>
-        <circle cx="75" cy="121" r="1.4"/><circle cx="-18" cy="118" r="1.6" fill="#F6C889"/>
+      <g class="arrow-comet">
+        <line x1="-26" y1="0" x2="-5" y2="0" stroke="rgba(246,200,137,.6)" stroke-width="2" stroke-linecap="round"/>
+        <circle r="2.8" fill="#FFF1D6" filter="url(#cometGlow)"/>
+        <animateMotion dur="10s" begin="5s" repeatCount="indefinite" rotate="auto"
+          path="M 690 330 Q 1120 -60 1580 470" keyPoints="0;1" keyTimes="0;0.22" calcMode="linear"/>
+        <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.02;.18;.22;1" dur="10s" begin="5s" repeatCount="indefinite"/>
       </g>
-    </g>
-
-    <!-- the arrows — shooting stars loosed toward the beam -->
-    <g class="arrow-comet">
-      <line x1="-20" y1="0" x2="-4" y2="0" stroke="rgba(246,200,137,.55)" stroke-width="1.4" stroke-linecap="round"/>
-      <circle r="2.2" fill="#FFF1D6" filter="url(#starGlow)"/>
-      <animateMotion dur="9s" repeatCount="indefinite" rotate="auto"
-        path="M 202 146 Q 500 -30 1360 46" keyPoints="0;1" keyTimes="0;0.2" calcMode="linear"/>
-      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.02;.16;.2;1" dur="9s" repeatCount="indefinite"/>
-    </g>
-    <g class="arrow-comet">
-      <line x1="-20" y1="0" x2="-4" y2="0" stroke="rgba(246,200,137,.55)" stroke-width="1.4" stroke-linecap="round"/>
-      <circle r="2.2" fill="#FFF1D6" filter="url(#starGlow)"/>
-      <animateMotion dur="9s" begin="4.5s" repeatCount="indefinite" rotate="auto"
-        path="M 404 184 Q 680 40 1370 116" keyPoints="0;1" keyTimes="0;0.2" calcMode="linear"/>
-      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.02;.16;.2;1" dur="9s" begin="4.5s" repeatCount="indefinite"/>
-    </g>
-  </svg>
+    </svg>
+  </div>
 
   <div class="wrap">
     <div class="hero-inner">
