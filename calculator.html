@@ -425,6 +425,35 @@
       margin: 0 auto 0.9rem;
     }
     .dw-line strong { font-style: normal; font-weight: 500; color: var(--gold-lt); }
+    .dw-moon-row {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.28rem;
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.45;
+      color: var(--text);
+      max-width: 36em;
+      margin: 0 auto 0.7rem;
+    }
+    .dw-moon-row strong { font-style: normal; font-weight: 500; color: var(--gold-lt); }
+    .dw-moon-row .dwm-win { display: block; font-family: 'Lora', serif; font-size: 0.72rem;
+      font-style: italic; letter-spacing: 0.05em; color: #9bb38a; margin-top: 0.1rem; }
+    .dw-fine { font-size: 0.75rem; color: var(--dim); font-style: italic; margin-top: 0.9rem; }
+    .dw-teaser {
+      display: block; text-align: center; text-decoration: none;
+      background: rgba(139,111,168,0.10);
+      border: 1px solid rgba(139,111,168,0.35);
+      border-radius: 10px;
+      padding: 0.75rem 1.2rem;
+      margin: -0.8rem 0 2rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--text);
+      transition: border-color .25s, background .25s;
+    }
+    .dw-teaser:hover { border-color: rgba(232,166,89,0.55); background: rgba(139,111,168,0.16); }
+    .dw-teaser strong { font-style: normal; font-weight: 500; color: var(--gold-lt); }
     .dw-sub {
       font-size: 0.83rem;
       color: var(--dim);
@@ -521,7 +550,7 @@
     .btn-save:hover { border-color: var(--gold); color: var(--gold); }
 
     @media print {
-      header, .page-hero, .form-card, .btn-save, .wheel-legend, footer, .cta-card, .doorway, .threshold, .ac-list, .explain-hint { display: none !important; }
+      header, .page-hero, .form-card, .btn-save, .wheel-legend, footer, .cta-card, .doorway, .dw-teaser, .threshold, .ac-list, .explain-hint { display: none !important; }
       body { background: #fff; color: #111; }
       main { padding: 0; max-width: 100%; }
       .results-header h2 { color: #111; }
@@ -974,6 +1003,9 @@
       </div>
     </div>
 
+    <!-- Luminary teaser — populated with THEIR next moon by renderDoorway -->
+    <a class="dw-teaser" id="dwTeaser" href="#doorway" style="display:none;"></a>
+
     <!-- Zodiac Wheel -->
     <div class="wheel-card" id="wheelCard">
       <div class="tcard-title">Natal Chart Wheel</div>
@@ -1042,9 +1074,10 @@
     <!-- Luminary doorway — the sky ahead, in THEIR chart -->
     <div class="doorway" id="doorway" style="display:none;">
       <div class="dw-eyebrow">✦ The Sky Ahead — In Your Chart</div>
-      <p class="dw-line" id="dwLine"></p>
+      <div id="dwMoons"></div>
       <p class="dw-sub" id="dwSub"></p>
-      <a class="dw-btn" href="index.html#readings">The Luminary reads it for you →</a>
+      <a class="dw-btn" href="luminary-details.html">Have the Luminary read it for you → <span style="opacity:.75">$33 AUD</span></a>
+      <p class="dw-fine">A personalised New or Full Moon reading — you choose the moon, we compute your exact sky, and a human writes what it means. Delivered within 48 hours.</p>
     </div>
 
     <!-- The Threshold Letter — soft email ask -->
@@ -2018,21 +2051,32 @@ const HOUSE_THEME = [
 const ORDINAL = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
 
 function renderDoorway(cusps) {
+  // BOTH moons on the menu — same 3-day grace window as the Luminary intake,
+  // so a moon that just peaked is still shown as open.
   const card = document.getElementById('doorway');
   try {
     const now = new Date();
-    const full = Astronomy.SearchMoonPhase(180, now, 40).date;
-    const nw   = Astronomy.SearchMoonPhase(0,   now, 40).date;
-    const isFull = full < nw;
-    const when   = isFull ? full : nw;
-    const moonLon = n360(Astronomy.EclipticGeoMoon(Astronomy.MakeTime(when)).lon);
-    const sign  = signFromLon(moonLon);
-    const house = getHouse(moonLon, cusps);
-    const dateFmt = when.toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
-    document.getElementById('dwLine').innerHTML =
-      `On ${dateFmt}, the <strong>${isFull ? 'Full' : 'New'} Moon in ${sign.name}</strong> lands in your <strong>${ORDINAL[house - 1]} house</strong> — ${HOUSE_THEME[house - 1]}.`;
+    const searchFrom = new Date(now.getTime() - 3*86400000 - 60000);
+    const moons = [
+      { kind: 'New Moon',  when: Astronomy.SearchMoonPhase(0,   searchFrom, 40).date },
+      { kind: 'Full Moon', when: Astronomy.SearchMoonPhase(180, searchFrom, 40).date }
+    ].sort((a, b) => a.when - b.when).map(m => {
+      const lon = n360(Astronomy.EclipticGeoMoon(Astronomy.MakeTime(m.when)).lon);
+      m.sign = signFromLon(lon).name;
+      m.house = getHouse(lon, cusps);
+      m.past = m.when <= now;
+      m.date = m.when.toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
+      return m;
+    });
+    document.getElementById('dwMoons').innerHTML = moons.map(m =>
+      `<p class="dw-moon-row">The <strong>${m.kind} in ${m.sign}</strong> of ${m.date} ${m.past ? 'landed' : 'lands'} in your <strong>${ORDINAL[m.house - 1]} house</strong> — ${HOUSE_THEME[m.house - 1]}.${m.past ? '<span class="dwm-win">just peaked — its three-day reading window is still open</span>' : ''}</p>`
+    ).join('');
     document.getElementById('dwSub').textContent =
-      'That is the where. The Luminary is the what: a hand-written report of this exact moon in your exact chart — what it stirs, what it closes, what it asks of you next.';
+      'That is the where. The Luminary is the what: a hand-written report of the moon you choose, in your exact chart — what it stirs, what it closes, what it asks of you next.';
+    const near = moons[0];
+    const teaser = document.getElementById('dwTeaser');
+    teaser.innerHTML = `✦ The ${near.kind} ${near.past ? 'landed' : 'lands'} in your <strong>${ORDINAL[near.house - 1]} house</strong> — see what it opens, and how to go deeper ↓`;
+    teaser.style.display = 'block';
     card.style.display = 'block';
   } catch (e) {
     console.error('doorway:', e);

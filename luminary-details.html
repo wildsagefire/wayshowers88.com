@@ -85,6 +85,20 @@
     .row { display: flex; gap: 0.7rem; }
     .row > div { flex: 1; }
 
+    /* moon chooser */
+    .moon-opts { display: flex; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; }
+    .moon-opt { flex: 1; min-width: 220px; background: var(--bg4); border: 1px solid var(--border2);
+      border-radius: 12px; padding: 1.15rem 1rem 1rem; cursor: pointer; text-align: center;
+      transition: border-color .25s, box-shadow .25s; }
+    .moon-opt:hover { border-color: var(--gold-dk); }
+    .moon-opt.sel { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 0 24px rgba(232,166,89,.12); }
+    .moon-opt .kind { font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gold-lt); }
+    .moon-opt .sign { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; margin: 0.3rem 0 0.15rem; }
+    .moon-opt .when { font-size: 0.85rem; color: var(--dim); }
+    .moon-opt .win { font-size: 0.78rem; margin-top: 0.45rem; font-style: italic; color: var(--green); }
+    .moon-opt .win.upcoming { color: var(--dim); }
+
     .check { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.9rem; cursor: pointer; }
     .check input { width: auto; accent-color: var(--gold); }
     .check span { font-size: 0.9rem; color: var(--dim); }
@@ -148,9 +162,17 @@
 
 <main>
 
-  <!-- STEP 1 · YOUR EMAIL -->
-  <div class="card" id="gateCard">
-    <h2>Step 1 · Where Your Reading Arrives</h2>
+  <!-- STEP 1 · CHOOSE YOUR MOON -->
+  <div class="card" id="moonCard">
+    <h2>Step 1 · Choose Your Moon</h2>
+    <div class="sub">Every Luminary is written to one moon. Choose the one that's calling you — a moon stays open for three days after it peaks, while its energy is still planting.</div>
+    <div class="moon-opts" id="moonOpts"><div class="when">Reading the sky…</div></div>
+    <div class="status" id="moonStatus"></div>
+  </div>
+
+  <!-- STEP 2 · YOUR EMAIL -->
+  <div class="card locked" id="gateCard">
+    <h2>Step 2 · Where Your Reading Arrives</h2>
     <div class="sub">Your finished reading — and nothing else — will be sent to this address. If you've already ordered on our store, use the same email you paid with.</div>
     <label for="orderEmail">Your email</label>
     <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com">
@@ -158,9 +180,9 @@
     <div class="status" id="gateStatus"></div>
   </div>
 
-  <!-- STEP 2 · DETAILS -->
+  <!-- STEP 3 · DETAILS -->
   <div class="card locked" id="detailsCard">
-    <h2>Step 2 · The Sky You Were Born Under</h2>
+    <h2>Step 3 · The Sky You Were Born Under</h2>
     <div class="sub">Exactly as it appears on your birth certificate, if you have it.</div>
 
     <label for="fullName">Your name, as you'd like it on the reading</label>
@@ -199,9 +221,9 @@
     <div class="status" id="detailsStatus"></div>
   </div>
 
-  <!-- STEP 3 · CONFIRMATION -->
+  <!-- STEP 4 · CONFIRMATION -->
   <div class="card" id="confirmCard">
-    <h2>Step 3 · Received</h2>
+    <h2>Step 4 · Received</h2>
     <div class="orn">✦ &nbsp; ✦ &nbsp; ✦</div>
     <div class="instant" id="instantRead"></div>
     <div class="moonline" id="moonLine"></div>
@@ -220,7 +242,8 @@
       <div class="fineprint">Introductory price — your reading arrives as two hand-finished editions:
         the <strong>violet edition</strong> for the screen and the <strong>parchment edition</strong> for printing and keeping.<br><br>
         Payment is handled securely by Square<span id="orPaypal"></span>. Your reading arrives at
-        <strong id="replyEmail"></strong> within 48 hours of your order — always before the moon peaks.<br><br>
+        <strong id="replyEmail"></strong> within 48 hours of your order — before your moon peaks, or inside its
+        three-day window if it just has.<br><br>
         <em>Already ordered on our store? Then you're done — nothing more to do. Your reading is being cast.</em><br><br>
         Your details travel encrypted to the reading desk's order system, are used for your reading and nothing else,
         and are never shared.</div>
@@ -283,6 +306,65 @@ const SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio
     document.getElementById('orPaypal').textContent = ' or PayPal';
   }
 })();
+
+// ═════════════ STEP 1 · CHOOSE YOUR MOON ═════════════
+// Both the next New Moon and next Full Moon are offered, computed live.
+// A moon that has already peaked stays on the menu for GRACE_DAYS after —
+// the customer chooses; nothing is ever silently defaulted.
+const GRACE_DAYS = 3;
+let selectedMoon = null;   // {kind, sign, exactUTC (Date), label}
+
+function buildMoonChooser(){
+  const box = document.getElementById('moonOpts');
+  try {
+    const now = new Date();
+    const searchFrom = new Date(now.getTime() - GRACE_DAYS*86400000 - 60000);
+    const opts = [
+      { kind:'New Moon',  date: Astronomy.SearchMoonPhase(0,   searchFrom, 40).date },
+      { kind:'Full Moon', date: Astronomy.SearchMoonPhase(180, searchFrom, 40).date }
+    ].map(o => {
+      const lon = (Astronomy.EclipticGeoMoon(Astronomy.MakeTime(o.date)).lon % 360 + 360) % 360;
+      o.sign = SIGNS[Math.floor(lon/30)];
+      o.past = o.date <= now;
+      return o;
+    }).sort((a,b)=> a.date - b.date);
+
+    box.innerHTML = opts.map((o,i)=>{
+      const when = o.date.toLocaleDateString('en-GB', { day:'numeric', month:'long' });
+      let win, winCls;
+      if (o.past){
+        const daysLeft = Math.max(1, Math.ceil(GRACE_DAYS - (now - o.date)/86400000));
+        win = `just peaked — window open ${daysLeft} more day${daysLeft>1?'s':''}`; winCls = 'win';
+      } else {
+        const daysTo = Math.ceil((o.date - now)/86400000);
+        win = daysTo <= 1 ? 'peaks within a day' : `peaks in ${daysTo} days`; winCls = 'win upcoming';
+      }
+      return `<div class="moon-opt" data-i="${i}">
+        <div class="kind">${o.kind}</div>
+        <div class="sign">in ${o.sign}</div>
+        <div class="when">${when}</div>
+        <div class="${winCls}">${win}</div>
+      </div>`;
+    }).join('');
+
+    [...box.children].forEach((el,i)=> el.onclick = ()=>{
+      [...box.children].forEach(c=> c.classList.remove('sel'));
+      el.classList.add('sel');
+      const o = opts[i];
+      selectedMoon = { kind:o.kind, sign:o.sign, exactUTC:o.date, label:`${o.kind} in ${o.sign}` };
+      const st = document.getElementById('moonStatus');
+      st.className = 'status ok';
+      st.textContent = `✓ Your reading will be written to the ${selectedMoon.label}.`;
+      document.getElementById('gateCard').classList.remove('locked');
+    });
+  } catch(e){
+    // engine unavailable → let the flow continue; the desk confirms the moon by hand
+    box.innerHTML = '<div class="when">We’ll confirm your moon with you by email before writing.</div>';
+    selectedMoon = null;
+    document.getElementById('gateCard').classList.remove('locked');
+  }
+}
+buildMoonChooser();
 
 function toggleTime(){
   const un = document.getElementById('timeUnknown').checked;
@@ -517,16 +599,23 @@ function confirmDetails(){
     const sunLon = (Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Sun, t, true)).elon % 360 + 360) % 360;
     const sunSign = SIGNS[Math.floor(sunLon/30)];
 
-    // next lunation (needed below for the house line too)
+    // the moon this reading is written to — the CUSTOMER'S choice from Step 1
+    // (fallback: next lunation, flagged unchosen so the desk confirms by hand)
     const now = new Date();
-    const nm = Astronomy.SearchMoonPhase(0, now, 40).date;
-    const fm = Astronomy.SearchMoonPhase(180, now, 40).date;
-    const ev = nm < fm ? nm : fm;
-    const kind = nm < fm ? 'New Moon' : 'Full Moon';
+    let ev, kind;
+    if (selectedMoon){
+      ev = selectedMoon.exactUTC; kind = selectedMoon.kind;
+    } else {
+      const nm = Astronomy.SearchMoonPhase(0, now, 40).date;
+      const fm = Astronomy.SearchMoonPhase(180, now, 40).date;
+      ev = nm < fm ? nm : fm; kind = nm < fm ? 'New Moon' : 'Full Moon';
+    }
+    const evPast = ev <= now;
     const evLon = (Astronomy.EclipticGeoMoon(Astronomy.MakeTime(ev)).lon % 360 + 360) % 360;
     const evSign = SIGNS[Math.floor(evLon/30)];
     const local = ev.toLocaleDateString('en-GB', { day:'numeric', month:'long', timeZone: intake.current.iana || undefined });
-    intake.targetMoon = { kind, sign: evSign, exactUTC: ev.toISOString() };
+    const arrival = evPast ? 'arriving inside its three-day planting window' : 'arriving before the moon peaks';
+    intake.targetMoon = { kind, sign: evSign, exactUTC: ev.toISOString(), chosen: !!selectedMoon };
 
     if (intake.timeKnown){
       const moonLon = (Astronomy.EclipticGeoMoon(t).lon % 360 + 360) % 360;
@@ -537,11 +626,11 @@ function confirmDetails(){
       const rising = SIGNS[Math.floor(cusps._asc/30)];
       const house = getHouse(evLon, cusps);
       readHTML = `The chart is cast. Sun in <b>${sunSign}</b>, Moon in <b>${moonSign}</b>, <b>${rising}</b> rising — we see you, ${name.split(' ')[0]}.`;
-      moonHTML = `The ${kind} in ${evSign} on ${local} lands in your ${ORDINAL[house]} house — ${HOUSE_PHRASE[house]}. Your reading is written by hand from exactly that, arriving before the moon peaks.`;
+      moonHTML = `The ${kind} in ${evSign} of ${local} ${evPast ? 'landed' : 'lands'} in your ${ORDINAL[house]} house — ${HOUSE_PHRASE[house]}. Your reading is written by hand from exactly that, ${arrival}.`;
       intake.instant = { sunSign, moonSign, rising, lunationHouse: house };
     } else {
       readHTML = `The chart is cast. Sun in <b>${sunSign}</b> — we see you, ${name.split(' ')[0]}. We’ll be in touch about your birth time before anything is written.`;
-      moonHTML = `Your reading: the ${kind} in ${evSign}, ${local} — written by hand, arriving before the moon peaks.`;
+      moonHTML = `Your reading: the ${kind} in ${evSign}, ${local} — written by hand, ${arrival}.`;
       intake.instant = { sunSign };
     }
   } catch(e){
@@ -594,6 +683,7 @@ async function submitViaRelay(st){
         from_name: 'The Luminary intake page',
         replyto: intake.order.email,
         name: intake.name,
+        moon: intake.targetMoon ? `${intake.targetMoon.kind} in ${intake.targetMoon.sign}${intake.targetMoon.chosen ? ' (customer-chosen)' : ' (auto — confirm)'}` : '—',
         born: `${intake.dobWritten}${intake.timeKnown ? ' at ' + intake.time : ' — TIME UNKNOWN (contact first)'}`,
         birthplace: `${intake.birth.place} (${intake.birth.lat}, ${intake.birth.lon}) [${intake.birth.iana||''}]`,
         now: `${intake.current.place} (${intake.current.lat}, ${intake.current.lon}) [${intake.current.iana||''}]`,
@@ -633,6 +723,7 @@ function payloadText(){
     `Now: ${i.current.place} (${i.current.lat}, ${i.current.lon}) [${i.current.iana||('UTC'+(i.current.utcStd>=0?'+':'')+i.current.utcStd)}]`,
     `Order: ${i.order.email} · ref ${i.order.ref}${i.order.verified?' · key verified':''}`,
   ];
+  if (i.targetMoon) lines.push(`Moon: ${i.targetMoon.kind} in ${i.targetMoon.sign} (${i.targetMoon.exactUTC})${i.targetMoon.chosen ? ' — customer-chosen' : ' — auto, confirm with customer'}`);
   if (i.note) lines.push(`Note: ${i.note}`);
   lines.push('', 'MACHINE BLOCK — do not edit below this line', JSON.stringify(i));
   return lines.join('\n');

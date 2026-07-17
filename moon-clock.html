@@ -133,8 +133,16 @@ h1 em{font-style:italic;font-weight:300;color:var(--halo)}
 }
 .moon-breathe{animation:moonbreathe 5.5s ease-in-out infinite alternate}
 @keyframes moonbreathe{from{opacity:.85}to{opacity:1}}
+/* the clock turns even between readings */
+.orbit{animation:orbitspin 90s linear infinite;transform-origin:220px 220px;transform-box:view-box}
+.dust{animation:orbitspin 260s linear infinite reverse;transform-origin:220px 220px;transform-box:view-box}
+@keyframes orbitspin{to{transform:rotate(360deg)}}
+.tip-star{animation:tippulse 2.8s ease-in-out infinite alternate}
+@keyframes tippulse{from{opacity:.65}to{opacity:1}}
+.dial-glow{animation:glowbreathe 7s ease-in-out infinite alternate}
+@keyframes glowbreathe{from{opacity:.7;transform:scale(.98)}to{opacity:1;transform:scale(1.02)}}
 @media (prefers-reduced-motion: reduce){
-  .moon-breathe,.stars,.stars::after{animation:none !important}
+  .moon-breathe,.stars,.stars::after,.orbit,.dust,.tip-star,.dial-glow{animation:none !important}
 }
 
 /* readout */
@@ -443,6 +451,14 @@ function buildDial(lon, elong){
   // rings
   el('circle', { cx, cy, r:206, fill:'none', stroke:'rgba(240,228,200,.16)', 'stroke-width':1 }, svg);
   el('circle', { cx, cy, r:164, fill:'none', stroke:'rgba(240,228,200,.10)', 'stroke-width':1 }, svg);
+  // star-dust ring, drifting slowly against the wheel
+  el('circle', { cx, cy, r:196, fill:'none', stroke:'rgba(246,200,137,.20)', 'stroke-width':1.2,
+    'stroke-dasharray':'1 9', class:'dust' }, svg);
+  // a lone spark orbiting the rim — the clock visibly turning
+  const orb = el('g', { class:'orbit' }, svg);
+  const spark = el('text', { x:cx, y:cy-206, 'text-anchor':'middle', 'dominant-baseline':'central',
+    'font-size':11, fill:'#F6C889', style:'filter:drop-shadow(0 0 5px #F6C889)' }, orb);
+  spark.textContent = '✦';
 
   // sign sectors + glyphs
   for (let i = 0; i < 12; i++){
@@ -486,7 +502,7 @@ function buildDial(lon, elong){
   el('stop', { offset:'100%', 'stop-color':'#F6C889', 'stop-opacity':'.95' }, lg);
   // marker star at the tip
   const [sx, sy] = pt(lon, 150);
-  const star = el('text', { x:sx, y:sy, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':15, fill:'#FFF1D6', style:'filter:drop-shadow(0 0 7px #F6C889)' }, svg);
+  const star = el('text', { x:sx, y:sy, 'text-anchor':'middle', 'dominant-baseline':'central', 'font-size':15, fill:'#FFF1D6', class:'tip-star', style:'filter:drop-shadow(0 0 7px #F6C889)' }, svg);
   star.textContent = '✦';
 
   // the Moon herself, at the heart, wearing her true phase
