@@ -127,6 +127,7 @@
     .ac-item:hover, .ac-item.sel { background: var(--bg3); color: var(--text); }
     .loc-confirm { display: none; margin-top: 0.55rem; font-size: 0.85rem; color: var(--green); }
     .loc-confirm .tz { color: var(--dim); font-style: italic; }
+    .help { font-size: 0.8rem; color: var(--dim); font-style: italic; line-height: 1.55; margin: 0.35rem 0 0.1rem; }
     .search-online { background: none; border: none; color: var(--blue); font-family: 'Lora', serif;
       font-size: 0.85rem; cursor: pointer; text-decoration: underline; padding: 0; margin-top: 0.4rem; }
 
@@ -201,15 +202,17 @@
       <span>I don't know my birth time — contact me about what's still possible</span></label>
 
     <label for="birthCity">Town or city you were born in</label>
+    <p class="help">Start typing, then <strong>tap your town in the list</strong> that appears — you'll see a green ✓ once it's set. If your exact town isn't listed, pick the nearest larger town or city.</p>
     <div class="ac-wrap">
-      <input type="text" id="birthCity" placeholder="Start typing, then pick from the list… e.g. Melbourne" autocomplete="off">
+      <input type="text" id="birthCity" placeholder="Type your birth town or city…" autocomplete="off">
       <div class="ac-list" id="birthCityList"></div>
     </div>
     <div class="loc-confirm" id="birthConfirm"></div>
 
     <label for="currentCity">Town or city you live in now</label>
+    <p class="help">Same again — start typing and <strong>tap it in the list</strong> to lock it in with a ✓.</p>
     <div class="ac-wrap">
-      <input type="text" id="currentCity" placeholder="Start typing, then pick from the list…" autocomplete="off">
+      <input type="text" id="currentCity" placeholder="Type the town or city you live in now…" autocomplete="off">
       <div class="ac-list" id="currentCityList"></div>
     </div>
     <div class="loc-confirm" id="currentConfirm"></div>
@@ -411,14 +414,23 @@ function localMatches(q){
 }
 
 async function geoMatches(q){
-  const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`);
-  if (!res.ok) throw new Error('geocoder ' + res.status);
-  const data = await res.json();
-  return (data.results || []).map(r => ({
-    label: [r.name, r.admin1, r.country].filter(Boolean).join(', '),
-    lat: +r.latitude.toFixed(4), lon: +r.longitude.toFixed(4),
-    iana: r.timezone || '', tz: Math.round(r.longitude/15*2)/2
-  }));
+  // Try the name as typed, then common spelling variants — the gazetteer lists
+  // some towns only one way (e.g. "Castleton on Hudson" is only "Castleton-on-Hudson").
+  const tries = [q];
+  if (/\s/.test(q)) tries.push(q.replace(/\s+/g, '-'));   // spaces → hyphens
+  if (q.includes('-')) tries.push(q.replace(/-/g, ' '));  // hyphens → spaces
+  for (const t of tries){
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(t)}&count=8&language=en&format=json`);
+    if (!res.ok) throw new Error('geocoder ' + res.status);
+    const data = await res.json();
+    const matches = (data.results || []).map(r => ({
+      label: [r.name, r.admin1, r.country].filter(Boolean).join(', '),
+      lat: +r.latitude.toFixed(4), lon: +r.longitude.toFixed(4),
+      iana: r.timezone || '', tz: Math.round(r.longitude/15*2)/2
+    }));
+    if (matches.length) return matches;
+  }
+  return [];
 }
 
 function setLoc(which, m){

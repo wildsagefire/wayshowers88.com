@@ -594,6 +594,9 @@
     .ac-item:last-child { border-bottom: none; }
     .ac-item:hover, .ac-item.sel { background: rgba(232,166,89,0.12); color: var(--gold-lt); }
     .ac-item .ac-sub { font-size: 0.72rem; color: var(--dim); display: block; }
+    /* status row (Searching…, no-match) — not selectable, no hover glow */
+    .ac-item.ac-note { cursor: default; color: var(--dim); font-style: italic; }
+    .ac-item.ac-note:hover { background: none; color: var(--dim); }
 
     /* ── BIG THREE CARDS ── */
     .big3 {
@@ -914,7 +917,7 @@
   <!-- FORM -->
   <div class="form-card">
     <p class="form-intro">
-      Enter your birth details below to generate your natal chart. For your birth location, type the name of the nearest major city — if your exact town isn't listed, use the closest large city or state capital. An accurate birth time is needed for house placements and your Rising sign.
+      Just three details and you're done — fill in each field below, then tap <strong>Calculate My Birth Chart</strong> at the bottom. Everything is worked out privately in your browser; nothing is saved or sent anywhere. If you have your birth certificate handy, use the date, time and place written on it.
     </p>
 
     <div class="form-grid">
@@ -923,6 +926,7 @@
       <div class="fg">
         <label for="bDate">Date of Birth</label>
         <input type="date" id="bDate">
+        <span class="fn">Tap the field and pick your birth day, month and year.</span>
       </div>
 
       <!-- Time -->
@@ -937,12 +941,12 @@
         <label>Birth Location</label>
         <div class="loc-row">
           <div class="ac-wrap">
-            <input type="text" id="cityInput" placeholder="Start typing the nearest major city…" autocomplete="off" />
+            <input type="text" id="cityInput" placeholder="Type your birth town or city…" autocomplete="off" />
             <div class="ac-list" id="acList"></div>
           </div>
           <button class="btn-lookup" onclick="geocodeCity()">Search Online</button>
         </div>
-        <span class="fn">Suggestions appear as you type — just tap your city. If it isn't listed, try the nearest large city or state capital, or press Search Online.</span>
+        <span class="fn"><strong>1.</strong> Start typing your birth town or city. &nbsp;<strong>2.</strong> Tap it when it appears in the list below. &nbsp;<strong>3.</strong> A ✓ line confirms the place and timezone. If nothing appears after a moment, press <strong>Search Online</strong> or the Enter key — and if your town still isn't found, try the nearest larger town or city.</span>
         <div id="locConfirm" class="loc-confirm" style="display:none;"></div>
         <div class="tz-override-row" id="tzOverrideRow">
           <label for="utcOverride">Override timezone (UTC offset):</label>
@@ -1503,47 +1507,84 @@ function toggleTZOverride(defaultTZ) {
   }
 }
 
+// Turn one Open-Meteo result into the same shape as a CITY_DB entry,
+// carrying its own IANA zone so acSelectCity/geocode can use it directly.
+function normalizeRemote(r) {
+  return {
+    n:   r.name,
+    lat: r.latitude,
+    lon: r.longitude,
+    tz:  Math.round(r.longitude / 15 * 2) / 2,   // rough offset; IANA zone is authoritative
+    d:   [r.name, r.admin1, r.country].filter(Boolean).join(', '),
+    zone: r.timezone || ''
+  };
+}
+
+// Ask Open-Meteo for towns/cities matching a single name. Returns [] offline.
+async function remoteSearch(name) {
+  const q = name.trim();
+  if (q.length < 2) return [];
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=en&format=json`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    return (data.results || []).map(normalizeRemote);
+  } catch { return []; }
+}
+
+function applyLocation(loc) {
+  document.getElementById('lat').value = loc.lat.toFixed(4);
+  document.getElementById('lon').value = loc.lon.toFixed(4);
+  document.getElementById('utcOffset').value = loc.tz;
+  document.getElementById('ianaZone').value = loc.zone || '';
+  document.getElementById('tzOverrideRow').style.display = 'none';
+  showLocConfirm(loc.d, loc.tz, loc.zone || '');
+  setStatus('');
+}
+
 async function geocodeCity() {
   const city = document.getElementById('cityInput').value.trim();
-  if (!city) { setStatus('Enter a city name first.', true); return; }
+  if (!city) { setStatus('Type your birth town or city first, then tap a suggestion or press Search Online.', true); return; }
   setStatus('Looking up location…');
+  document.getElementById('acList').style.display = 'none';
 
   // ── Local database (fully offline) ─────────────────────────────
   const found = cityLookup(city);
   if (found) {
-    const zone = CITY_TZ[found.n] || '';
-    document.getElementById('lat').value = found.lat.toFixed(4);
-    document.getElementById('lon').value = found.lon.toFixed(4);
-    document.getElementById('utcOffset').value = found.tz;
-    document.getElementById('ianaZone').value = zone;
-    document.getElementById('tzOverrideRow').style.display = 'none';
-    showLocConfirm(found.d, found.tz, zone);
-    setStatus('');
+    applyLocation({ ...found, zone: CITY_TZ[found.n] || '' });
     return;
   }
 
-  // ── Fallback: Open-Meteo if online ─────────────────────────────
-  try {
-    const cityOnly = city.split(',')[0].trim();
-    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityOnly)}&count=5&language=en&format=json`;
-    const res  = await fetch(url);
-    const data = await res.json();
-    if (data.results && data.results.length > 0) {
-      const r = data.results[0];
-      document.getElementById('lat').value = r.latitude.toFixed(4);
-      document.getElementById('lon').value = r.longitude.toFixed(4);
-      const zone = r.timezone || '';
-      const roughTZ = Math.round(r.longitude / 15 * 2) / 2;
-      document.getElementById('utcOffset').value = roughTZ;
-      document.getElementById('ianaZone').value = zone;
-      const label = [r.name, r.admin1, r.country].filter(Boolean).join(', ');
-      showLocConfirm(label, roughTZ, zone);
-      setStatus('');
+  // ── Online: try the name, then common spelling variants ────────
+  // Handles hyphenated town names (e.g. "Castleton on Hudson" →
+  // "Castleton-on-Hudson") that the gazetteer only lists one way.
+  const raw   = city.split(',')[0].trim();
+  const hint  = (city.split(',')[1] || '').toLowerCase().replace(/[^a-z ]/g, ' ');
+  const tries = [];
+  const addTry = v => { if (v && !tries.includes(v)) tries.push(v); };
+  addTry(raw);
+  if (/\s/.test(raw)) addTry(raw.replace(/\s+/g, '-'));   // spaces → hyphens
+  if (raw.includes('-')) addTry(raw.replace(/-/g, ' '));  // hyphens → spaces
+
+  for (const attempt of tries) {
+    const results = await remoteSearch(attempt);
+    if (results.length) {
+      // If the user named a state/country after the comma, prefer the match there.
+      let pick = results[0];
+      if (hint.trim()) {
+        const better = results.find(r => {
+          const a = (r.d.split(',')[1] || '').trim().toLowerCase();
+          const c = (r.d.split(',')[2] || '').trim().toLowerCase();
+          return (a && hint.includes(a)) || (c && hint.includes(c));
+        });
+        if (better) pick = better;
+      }
+      applyLocation(pick);
       return;
     }
-  } catch { /* offline */ }
+  }
 
-  setStatus(`"${city}" wasn't found. Try the nearest large city or state capital — e.g. type "Brisbane" for anywhere in SE Queensland.`, true);
+  setStatus(`We couldn't find "${city}". Try just the town name on its own, double-check the spelling, or use the nearest larger town or city.`, true);
 }
 
 // ─────────────────────────────────────────
@@ -1552,7 +1593,8 @@ async function geocodeCity() {
 
 let acSel = -1;
 
-function acMatches(q) {
+// Instant matches from the built-in list (works with no internet).
+function acLocalMatches(q) {
   q = q.toLowerCase().trim();
   if (q.length < 2) return [];
   const starts = [], contains = [];
@@ -1561,20 +1603,20 @@ function acMatches(q) {
     if (name.startsWith(q)) starts.push(c);
     else if (name.includes(q) || disp.includes(q)) contains.push(c);
   }
-  return starts.concat(contains).slice(0, 8);
+  return starts.concat(contains).slice(0, 6);
 }
 
 function acSelectCity(c) {
-  const zone = CITY_TZ[c.n] || '';
+  const zone = c.zone || CITY_TZ[c.n] || '';
   document.getElementById('cityInput').value = c.d;
-  document.getElementById('lat').value = c.lat.toFixed(4);
-  document.getElementById('lon').value = c.lon.toFixed(4);
-  document.getElementById('utcOffset').value = c.tz;
-  document.getElementById('ianaZone').value = zone;
-  document.getElementById('tzOverrideRow').style.display = 'none';
   document.getElementById('acList').style.display = 'none';
-  showLocConfirm(c.d, c.tz, zone);
-  setStatus('');
+  applyLocation({ ...c, zone });
+}
+
+function acShowMessage(text, sub) {
+  const el = document.getElementById('acList');
+  el.innerHTML = `<div class="ac-item ac-note">${text}${sub ? `<span class="ac-sub">${sub}</span>` : ''}</div>`;
+  el.style.display = 'block';
 }
 
 function acRender(list) {
@@ -1596,16 +1638,41 @@ function acRender(list) {
   const input = document.getElementById('cityInput');
   if (!input) return;
   let current = [];
+  let remoteTimer = null;
+  let reqId = 0;
+
   input.addEventListener('input', () => {
     acSel = -1;
-    current = acMatches(input.value);
+    const val = input.value;
+    current = acLocalMatches(val);
     acRender(current);
+
+    // Live worldwide lookup (debounced) so real birth towns appear as you type,
+    // not just the ~200 major cities in the built-in list.
+    clearTimeout(remoteTimer);
+    const myReq = ++reqId;
+    const cityOnly = val.split(',')[0].trim();
+    if (cityOnly.length < 3) return;
+    if (!current.length) acShowMessage('Searching worldwide…', 'finding your town');
+    remoteTimer = setTimeout(async () => {
+      const remote = await remoteSearch(cityOnly);
+      if (myReq !== reqId) return;   // a newer keystroke already superseded this
+      const seen = new Set(current.map(c => c.n.toLowerCase()));
+      current = current.concat(remote.filter(r => !seen.has(r.n.toLowerCase()))).slice(0, 8);
+      if (current.length) acRender(current);
+      else acShowMessage(`No match for “${cityOnly}” — press Search Online or try a nearby larger town.`);
+    }, 350);
   });
+
   input.addEventListener('keydown', e => {
-    if (document.getElementById('acList').style.display !== 'block') return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); acSel = Math.min(acSel + 1, current.length - 1); acRender(current); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); acSel = Math.max(acSel - 1, 0); acRender(current); }
-    else if (e.key === 'Enter')  { e.preventDefault(); if (current.length) acSelectCity(current[Math.max(acSel, 0)]); }
+    const selectable = current.length > 0;
+    if (e.key === 'ArrowDown') { if (!selectable) return; e.preventDefault(); acSel = Math.min(acSel + 1, current.length - 1); acRender(current); }
+    else if (e.key === 'ArrowUp') { if (!selectable) return; e.preventDefault(); acSel = Math.max(acSel - 1, 0); acRender(current); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectable && acSel >= 0) acSelectCity(current[acSel]);
+      else geocodeCity();   // no suggestion picked → run the thorough search
+    }
     else if (e.key === 'Escape') { document.getElementById('acList').style.display = 'none'; }
   });
   input.addEventListener('blur', () => {
