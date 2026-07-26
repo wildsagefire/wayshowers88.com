@@ -259,6 +259,22 @@
       font-size: 0.75rem;
       margin-top: 0.25rem;
     }
+    /* Pre-1967 US daylight-saving notice, shown with the chart */
+    .dst-notice {
+      background: rgba(232,166,89,0.07);
+      border: 1px solid rgba(232,166,89,0.28);
+      border-radius: 7px;
+      padding: 0.7rem 1rem;
+      margin: 0.9rem auto 0;
+      max-width: 46rem;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: var(--gold-lt);
+      text-align: left;
+    }
+    .dst-notice.warn { border-color: rgba(232,166,89,0.5); }
+    .dst-notice strong { color: var(--gold); }
+    .dst-notice .sub { color: var(--dim); font-size: 0.76rem; margin-top: 0.3rem; }
     .dst-link {
       color: var(--gold);
       cursor: pointer;
@@ -958,6 +974,7 @@
         <input type="hidden" id="lon">
         <input type="hidden" id="utcOffset">
         <input type="hidden" id="ianaZone">
+        <input type="hidden" id="placeLabel">
       </div>
 
     </div>
@@ -981,6 +998,7 @@
     <div class="results-header">
       <h2 id="rTitle">Natal Chart</h2>
       <div class="sub" id="rSub"></div>
+      <div id="dstNotice" class="dst-notice" style="display:none;"></div>
     </div>
 
     <button class="btn-save" onclick="window.print()">⬇ Save as PDF</button>
@@ -1113,6 +1131,9 @@
 
 <!-- ═══════════════ SCRIPTS ═══════════════ -->
 <script src="astronomy.browser.min.js"></script>
+<!-- Historical US daylight saving — IANA is unreliable before 1967. Shared byte-for-byte
+     with the report engine; regenerate from Lunar Report Engine/ushistdst.js, don't hand-edit. -->
+<script src="ushistdst.js"></script>
 
 <script>
 // ─────────────────────────────────────────
@@ -1537,6 +1558,7 @@ function applyLocation(loc) {
   document.getElementById('lon').value = loc.lon.toFixed(4);
   document.getElementById('utcOffset').value = loc.tz;
   document.getElementById('ianaZone').value = loc.zone || '';
+  document.getElementById('placeLabel').value = loc.d || '';
   document.getElementById('tzOverrideRow').style.display = 'none';
   showLocConfirm(loc.d, loc.tz, loc.zone || '');
   setStatus('');
@@ -1924,6 +1946,47 @@ function zoneOffsetHours(zone, y, m, d, hh, mm) {
 
 let houseSystem = 'placidus';
 
+// Result of the last historical-DST resolution, rendered with the chart.
+let lastHistTZ = null;
+
+function renderDSTNotice(tz) {
+  const el = document.getElementById('dstNotice');
+  if (!tz || tz.verdict === 'ok' && !tz.note) { el.style.display = 'none'; return; }
+
+  const off = `UTC${tz.offset >= 0 ? '+' : ''}${tz.offset}`;
+  let html = '';
+
+  if (tz.verdict === 'ok' && tz.source === 'table-1946-1966-nodst') {
+    // We silently corrected an IANA error — say so, because it changes the chart.
+    el.className = 'dst-notice';
+    html = `<strong>A note on your birth time.</strong> Before 1967 each US state chose for
+      itself whether to keep daylight saving, and most timezone software still applies the
+      wrong rule to whole regions. ${tz.state} did <strong>not</strong> observe daylight
+      saving in ${tz.year || 'that year'}, so your chart is cast on standard time (${off}).
+      <div class="sub">Many other chart sites get this wrong by an hour, which shifts the
+      rising sign and the house cusps. Your Sun, Moon and planet signs are the same either way.</div>`;
+  } else if (tz.verdict === 'stop') {
+    el.className = 'dst-notice warn';
+    html = `<strong>Please double-check your birth hour.</strong> ${tz.state
+      ? tz.state + ' had no statewide daylight-saving law then'
+      : 'Daylight saving was not standardised in the US then'} — individual towns decided
+      year by year, and no timezone database can resolve it reliably. We've used ${off}.
+      <div class="sub">If your birth certificate or family records say otherwise, use
+      <strong>Set manually</strong> above to enter the exact offset. This affects your rising
+      sign and house cusps only — your Sun, Moon and planet signs are unaffected.</div>`;
+  } else if (tz.verdict === 'check') {
+    el.className = 'dst-notice warn';
+    html = `<strong>Your birth falls near a clock change.</strong> Before the Uniform Time
+      Act of 1966, daylight saving start and end dates varied from town to town. We've used
+      ${off}, which is the best available record.
+      <div class="sub">If you know your birth was on the other side of the changeover, use
+      <strong>Set manually</strong> above. Your Sun, Moon and planet signs are unaffected.</div>`;
+  } else { el.style.display = 'none'; return; }
+
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
 function setHouseSystem(sys) {
   houseSystem = sys;
   document.getElementById('hsPlacidus').classList.toggle('active', sys === 'placidus');
@@ -1980,17 +2043,25 @@ async function calculateChart() {
   const baseOff     = parseFloat(document.getElementById('utcOffset').value);
   const zone        = document.getElementById('ianaZone').value;
 
-  let utcOff;
+  // Before 1967 US daylight saving was a local-option patchwork and IANA just
+  // replays its zone's representative city, so a pre-1967 US birth can come out
+  // an hour wrong — which moves the rising sign and every house cusp. The shared
+  // resolver corrects what the record settles and flags what it doesn't.
+  let utcOff, histTZ = null;
   if (overrideRow.style.display === 'flex' && !isNaN(overrideVal)) {
     utcOff = overrideVal;
   } else if (zone) {
     const [zy, zm, zd] = dateStr.split('-').map(Number);
     const [zh, zmin]   = (timeStr || '12:00').split(':').map(Number);
-    const z = zoneOffsetHours(zone, zy, zm, zd, zh, zmin);
-    utcOff = isNaN(z) ? baseOff : z;
+    histTZ = WS88_HISTDST.resolveOffset({
+      year: zy, month: zm, day: zd, hour: zh, minute: zmin,
+      iana: zone, place: document.getElementById('placeLabel').value
+    });
+    utcOff = isNaN(histTZ.offset) ? baseOff : histTZ.offset;
   } else {
     utcOff = baseOff;
   }
+  lastHistTZ = histTZ;
   if (isNaN(latVal) || isNaN(lonVal)) {
     setStatus('Please look up your birth location first — type a city name and click Look Up.', true); return;
   }
@@ -2424,6 +2495,7 @@ function renderResults(positions, cusps, meta) {
   const utcLabel = meta.utcOff >= 0 ? `UTC+${meta.utcOff}` : `UTC${meta.utcOff}`;
   document.getElementById('rSub').textContent =
     `${meta.dateStr}  ·  ${meta.timeStr} local (${utcLabel})  ·  ${meta.lat.toFixed(2)}°, ${meta.lon.toFixed(2)}°`;
+  renderDSTNotice(lastHistTZ);
 
   // Wheel
   document.getElementById('wheelSVG').innerHTML = renderWheel(positions, cusps);

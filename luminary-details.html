@@ -261,6 +261,9 @@
 
 <script src="cities.js"></script>
 <script src="astronomy.browser.min.js"></script>
+<!-- Historical US daylight saving — IANA is unreliable before 1967. Shared byte-for-byte
+     with the report engine; regenerate from Lunar Report Engine/ushistdst.js, don't hand-edit. -->
+<script src="ushistdst.js"></script>
 <script>
 // ═════════════════════════════════════════════════════════════
 //  CONFIG
@@ -604,7 +607,17 @@ function confirmDetails(){
   try {
     const zone = intake.birth.iana;
     const [hh,mm] = intake.timeKnown ? time.split(':').map(Number) : [12,0];
-    const off = zone ? zoneOffsetHours(zone, Y, M, D, hh, mm) : intake.birth.utcStd;
+    // Before 1967 US daylight saving was a local-option patchwork and IANA just
+    // replays its zone's representative city — so a pre-1967 US birth can come out
+    // an hour wrong, which moves the rising sign we are about to show them. Correct
+    // what the record settles, and record the verdict on the order so the desk sees
+    // it at fulfilment rather than discovering it after the reading is written.
+    const tz = WS88_HISTDST.resolveOffset({
+      year: Y, month: M, day: D, hour: hh, minute: mm,
+      iana: zone, place: intake.birth.place
+    });
+    intake.tz = tz;
+    const off = zone ? tz.offset : intake.birth.utcStd;
     const offH = isNaN(off) ? intake.birth.utcStd : off;
     const utc = new Date(Date.UTC(Y, M-1, D, hh, mm) - offH*3600000);
     const t = Astronomy.MakeTime(utc);
@@ -638,6 +651,9 @@ function confirmDetails(){
       const rising = SIGNS[Math.floor(cusps._asc/30)];
       const house = getHouse(evLon, cusps);
       readHTML = `The chart is cast. Sun in <b>${sunSign}</b>, Moon in <b>${moonSign}</b>, <b>${rising}</b> rising — we see you, ${name.split(' ')[0]}.`;
+      // Where the daylight-saving record genuinely can't be resolved, say so now
+      // rather than let a rising sign we aren't sure of set their expectation.
+      if (tz.verdict === 'stop') readHTML += ` <span class="fn">Your birth year falls in the era when American daylight saving was decided town by town, so we'll confirm your rising sign by hand before writing — your Sun and Moon are unaffected.</span>`;
       moonHTML = `The ${kind} in ${evSign} of ${local} ${evPast ? 'landed' : 'lands'} in your ${ORDINAL[house]} house — ${HOUSE_PHRASE[house]}. Your reading is written by hand from exactly that, ${arrival}.`;
       intake.instant = { sunSign, moonSign, rising, lunationHouse: house };
     } else {
