@@ -1099,13 +1099,13 @@
       <div id="dwMoons"></div>
       <p class="dw-sub" id="dwSub"></p>
       <a class="dw-btn" href="luminary-details.html">Have the Luminary read it for you → <span style="opacity:.75">$33 AUD</span></a>
-      <p class="dw-fine">A personalised New or Full Moon reading — you choose the moon, we compute your exact sky, and a human writes what it means. Delivered in good time for your chosen moon.</p>
+      <p class="dw-fine">A personalised New or Full Moon reading — you choose the moon, we compute your exact sky, and your reading is composed to it alone. Delivered in good time for your chosen moon.</p>
     </div>
 
     <!-- The Threshold Letter — soft email ask -->
     <div class="threshold" id="threshold">
       <div class="dw-eyebrow">✦ The Threshold Letter</div>
-      <p class="dw-sub" style="margin-bottom:0;">A short letter at each threshold — every New and Full Moon — with what the sky is doing and what it's asking. Free, occasional, written by hand. Your chart stays in your browser; only your email travels.</p>
+      <p class="dw-sub" style="margin-bottom:0;">A short letter at each threshold — every New and Full Moon — with what the sky is doing and what it's asking. Free, occasional, written for the moment. Your chart stays in your browser; only your email travels.</p>
       <form class="tl-row" id="tlForm">
         <input type="email" id="tlEmail" placeholder="your@email.com" required>
         <button type="submit">Receive the letter</button>
@@ -2210,7 +2210,7 @@ function renderDoorway(cusps) {
       `<p class="dw-moon-row">The <strong>${m.kind} in ${m.sign}</strong> of ${m.date} ${m.past ? 'landed' : 'lands'} in your <strong>${ORDINAL[m.house - 1]} house</strong> — ${HOUSE_THEME[m.house - 1]}.${m.past ? '<span class="dwm-win">just peaked — its three-day reading window is still open</span>' : ''}</p>`
     ).join('');
     document.getElementById('dwSub').textContent =
-      'That is the where. The Luminary is the what: a hand-written report of the moon you choose, in your exact chart — what it stirs, what it closes, what it asks of you next.';
+      'That is the where. The Luminary is the what: a personal report of the moon you choose, in your exact chart — what it stirs, what it closes, what it asks of you next.';
     const near = moons[0];
     const teaser = document.getElementById('dwTeaser');
     teaser.innerHTML = `✦ The ${near.kind} ${near.past ? 'landed' : 'lands'} in your <strong>${ORDINAL[near.house - 1]} house</strong> — see what it opens, and how to go deeper ↓`;

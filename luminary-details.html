@@ -242,11 +242,15 @@
     <div id="receivedNote" style="display:none">
       <a class="btn" id="squareBtn" href="#" target="_blank" rel="noopener">Continue to Secure Checkout</a>
       <a class="btn ghost" id="paypalBtn" href="#" target="_blank" rel="noopener" style="display:none">Or Pay with PayPal</a>
-      <div class="fineprint">Introductory price — your reading arrives as two hand-finished editions:
+      <div class="fineprint">Introductory price — your reading arrives as two finished editions:
         the <strong>violet edition</strong> for the screen and the <strong>parchment edition</strong> for printing and keeping.<br><br>
         Payment is handled securely by Square<span id="orPaypal"></span>. Your reading arrives at
-        <strong id="replyEmail"></strong> in good time for your chosen moon — readings are written by hand,
+        <strong id="replyEmail"></strong> in good time for your chosen moon — readings are composed
         one chart at a time, in the order of the sky itself: whichever moon peaks next is written first.<br><br>
+        <em>How readings are made:</em> every reading begins with a verified astronomical engine computing
+        your exact chart. The interpretation is then composed for your chart alone — using the same modern
+        co-reading craft we teach openly in the Mystic's Codex — and personally reviewed, finished, and sent
+        before it reaches you. No two readings share a sentence.<br><br>
         <em>Already ordered on our store? Then you're done — nothing more to do. Your reading is being cast.</em><br><br>
         Your details travel encrypted to the reading desk's order system, are used for your reading and nothing else,
         and are never shared.</div>
@@ -654,15 +658,15 @@ function confirmDetails(){
       // Where the daylight-saving record genuinely can't be resolved, say so now
       // rather than let a rising sign we aren't sure of set their expectation.
       if (tz.verdict === 'stop') readHTML += ` <span class="fn">Your birth year falls in the era when American daylight saving was decided town by town, so we'll confirm your rising sign by hand before writing — your Sun and Moon are unaffected.</span>`;
-      moonHTML = `The ${kind} in ${evSign} of ${local} ${evPast ? 'landed' : 'lands'} in your ${ORDINAL[house]} house — ${HOUSE_PHRASE[house]}. Your reading is written by hand from exactly that, ${arrival}.`;
+      moonHTML = `The ${kind} in ${evSign} of ${local} ${evPast ? 'landed' : 'lands'} in your ${ORDINAL[house]} house — ${HOUSE_PHRASE[house]}. Your reading is composed from exactly that, ${arrival}.`;
       intake.instant = { sunSign, moonSign, rising, lunationHouse: house };
     } else {
       readHTML = `The chart is cast. Sun in <b>${sunSign}</b> — we see you, ${name.split(' ')[0]}. We’ll be in touch about your birth time before anything is written.`;
-      moonHTML = `Your reading: the ${kind} in ${evSign}, ${local} — written by hand, ${arrival}.`;
+      moonHTML = `Your reading: the ${kind} in ${evSign}, ${local} — composed for you alone, ${arrival}.`;
       intake.instant = { sunSign };
     }
   } catch(e){
-    readHTML = `Details received, ${name.split(' ')[0]} — your chart will be cast by hand.`;
+    readHTML = `Details received, ${name.split(' ')[0]} — your chart will be cast for your reading alone.`;
   }
 
   document.getElementById('instantRead').innerHTML = readHTML;
