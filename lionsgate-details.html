@@ -391,7 +391,7 @@ function attachCity(which){
 
   const render = (matches) => {
     if (!matches.length){
-      list.innerHTML = `<div class="ac-item" style="cursor:default">Nothing found — check the spelling, or pick the nearest larger town and name the real one in the note box.</div>`;
+      list.innerHTML = `<div class="ac-item" style="cursor:default">Nothing found — check the spelling, or pick the nearest larger town or city.</div>`;
       list.style.display='block';
       return;
     }
@@ -424,7 +424,7 @@ function attachCity(which){
   });
   input.addEventListener('blur', ()=> setTimeout(()=> list.style.display='none', 200));
 }
-attachCity('birth'); attachCity('current');
+attachCity('birth');   // this edition asks only for the birth town — no current-city field
 
 // ═════════════ TIMEZONE (historical, DST-aware) ═════════════
 function zoneOffsetHours(zone, y, m, d, hh, mm){
