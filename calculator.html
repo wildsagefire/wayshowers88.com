@@ -2595,5 +2595,20 @@ function renderResults(positions, cusps, meta) {
   note.innerHTML = `<strong>About these calculations:</strong> Planetary positions are computed with the astronomy-engine library and verified against the Swiss Ephemeris — the engine used by professional astrology software. ${sysTxt} Lunar Nodes and Lilith are mean positions. The MC/IC axis is shown on the wheel at its true degree. ℞ indicates retrograde motion. Aspect lines: gold/blue/green = flowing, red = challenging (dashed red = opposition). An exact birth time is needed for an accurate Rising sign and house placements.`;
 }
 </script>
+<script>
+/* WayShowers analytics beacon — no cookies, no identity stored.
+   Ingest worker: wayshowers-analytics (see Lunar Report Engineanalytics-worker). */
+(function(){
+  if (!/wayshowers88.com$/.test(location.hostname)) return;
+  try {
+    navigator.sendBeacon('https://wayshowers-analytics.wayshowers88.workers.dev/hit',
+      JSON.stringify({
+        page: location.pathname,
+        ref: document.referrer || '',
+        screen: innerWidth < 768 ? 'mobile' : innerWidth < 1100 ? 'tablet' : 'desktop'
+      }));
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

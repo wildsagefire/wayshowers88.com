@@ -1399,5 +1399,20 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   document.body.appendChild(s);
 })();
 </script>
+<script>
+/* WayShowers analytics beacon — no cookies, no identity stored.
+   Ingest worker: wayshowers-analytics (see Lunar Report Engineanalytics-worker). */
+(function(){
+  if (!/wayshowers88.com$/.test(location.hostname)) return;
+  try {
+    navigator.sendBeacon('https://wayshowers-analytics.wayshowers88.workers.dev/hit',
+      JSON.stringify({
+        page: location.pathname,
+        ref: document.referrer || '',
+        screen: innerWidth < 768 ? 'mobile' : innerWidth < 1100 ? 'tablet' : 'desktop'
+      }));
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>
