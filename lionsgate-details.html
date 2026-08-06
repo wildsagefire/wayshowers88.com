@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Reading Details — The Luminary | WayShowers88</title>
+  <title>Your Star Map — Lion’s Gate 2026 | WayShowers88</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -156,25 +156,17 @@
 </div></div></div>
 
 <div class="page-hero">
-  <div class="channel-label">✦ The Luminary</div>
-  <h1>Your Reading Begins Here</h1>
-  <div class="tagline">Three small steps, and the sky you were born under is in our hands.</div>
+  <div class="channel-label">✦ Lion’s Gate 2026 · Limited Edition</div>
+  <h1>Where the Gate Opens for You</h1>
+  <div class="tagline">Your natal star map, ringed by the sky of the 8th of August — listed only while the Sun walks Leo.</div>
 </div>
 
 <main>
 
-  <!-- STEP 1 · CHOOSE YOUR MOON -->
-  <div class="card" id="moonCard">
-    <h2>Step 1 · Choose Your Moon</h2>
-    <div class="sub">Every Luminary is written to one moon. Choose the one that's calling you — a moon stays open for three days after it peaks, while its energy is still planting.</div>
-    <div class="moon-opts" id="moonOpts"><div class="when">Reading the sky…</div></div>
-    <div class="status" id="moonStatus"></div>
-  </div>
-
-  <!-- STEP 2 · YOUR EMAIL -->
-  <div class="card locked" id="gateCard">
-    <h2>Step 2 · Where Your Reading Arrives</h2>
-    <div class="sub">Your finished reading — and nothing else — will be sent to this address. If you've already ordered on our store, use the same email you paid with.</div>
+  <!-- STEP 1 · YOUR EMAIL -->
+  <div class="card" id="gateCard">
+    <h2>Step 1 · Where Your Star Map Arrives</h2>
+    <div class="sub">Your finished star map — and nothing else — will be sent to this address. If you've already ordered on our store, use the same email you paid with.</div>
     <label for="orderEmail">Your email</label>
     <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com">
     <button class="btn" id="unlockBtn" onclick="unlock()">Begin ✦ Your Details</button>
@@ -183,10 +175,10 @@
 
   <!-- STEP 3 · DETAILS -->
   <div class="card locked" id="detailsCard">
-    <h2>Step 3 · The Sky You Were Born Under</h2>
+    <h2>Step 2 · The Sky You Were Born Under</h2>
     <div class="sub">Exactly as it appears on your birth certificate, if you have it.</div>
 
-    <label for="fullName">Your name, as you'd like it on the reading</label>
+    <label for="fullName">Your name, as you'd like it on the map</label>
     <input type="text" id="fullName" autocomplete="name" placeholder="e.g. Kathleen">
 
     <label>Date of birth</label>
@@ -209,24 +201,13 @@
     </div>
     <div class="loc-confirm" id="birthConfirm"></div>
 
-    <label for="currentCity">Town or city you live in now</label>
-    <p class="help">Same again — start typing and <strong>tap it in the list</strong> to lock it in with a ✓.</p>
-    <div class="ac-wrap">
-      <input type="text" id="currentCity" placeholder="Type the town or city you live in now…" autocomplete="off">
-      <div class="ac-list" id="currentCityList"></div>
-    </div>
-    <div class="loc-confirm" id="currentConfirm"></div>
-
-    <label for="lifeNote">Anything you'd like this moon to speak to? <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
-    <textarea id="lifeNote" placeholder="A few words about what's alive for you right now — it enriches the writing, and stays between us."></textarea>
-
     <button class="btn" id="confirmBtn" onclick="confirmDetails()">Confirm My Details</button>
     <div class="status" id="detailsStatus"></div>
   </div>
 
   <!-- STEP 4 · CONFIRMATION -->
   <div class="card" id="confirmCard">
-    <h2>Step 4 · Received</h2>
+    <h2>Step 3 · Received</h2>
     <div class="orn">✦ &nbsp; ✦ &nbsp; ✦</div>
     <div class="instant" id="instantRead"></div>
     <div class="moonline" id="moonLine"></div>
@@ -242,18 +223,17 @@
     <div id="receivedNote" style="display:none">
       <a class="btn" id="squareBtn" href="#" target="_blank" rel="noopener">Continue to Secure Checkout</a>
       <a class="btn ghost" id="paypalBtn" href="#" target="_blank" rel="noopener" style="display:none">Or Pay with PayPal</a>
-      <div class="fineprint">Introductory price — your reading arrives as two finished editions:
-        the <strong>violet edition</strong> for the screen and the <strong>parchment edition</strong> for printing and keeping.<br><br>
-        Payment is handled securely by Square<span id="orPaypal"></span>. Your reading arrives at
-        <strong id="replyEmail"></strong> in good time for your chosen moon — readings are composed
-        one chart at a time, in the order of the sky itself: whichever moon peaks next is written first.<br><br>
-        <em>How readings are made:</em> every reading begins with a verified astronomical engine computing
-        your exact chart. The interpretation is then composed for your chart alone — using the same modern
-        co-reading craft we teach openly in the Mystic's Codex — and personally reviewed, finished, and sent
-        before it reaches you. No two readings share a sentence.<br><br>
-        <em>Already ordered on our store? Then you're done — nothing more to do. Your reading is being cast.</em><br><br>
-        Your details travel encrypted to the reading desk's order system, are used for your reading and nothing else,
-        and are never shared.</div>
+      <div class="fineprint">Your Lion&rsquo;s Gate star map arrives as a <strong>print-ready fine-art file</strong> —
+        sized for framing at A4 and larger, delivered to <strong id="replyEmail"></strong>.
+        Maps are composed one chart at a time, in good time.<br><br>
+        <em>What you receive:</em> your own natal wheel, ringed by the sky of the 8th of August 2026 —
+        Jupiter gilded at 8&deg; of Leo, a fine beam marking the exact house where the gate opens for you,
+        and the Lion himself drawn in star-points behind your chart. Cast by a verified astronomical
+        engine, composed for your chart alone.<br><br>
+        This edition is listed only while the Sun walks Leo — retired on the 23rd of August.
+        The gate sky of 2026 is never cast again.<br><br>
+        Payment is handled securely by Square<span id="orPaypal"></span>. Your details travel encrypted
+        to the desk&rsquo;s order system, are used for your map and nothing else, and are never shared.</div>
     </div>
   </div>
 
@@ -275,13 +255,13 @@
 //  catchment (Cloudflare Worker); the Square webhook matches the payment to it
 //  by email automatically. Web3Forms is the emergency fallback only.
 // ═════════════════════════════════════════════════════════════
-const PRICE = '$33 AUD';
+const PRICE = '$44 AUD';
 // Catchment Worker — primary intake destination.
 const CATCHMENT = 'https://wayshowers-catchment.wayshowers88.workers.dev';
-// Square payment link (Payment Links, $33 AUD) — clean checkout, no store wrapper.
-const SQUARE_CHECKOUT = 'https://square.link/u/9Q0hQYSb';
-// PayPal alternative — no-code checkout link, $33 AUD baked in on PayPal's side.
-const PAYPAL_LINK = 'https://www.paypal.com/ncp/payment/HKYCCGS24DPJS';
+// Square payment link (Payment Links, $44 AUD) — Adrian creates in Square, paste here.
+const SQUARE_CHECKOUT = 'PENDING';
+// PayPal alternative — no-code checkout link, $44 AUD baked in on PayPal's side.
+const PAYPAL_LINK = 'PENDING';
 const INTAKE_EMAIL = 'wayshowers88@gmail.com';
 // FALLBACK RELAY — only fires if the catchment is unreachable, so no order is ever lost.
 const RELAY = {
@@ -305,9 +285,13 @@ const SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio
 // ── payment buttons from config ──
 (function(){
   const sq = document.getElementById('squareBtn'), sqf = document.getElementById('squareBtnFallback');
-  sq.href = sqf.href = SQUARE_CHECKOUT;
-  sq.textContent = `Continue to Secure Checkout ✦ ${PRICE}`;
-  sqf.textContent = `Then Continue to Secure Checkout ✦ ${PRICE}`;
+  if (SQUARE_CHECKOUT === 'PENDING'){
+    sq.style.display = sqf.style.display = 'none';
+  } else {
+    sq.href = sqf.href = SQUARE_CHECKOUT;
+    sq.textContent = `Continue to Secure Checkout ✦ ${PRICE}`;
+    sqf.textContent = `Then Continue to Secure Checkout ✦ ${PRICE}`;
+  }
   if (PAYPAL_LINK !== 'PENDING'){
     const pp = document.getElementById('paypalBtn');
     pp.href = PAYPAL_LINK;
@@ -317,72 +301,13 @@ const SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio
   }
 })();
 
-// ═════════════ STEP 1 · CHOOSE YOUR MOON ═════════════
-// Both the next New Moon and next Full Moon are offered, computed live.
-// A moon that has already peaked stays on the menu for GRACE_DAYS after —
-// the customer chooses; nothing is ever silently defaulted.
-const GRACE_DAYS = 3;
-let selectedMoon = null;   // {kind, sign, exactUTC (Date), label}
-
-function buildMoonChooser(){
-  const box = document.getElementById('moonOpts');
-  try {
-    const now = new Date();
-    const searchFrom = new Date(now.getTime() - GRACE_DAYS*86400000 - 60000);
-    const opts = [
-      { kind:'New Moon',  date: Astronomy.SearchMoonPhase(0,   searchFrom, 40).date },
-      { kind:'Full Moon', date: Astronomy.SearchMoonPhase(180, searchFrom, 40).date }
-    ].map(o => {
-      const lon = (Astronomy.EclipticGeoMoon(Astronomy.MakeTime(o.date)).lon % 360 + 360) % 360;
-      o.sign = SIGNS[Math.floor(lon/30)];
-      o.past = o.date <= now;
-      return o;
-    }).sort((a,b)=> a.date - b.date);
-
-    box.innerHTML = opts.map((o,i)=>{
-      const when = o.date.toLocaleDateString('en-GB', { day:'numeric', month:'long' });
-      let win, winCls;
-      if (o.past){
-        const daysLeft = Math.max(1, Math.ceil(GRACE_DAYS - (now - o.date)/86400000));
-        win = `just peaked — window open ${daysLeft} more day${daysLeft>1?'s':''}`; winCls = 'win';
-      } else {
-        const daysTo = Math.ceil((o.date - now)/86400000);
-        win = daysTo <= 1 ? 'peaks within a day' : `peaks in ${daysTo} days`; winCls = 'win upcoming';
-      }
-      return `<div class="moon-opt" data-i="${i}">
-        <div class="kind">${o.kind}</div>
-        <div class="sign">in ${o.sign}</div>
-        <div class="when">${when}</div>
-        <div class="${winCls}">${win}</div>
-      </div>`;
-    }).join('');
-
-    [...box.children].forEach((el,i)=> el.onclick = ()=>{
-      [...box.children].forEach(c=> c.classList.remove('sel'));
-      el.classList.add('sel');
-      const o = opts[i];
-      selectedMoon = { kind:o.kind, sign:o.sign, exactUTC:o.date, label:`${o.kind} in ${o.sign}` };
-      const st = document.getElementById('moonStatus');
-      st.className = 'status ok';
-      st.textContent = `✓ Your reading will be written to the ${selectedMoon.label}.`;
-      document.getElementById('gateCard').classList.remove('locked');
-    });
-  } catch(e){
-    // engine unavailable → let the flow continue; the desk confirms the moon by hand
-    box.innerHTML = '<div class="when">We’ll confirm your moon with you by email before writing.</div>';
-    selectedMoon = null;
-    document.getElementById('gateCard').classList.remove('locked');
-  }
-}
-buildMoonChooser();
-
 function toggleTime(){
   const un = document.getElementById('timeUnknown').checked;
   document.getElementById('dobTime').disabled = un;
   if (un) document.getElementById('dobTime').value = '';
 }
 
-// ═════════════ STEP 1 · EMAIL ═════════════
+// ═════════════ STEP 1 · EMAIL ═════════════ (no moon step on this edition)
 // Details are collected BEFORE checkout — the reading desk matches this email
 // against the Square order that follows. Buyers arriving from a receipt
 // (already paid) use the same email they paid with; the flow is identical.
@@ -587,35 +512,28 @@ function confirmDetails(){
   const time = document.getElementById('dobTime').value;
   if (!timeUnknown && !time){ st.textContent='Add your birth time, or tick the box if you don’t know it.'; return; }
   if (!loc.birth){ st.textContent='Pick your birthplace from the suggestions (or use the online search).'; return; }
-  if (!loc.current){ st.textContent='Pick the town you live in now from the suggestions.'; return; }
   st.className='status'; st.textContent='';
 
   intake = {
-    product: 'luminary',
+    product: 'starmap-lionsgate',
     name,
     dob: `${Y}-${String(M).padStart(2,'0')}-${String(D).padStart(2,'0')}`,
     dobWritten: `${D} ${MONTHS[M-1]} ${Y}`,
     time: timeUnknown ? null : time,
     timeKnown: !timeUnknown,
     birth:   { place: loc.birth.place,   lat: loc.birth.lat,   lon: loc.birth.lon,   iana: loc.birth.iana   || null, utcStd: loc.birth.tz },
-    current: { place: loc.current.place, lat: loc.current.lat, lon: loc.current.lon, iana: loc.current.iana || null, utcStd: loc.current.tz },
-    note: document.getElementById('lifeNote').value.trim() || null,
     order: { email: gate.email, ref: gate.ref, verified: gate.verified },
     submitted: new Date().toISOString()
   };
 
-  // instant read — the Big 3 (Sun always; Moon + Rising when time is known)
-  // plus WHERE the next lunation lands in their natal houses: the hook only
-  // this page can give them, computed with the same math as the paid reading.
+  // instant read — the Big 3 plus WHERE the gate opens: Jupiter's longitude at
+  // the canonical gate instant (2026-08-07T20:18:06Z · 8°28.5' Leo) against the
+  // visitor's natal Placidus cusps — the same math as the finished map.
+  const JUP_GATE_LON = 128.475;
   let readHTML = '', moonHTML = '';
   try {
     const zone = intake.birth.iana;
     const [hh,mm] = intake.timeKnown ? time.split(':').map(Number) : [12,0];
-    // Before 1967 US daylight saving was a local-option patchwork and IANA just
-    // replays its zone's representative city — so a pre-1967 US birth can come out
-    // an hour wrong, which moves the rising sign we are about to show them. Correct
-    // what the record settles, and record the verdict on the order so the desk sees
-    // it at fulfilment rather than discovering it after the reading is written.
     const tz = WS88_HISTDST.resolveOffset({
       year: Y, month: M, day: D, hour: hh, minute: mm,
       iana: zone, place: intake.birth.place
@@ -628,45 +546,24 @@ function confirmDetails(){
     const sunLon = (Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Sun, t, true)).elon % 360 + 360) % 360;
     const sunSign = SIGNS[Math.floor(sunLon/30)];
 
-    // the moon this reading is written to — the CUSTOMER'S choice from Step 1
-    // (fallback: next lunation, flagged unchosen so the desk confirms by hand)
-    const now = new Date();
-    let ev, kind;
-    if (selectedMoon){
-      ev = selectedMoon.exactUTC; kind = selectedMoon.kind;
-    } else {
-      const nm = Astronomy.SearchMoonPhase(0, now, 40).date;
-      const fm = Astronomy.SearchMoonPhase(180, now, 40).date;
-      ev = nm < fm ? nm : fm; kind = nm < fm ? 'New Moon' : 'Full Moon';
-    }
-    const evPast = ev <= now;
-    const evLon = (Astronomy.EclipticGeoMoon(Astronomy.MakeTime(ev)).lon % 360 + 360) % 360;
-    const evSign = SIGNS[Math.floor(evLon/30)];
-    const local = ev.toLocaleDateString('en-GB', { day:'numeric', month:'long', timeZone: intake.current.iana || undefined });
-    const arrival = evPast ? 'arriving inside its three-day planting window' : 'arriving before the moon peaks';
-    intake.targetMoon = { kind, sign: evSign, exactUTC: ev.toISOString(), chosen: !!selectedMoon };
-
     if (intake.timeKnown){
       const moonLon = (Astronomy.EclipticGeoMoon(t).lon % 360 + 360) % 360;
       const moonSign = SIGNS[Math.floor(moonLon/30)];
-      // natal Placidus cusps → rising sign + the lunation's natal house
       const jdUT = toJD(Y, M, D, hh + mm/60 - offH);
       const cusps = computeHouses(jdUT, intake.birth.lat, intake.birth.lon);
       const rising = SIGNS[Math.floor(cusps._asc/30)];
-      const house = getHouse(evLon, cusps);
+      const house = getHouse(JUP_GATE_LON, cusps);
       readHTML = `The chart is cast. Sun in <b>${sunSign}</b>, Moon in <b>${moonSign}</b>, <b>${rising}</b> rising — we see you, ${name.split(' ')[0]}.`;
-      // Where the daylight-saving record genuinely can't be resolved, say so now
-      // rather than let a rising sign we aren't sure of set their expectation.
-      if (tz.verdict === 'stop') readHTML += ` <span class="fn">Your birth year falls in the era when American daylight saving was decided town by town, so we'll confirm your rising sign by hand before writing — your Sun and Moon are unaffected.</span>`;
-      moonHTML = `The ${kind} in ${evSign} of ${local} ${evPast ? 'landed' : 'lands'} in your ${ORDINAL[house]} house — ${HOUSE_PHRASE[house]}. Your reading is composed from exactly that, ${arrival}.`;
-      intake.instant = { sunSign, moonSign, rising, lunationHouse: house };
+      if (tz.verdict === 'stop') readHTML += ` <span class="fn">Your birth year falls in the era when American daylight saving was decided town by town, so we'll confirm your houses by hand before your map is drawn — your Sun and Moon are unaffected.</span>`;
+      moonHTML = `On the morning of the 8th of August, the gate opens in your ${ORDINAL[house]} house — ${HOUSE_PHRASE[house]}. Your map is drawn from exactly that.`;
+      intake.instant = { sunSign, moonSign, rising, gateHouse: house };
     } else {
-      readHTML = `The chart is cast. Sun in <b>${sunSign}</b> — we see you, ${name.split(' ')[0]}. We’ll be in touch about your birth time before anything is written.`;
-      moonHTML = `Your reading: the ${kind} in ${evSign}, ${local} — composed for you alone, ${arrival}.`;
+      readHTML = `The chart is cast. Sun in <b>${sunSign}</b> — we see you, ${name.split(' ')[0]}. The gate's house needs your birth time — we'll be in touch about what's still possible before anything is drawn.`;
+      moonHTML = `Lion's Gate · 8 August 2026 — Jupiter gilded at 8° of Leo, drawn for your sky alone.`;
       intake.instant = { sunSign };
     }
   } catch(e){
-    readHTML = `Details received, ${name.split(' ')[0]} — your chart will be cast for your reading alone.`;
+    readHTML = `Details received, ${name.split(' ')[0]} — your sky will be cast for your map alone.`;
   }
 
   document.getElementById('instantRead').innerHTML = readHTML;
@@ -711,14 +608,12 @@ async function submitViaRelay(st){
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: RELAY.accessKey,
-        subject: `LUMINARY INTAKE — ${intake.name}`,
-        from_name: 'The Luminary intake page',
+        subject: `LIONS GATE INTAKE — ${intake.name}`,
+        from_name: 'The Lion’s Gate intake page',
         replyto: intake.order.email,
         name: intake.name,
-        moon: intake.targetMoon ? `${intake.targetMoon.kind} in ${intake.targetMoon.sign}${intake.targetMoon.chosen ? ' (customer-chosen)' : ' (auto — confirm)'}` : '—',
         born: `${intake.dobWritten}${intake.timeKnown ? ' at ' + intake.time : ' — TIME UNKNOWN (contact first)'}`,
         birthplace: `${intake.birth.place} (${intake.birth.lat}, ${intake.birth.lon}) [${intake.birth.iana||''}]`,
-        now: `${intake.current.place} (${intake.current.lat}, ${intake.current.lon}) [${intake.current.iana||''}]`,
         order: `${intake.order.email} · ref ${intake.order.ref}${intake.order.verified ? ' · key verified' : ''}`,
         note: intake.note || '—',
         machine_block: JSON.stringify(intake)
@@ -747,22 +642,20 @@ function showFallback(st){
 function payloadText(){
   const i = intake;
   const lines = [
-    'WAYSHOWERS88 · LUMINARY INTAKE',
+    'WAYSHOWERS88 · LIONS GATE INTAKE',
     '--------------------------------',
     `Name: ${i.name}`,
     `Born: ${i.dobWritten}${i.timeKnown ? ' at '+i.time : ' — TIME UNKNOWN (contact first)'}`,
     `Birthplace: ${i.birth.place} (${i.birth.lat}, ${i.birth.lon}) [${i.birth.iana||('UTC'+(i.birth.utcStd>=0?'+':'')+i.birth.utcStd)}]`,
-    `Now: ${i.current.place} (${i.current.lat}, ${i.current.lon}) [${i.current.iana||('UTC'+(i.current.utcStd>=0?'+':'')+i.current.utcStd)}]`,
     `Order: ${i.order.email} · ref ${i.order.ref}${i.order.verified?' · key verified':''}`,
   ];
-  if (i.targetMoon) lines.push(`Moon: ${i.targetMoon.kind} in ${i.targetMoon.sign} (${i.targetMoon.exactUTC})${i.targetMoon.chosen ? ' — customer-chosen' : ' — auto, confirm with customer'}`);
   if (i.note) lines.push(`Note: ${i.note}`);
   lines.push('', 'MACHINE BLOCK — do not edit below this line', JSON.stringify(i));
   return lines.join('\n');
 }
 
 function sendEmail(){
-  const subject = `LUMINARY INTAKE — ${intake.name}`;
+  const subject = `LIONS GATE INTAKE — ${intake.name}`;
   const href = `mailto:${INTAKE_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(payloadText())}`;
   window.location.href = href;
   const st = document.getElementById('sendStatus');
