@@ -176,7 +176,9 @@
     <h2>Step 2 · Where Your Reading Arrives</h2>
     <div class="sub">Your finished reading — and nothing else — will be sent to this address. If you've already ordered on our store, use the same email you paid with.</div>
     <label for="orderEmail">Your email</label>
-    <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com">
+    <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com" oninput="resetEmailTypoCheck()">
+    <label for="orderEmailConfirm">Type it again, to be sure</label>
+    <input type="email" id="orderEmailConfirm" autocomplete="email" placeholder="you@example.com" oninput="resetEmailTypoCheck()">
     <button class="btn" id="unlockBtn" onclick="unlock()">Begin ✦ Your Details</button>
     <div class="status" id="gateStatus"></div>
   </div>
@@ -386,13 +388,82 @@ function toggleTime(){
 // Details are collected BEFORE checkout — the reading desk matches this email
 // against the Square order that follows. Buyers arriving from a receipt
 // (already paid) use the same email they paid with; the flow is identical.
+// Hardened 7 Aug 2026 after Christine Rose's order (754a2ab0) typo'd her
+// yahoo address and bounced at delivery: double-entry catches a mistyped
+// address outright, and a typo heuristic on the major providers catches the
+// single-field slip (gmial, yahooo, hotmial...) with a "did you mean" nudge
+// rather than a hard block — it's a suggestion, not a gate, since a business
+// or less-common domain can look "wrong" to this check and still be correct.
 let gate = { email:'', ref:'PRE-CHECKOUT', verified:false };
+let typoSuggestionDismissed = false;
+
+function resetEmailTypoCheck(){ typoSuggestionDismissed = false; }
+
+const COMMON_EMAIL_DOMAINS = ['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','live.com','aol.com','msn.com','me.com'];
+// Exact known misspellings first — precise, zero false positives.
+const EMAIL_DOMAIN_TYPOS = {
+  'gmial.com':'gmail.com', 'gmai.com':'gmail.com', 'gmail.co':'gmail.com', 'gmal.com':'gmail.com', 'gnail.com':'gmail.com', 'gamil.com':'gmail.com', 'gmailc.om':'gmail.com',
+  'yahooo.com':'yahoo.com', 'yaho.com':'yahoo.com', 'yahoo.co':'yahoo.com', 'yhoo.com':'yahoo.com', 'yahoo.cm':'yahoo.com',
+  'hotmial.com':'hotmail.com', 'hotmal.com':'hotmail.com', 'hotmai.com':'hotmail.com', 'hotmail.co':'hotmail.com', 'hotmil.com':'hotmail.com', 'hotmaill.com':'hotmail.com',
+  'outlok.com':'outlook.com', 'outlool.com':'outlook.com', 'outllok.com':'outlook.com', 'outlook.co':'outlook.com',
+  'iclod.com':'icloud.com', 'icoud.com':'icloud.com', 'icloud.co':'icloud.com'
+};
+
+// True if two strings are a single insertion/deletion/substitution apart —
+// enough to catch a fat-fingered domain without a full Levenshtein table.
+function withinOneEdit(a, b){
+  if (a === b) return true;
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length === b.length) { i++; j++; }        // substitution
+    else if (a.length > b.length) { i++; }          // extra char in a
+    else { j++; }                                    // extra char in b
+  }
+  if (i < a.length || j < b.length) edits++;
+  return edits <= 1;
+}
+
+function suggestEmailFix(email){
+  const at = email.lastIndexOf('@');
+  if (at < 0) return null;
+  const domain = email.slice(at + 1).toLowerCase();
+  if (EMAIL_DOMAIN_TYPOS[domain]) return email.slice(0, at + 1) + EMAIL_DOMAIN_TYPOS[domain];
+  if (COMMON_EMAIL_DOMAINS.includes(domain)) return null;
+  for (const good of COMMON_EMAIL_DOMAINS) {
+    if (withinOneEdit(domain, good)) return email.slice(0, at + 1) + good;
+  }
+  return null;
+}
+
+function acceptEmailFix(fix){
+  document.getElementById('orderEmail').value = fix;
+  document.getElementById('orderEmailConfirm').value = fix;
+  typoSuggestionDismissed = false;
+  unlock();
+}
 
 function unlock(){
   const email = document.getElementById('orderEmail').value.trim();
+  const confirmEmail = document.getElementById('orderEmailConfirm').value.trim();
   const st = document.getElementById('gateStatus');
   st.className = 'status';
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { st.className='status err'; st.textContent='That email doesn’t look complete — check for typos; it’s where your reading will arrive.'; return; }
+  if (email.toLowerCase() !== confirmEmail.toLowerCase()) {
+    st.className='status err';
+    st.textContent = 'Those two don’t match — please type your email the same way in both boxes. It’s the only address your reading will be sent to.';
+    return;
+  }
+  const fix = suggestEmailFix(email);
+  if (fix && !typoSuggestionDismissed) {
+    st.className = 'status err';
+    st.innerHTML = `Did you mean <b>${fix.replace(/</g,'&lt;')}</b>? ` +
+      `<button type="button" class="btn ghost" style="display:inline-block;width:auto;padding:4px 10px;margin:0 6px" onclick="acceptEmailFix('${fix.replace(/'/g,"\\'").replace(/</g,'&lt;')}')">Use this instead</button>` +
+      `<button type="button" class="btn ghost" style="display:inline-block;width:auto;padding:4px 10px" onclick="typoSuggestionDismissed=true;unlock()">No, that's right</button>`;
+    return;
+  }
   gate = { email, ref:'PRE-CHECKOUT', verified:false };
   document.getElementById('detailsCard').classList.remove('locked');
   document.getElementById('gateCard').style.opacity = 0.6;
