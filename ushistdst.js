@@ -101,6 +101,35 @@
   // Where one of these is in use, the tz maintainers have done the work.
   const CITY_SPECIFIC = /^America\/(Detroit|Menominee|Indiana\/|Kentucky\/|North_Dakota\/|Phoenix|Boise|Juneau|Sitka|Metlakatla|Yakutat|Nome|Adak)/;
 
+  // The state each zone's REPRESENTATIVE CITY actually sits in. This whole module
+  // exists because IANA replays that city's rules onto every other state in the
+  // zone — but when the birthplace is in the zone's OWN home state, that reasoning
+  // collapses: IANA is then this state's own record, not a foreign proxy, and
+  // overriding it is an inversion of the module's purpose.
+  // Learned the hard way on order f90d4243 (Longmont, Colorado, 21 Aug 1965): a
+  // blanket CO:'no' overrode America/Denver — Denver being in Colorado — and
+  // delivered Scorpio rising where the true chart is Libra rising.
+  const ZONE_HOME_STATE = {
+    'America/New_York':'NY', 'America/Chicago':'IL', 'America/Denver':'CO',
+    'America/Los_Angeles':'CA', 'America/Phoenix':'AZ', 'America/Boise':'ID',
+    'America/Detroit':'MI', 'America/Menominee':'MI', 'America/Anchorage':'AK',
+    'Pacific/Honolulu':'HI'
+  };
+
+  // Did this zone run a daylight-saving season in the given year at all?
+  function hasSeason(zone, y) {
+    const jan = zoneOffsetHours(zone, y, 1, 15, 12, 0);
+    const jul = zoneOffsetHours(zone, y, 7, 15, 12, 0);
+    return !isNaN(jan) && !isNaN(jul) && jan !== jul;
+  }
+
+  // A zone that switches daylight saving ON in one specific year is the tz
+  // maintainers modelling a real local law change — not a generic replay. A
+  // blanket "this state never observed DST" cannot be trusted over that.
+  function adoptedThisYear(zone, y) {
+    return hasSeason(zone, y) && !hasSeason(zone, y - 1);
+  }
+
   function resolveState(place) {
     if (!place) return null;
     const s = String(place).toLowerCase();
@@ -131,7 +160,8 @@
   const TABLE = {
     AL:'no', AK:'no', AZ:'no', AR:'no',
     CA:[[1946,1949,'no'], [1950,1966,'yes']],      // statewide by referendum, Nov 1949
-    CO:'no', CT:'yes', DC:'yes', DE:'yes', FL:'no', GA:'no', HI:'no',
+    CO:[[1946,1964,'no'], [1965,1966,'yes']],      // CO adopted DST in 1965 (see ZONE_HOME_STATE)
+    CT:'yes', DC:'yes', DE:'yes', FL:'no', GA:'no', HI:'no',
     ID:'no',
     IL:'local',                                     // Chicago observed; downstate varied
     IN:'iana', IA:'local', KS:'no', KY:'iana', LA:'no',
@@ -261,8 +291,25 @@
 
     // 1945-10-01 → 1966-12-31: the main patchwork window.
     if (verdictRaw === 'no') {
+      const fmt = o => `UTC${o >= 0 ? '+' : ''}${o}`;
+      // Two sanity gates before we assert standard time OVER IANA. Both exist
+      // because a blanket CO:'no' silently produced a wrong rising sign on
+      // order f90d4243 and nothing in the pipeline questioned it.
+      if (ianaOff !== std) {
+        // (a) The zone's own home state. A blanket "never observed" cannot
+        //     outrank the tz record for the zone's own reference locality.
+        if (ZONE_HOME_STATE[zone] === state) {
+          return { offset: ianaOff, verdict: 'check', source: 'zone-home-state-conflict', state,
+            note: `Our table claims ${state} never observed daylight saving in ${year}, but ${zone} is ${state}'s OWN zone — IANA is not replaying another state's rules here, it is this state's own record, and it models daylight saving on this date. IANA's ${fmt(ianaOff)} is used instead of the table's ${fmt(std)}. VERIFY against the ACS/Shanks atlas before delivering: this is the exact failure mode that produced a wrong rising sign for a Colorado 1965 birth.` };
+        }
+        // (b) A year-specific adoption event in the tz data.
+        if (adoptedThisYear(zone, year)) {
+          return { offset: ianaOff, verdict: 'check', source: 'dst-adoption-year', state,
+            note: `Our table claims ${state} never observed daylight saving in ${year}, but ${zone} switches daylight saving ON in ${year} specifically (it ran none in ${year - 1}). A year-specific switch is deliberate tz modelling of a real law change, not a generic replay, so the blanket "never" is not trustworthy here. IANA's ${fmt(ianaOff)} is used. VERIFY against an atlas before delivering.` };
+        }
+      }
       return { offset: std, verdict: 'ok', source: 'table-1946-1966-nodst', state,
-        note: `${state} did not observe daylight saving in ${year}; standard time (UTC${std >= 0 ? '+' : ''}${std}) applied. IANA would have given UTC${ianaOff >= 0 ? '+' : ''}${ianaOff}.` };
+        note: `${state} did not observe daylight saving in ${year}; standard time (${fmt(std)}) applied. IANA would have given ${fmt(ianaOff)}.` };
     }
     if (verdictRaw === 'yes') {
       if (nearTransition(zone, year, month, day, hour, minute, 21)) {

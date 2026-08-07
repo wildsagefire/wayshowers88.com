@@ -1134,6 +1134,9 @@
 <!-- Historical US daylight saving — IANA is unreliable before 1967. Shared byte-for-byte
      with the report engine; regenerate from Lunar Report Engine/ushistdst.js, don't hand-edit. -->
 <script src="ushistdst.js"></script>
+<!-- True (osculating) lunar node — shared byte-identical
+     with the report engine; regenerate from Lunar Report Engine/truenode.js, don't hand-edit. -->
+<script src="truenode.js"></script>
 
 <script>
 // ─────────────────────────────────────────
@@ -2122,10 +2125,11 @@ async function calculateChart() {
       retro: isChironRetro(utcDate)
     });
 
-    // Lunar Nodes & Black Moon Lilith (mean positions)
-    const nodeLon = meanNodeLon(jdUT);
-    positions.push({ name: 'North Node', lon: nodeLon,            retro: false, noAspect: false });
-    positions.push({ name: 'South Node', lon: n360(nodeLon + 180), retro: false, noAspect: true });
+    // Lunar Nodes (TRUE node — school switch 7 Aug 2026, matches astro.com) & Black Moon Lilith (mean)
+    const nodeLon   = WS88_TRUENODE.trueNodeLon(utcDate, Astronomy);
+    const nodeRetro = WS88_TRUENODE.trueNodeRetro(utcDate, Astronomy);
+    positions.push({ name: 'North Node', lon: nodeLon,            retro: nodeRetro, noAspect: false });
+    positions.push({ name: 'South Node', lon: n360(nodeLon + 180), retro: nodeRetro, noAspect: true });
     positions.push({ name: 'Lilith',     lon: meanLilithLon(jdUT), retro: false, noAspect: true });
 
     // ── House cusps ──────────────────────────────────────────────
@@ -2592,7 +2596,7 @@ function renderResults(positions, cusps, meta) {
   const sysTxt = isWhole
     ? `Houses use the <strong>Whole Sign</strong> system — the oldest house system in Western astrology. Each house occupies one complete sign, starting from the sign of your Ascendant.${cusps._fellBack ? ' (Your birth latitude is inside the polar circles, where Placidus is undefined, so Whole Sign is shown instead.)' : ''}`
     : `Houses use the <strong>Placidus</strong> system — the most widely used system on chart websites, so these placements will match what you see elsewhere.`;
-  note.innerHTML = `<strong>About these calculations:</strong> Planetary positions are computed with the astronomy-engine library and verified against the Swiss Ephemeris — the engine used by professional astrology software. ${sysTxt} Lunar Nodes and Lilith are mean positions. The MC/IC axis is shown on the wheel at its true degree. ℞ indicates retrograde motion. Aspect lines: gold/blue/green = flowing, red = challenging (dashed red = opposition). An exact birth time is needed for an accurate Rising sign and house placements.`;
+  note.innerHTML = `<strong>About these calculations:</strong> Planetary positions are computed with the astronomy-engine library and verified against the Swiss Ephemeris — the engine used by professional astrology software. ${sysTxt} Lunar Nodes are true (osculating) positions, the reckoning used by astro.com and mainstream chart apps; Lilith is the mean position. The MC/IC axis is shown on the wheel at its true degree. ℞ indicates retrograde motion. Aspect lines: gold/blue/green = flowing, red = challenging (dashed red = opposition). An exact birth time is needed for an accurate Rising sign and house placements.`;
 }
 </script>
 <script>
