@@ -582,6 +582,9 @@
       .house-cell { color: #446688; }
       .chart-note { border-left: 3px solid #aaa; background: #f5f5f5; color: #555; }
       .wheel-card { break-inside: avoid; }
+      #patternCard { break-inside: avoid; }
+      .pat-label { color: #111; }
+      .pat-desc, .pat-empty { color: #555; }
       .wheel-svg-wrap svg { max-width: 400px; }
     }
 
@@ -655,6 +658,14 @@
     .asp-conj { color: var(--gold-lt); }
     .asp-meaning { font-size: 0.8rem; color: var(--dim); font-style: italic; line-height: 1.5; }
     .asp-orb { font-family: 'Courier New', monospace; font-size: 0.76rem; color: var(--dim); white-space: nowrap; }
+
+    /* ── PATTERNS CARD (closed aspect figures) ── */
+    .pat-body { padding: 0.4rem 1.3rem 0.9rem; }
+    .pat-row { padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+    .pat-row:last-child { border-bottom: none; }
+    .pat-label { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--gold-lt); margin-bottom: 0.3rem; line-height: 1.5; }
+    .pat-desc, .pat-empty { font-size: 0.8rem; color: var(--dim); font-style: italic; line-height: 1.5; }
+    .pat-empty { padding: 0.75rem 0; }
 
     /* ── CHANNEL CTA ── */
     .cta-card {
@@ -1041,6 +1052,7 @@
         <span class="wleg"><span class="wleg-dot" style="background:#D98A6A;"></span>Retrograde ℞</span>
         <span class="wleg"><span class="wleg-line" style="background:#4E89A4;"></span>Flowing aspect</span>
         <span class="wleg"><span class="wleg-line" style="background:#D98A6A;"></span>Challenging aspect</span>
+        <span class="wleg" id="wlegPattern" style="display:none;"><span class="wleg-line" style="background:var(--gold);"></span><span id="wlegPatternTxt">Gold: your pattern</span></span>
       </div>
     </div>
 
@@ -1057,6 +1069,12 @@
         </thead>
         <tbody id="aspectTbody"></tbody>
       </table>
+    </div>
+
+    <!-- Aspect patterns — closed figures among the ten planets (patterns.js) -->
+    <div class="tcard" id="patternCard">
+      <div class="tcard-title">Patterns</div>
+      <div class="pat-body" id="patternBody"></div>
     </div>
 
     <!-- Planets table -->
@@ -1152,6 +1170,9 @@
 <!-- True (osculating) lunar node — shared byte-identical
      with the report engine; regenerate from Lunar Report Engine/truenode.js, don't hand-edit. -->
 <script src="truenode.js"></script>
+<!-- Aspect patterns (kite · grand trine · T-square · grand cross) — shared byte-identical
+     with the report engine; regenerate from Lunar Report Engine/patterns.js, don't hand-edit. -->
+<script src="patterns.js"></script>
 
 <script>
 // ─────────────────────────────────────────
@@ -2459,12 +2480,28 @@ function renderWheel(positions, cusps) {
   }
 
   // ── Aspect lines (drawn inside the inner circle, under the glyphs) ──
+  // When a closed figure exists (patterns.js), its legs are redrawn on top in gold and
+  // the other lines fade back so the figure reads at a glance. Tightest pattern only.
+  const topPattern = (typeof Patterns !== 'undefined') ? (Patterns.findPatterns(positions)[0] || null) : null;
+  const legKey = (a, b) => [a, b].sort().join('|');
+  const patLegs = new Set(topPattern ? topPattern.legs.filter(l => l.aspect !== 'Conjunction').map(l => legKey(l.a, l.b)) : []);
   for (const asp of findAspects(positions)) {
     if (asp.asp.angle === 0) continue; // conjunctions self-evident from glyph proximity
+    if (patLegs.has(legKey(asp.a.name, asp.b.name))) continue; // drawn in gold below
     const [x1,y1] = polar(svgAng(asp.a.lon), rInner - 3);
     const [x2,y2] = polar(svgAng(asp.b.lon), rInner - 3);
-    const op = Math.max(0.18, 0.6 - asp.orb * 0.06); // tighter orb = stronger line
+    const op = topPattern ? 0.15 : Math.max(0.18, 0.6 - asp.orb * 0.06); // tighter orb = stronger line
     s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${asp.asp.col}" stroke-width="0.9"${asp.asp.dash ? ` stroke-dasharray="${asp.asp.dash}"` : ''} opacity="${op.toFixed(2)}"/>`;
+  }
+  if (topPattern) {
+    const lonOf = {};
+    for (const p of positions) lonOf[p.name] = p.lon;
+    for (const leg of topPattern.legs) {
+      if (leg.aspect === 'Conjunction' || !(leg.a in lonOf) || !(leg.b in lonOf)) continue;
+      const [x1,y1] = polar(svgAng(lonOf[leg.a]), rInner - 3);
+      const [x2,y2] = polar(svgAng(lonOf[leg.b]), rInner - 3);
+      s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:var(--gold)" stroke="#E8A659" stroke-width="1.6" opacity="1"/>`;
+    }
   }
 
   // ── Planet glyphs ────────────────────────────────────────────────
@@ -2553,6 +2590,20 @@ function renderResults(positions, cusps, meta) {
   }
   if (!aspects.length) {
     atbody.innerHTML = '<tr><td colspan="3" class="asp-meaning">No major aspects within orb — a rare, free-flowing chart.</td></tr>';
+  }
+
+  // Patterns — closed figures among the ten planets (patterns.js, shared with the engine).
+  // Tightest first; the tightest one is also the figure drawn in gold on the wheel.
+  const pbody = document.getElementById('patternBody');
+  const pats = (typeof Patterns !== 'undefined') ? Patterns.findPatterns(positions) : [];
+  pbody.innerHTML = pats.length
+    ? pats.map(p => `<div class="pat-row"><div class="pat-label">${p.label}</div><div class="pat-desc">${Patterns.describe(p)}</div></div>`).join('')
+    : '<div class="pat-empty">No closed figure among the major aspects — most charts have none, and that is not a lack. The aspects above carry the story.</div>';
+  const wlp = document.getElementById('wlegPattern');
+  if (wlp) {
+    const PAT_NAME = { 'kite':'kite', 'grand-trine':'grand trine', 't-square':'T-square', 'grand-cross':'grand cross' };
+    wlp.style.display = pats.length ? '' : 'none';
+    if (pats.length) document.getElementById('wlegPatternTxt').textContent = 'Gold: your ' + (PAT_NAME[pats[0].type] || 'pattern');
   }
 
   // Planets table — each row expands into a plain-English explainer
