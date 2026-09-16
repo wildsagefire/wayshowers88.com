@@ -315,10 +315,18 @@ const SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio
 // see the SQUARE_CHECKOUT / PAYPAL_LINK constants above.
 (function(){
   const sq = document.getElementById('squareBtn'), sqf = document.getElementById('squareBtnFallback');
+  const pp = document.getElementById('paypalBtn');
+  // Guard: while the constants above still hold placeholders, the buttons render
+  // disarmed — a live page must never offer a checkout that goes nowhere.
+  if (SQUARE_CHECKOUT.indexOf('PLACEHOLDER') === 0) {
+    [sq, sqf, pp].forEach(b => { b.removeAttribute('href'); b.style.opacity = '.45'; b.style.pointerEvents = 'none'; });
+    sq.textContent = sqf.textContent = `Checkout is being connected ✦ ${PRICE}`;
+    pp.style.display = 'none';
+    return;
+  }
   sq.href = sqf.href = SQUARE_CHECKOUT;
   sq.textContent = `Continue to Secure Checkout ✦ ${PRICE}`;
   sqf.textContent = `Then Continue to Secure Checkout ✦ ${PRICE}`;
-  const pp = document.getElementById('paypalBtn');
   pp.href = PAYPAL_LINK;
   pp.textContent = `Or Pay with PayPal ✦ ${PRICE}`;
   pp.style.display = 'inline-block';
