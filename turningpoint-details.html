@@ -506,6 +506,21 @@ function computeHouses(jdUT,lat,lon){
   return cusps;
 }
 
+// ═════════════ CLIENT ZONE (read from the browser clock; never blocks the form) ═════════════
+// The reading dates the season in the reader's own calendar as well as UTC.
+function captureClientContext(){
+  try {
+    return {
+      zone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+      utcOffsetMin: -new Date().getTimezoneOffset(),
+      locale: navigator.language || null,
+      capturedAt: new Date().toISOString()
+    };
+  } catch(e){
+    return { zone: null, utcOffsetMin: null, locale: null, capturedAt: null };
+  }
+}
+
 // ═════════════ STEP 2 → 3 · CONFIRM ═════════════
 let intake = null;
 
@@ -533,6 +548,7 @@ function confirmDetails(){
     timeKnown: !timeUnknown,
     birth:   { place: loc.birth.place,   lat: loc.birth.lat,   lon: loc.birth.lon,   iana: loc.birth.iana   || null, utcStd: loc.birth.tz },
     note: document.getElementById('lifeNote').value.trim() || null,
+    client: captureClientContext(),
     order: { email: gate.email, ref: gate.ref, verified: gate.verified },
     submitted: new Date().toISOString()
   };
