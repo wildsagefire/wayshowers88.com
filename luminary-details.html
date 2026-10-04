@@ -841,6 +841,24 @@ function showFallback(st){
   document.getElementById('fallbackSend').style.display = 'block';
 }
 
+// ═════════════ SQUARE CHECKOUT (a link made for this order) ═════════════
+// The shared Square link matches a payment to an order by the email typed at
+// Square. Here the reading desk asks Square for a link made for THIS order —
+// price set, email pre-filled, payment stamped with the order id — so it is
+// matched by id, and Square returns the buyer to the order-received page.
+// The shared link stays as the fallback (no order id, or the desk unreachable).
+// TEST SWITCH: on only with ?sqc=1 until a real payment has been proven.
+const SQ_PER_ORDER = /[?&]sqc=1(&|$)/.test(location.search);
+document.getElementById('squareBtn').addEventListener('click', ev => {
+  if (!SQ_PER_ORDER || !orderId) return;
+  ev.preventDefault();
+  const w = window.open('', '_blank');   // opened inside the click, so pop-up blockers allow it
+  if (w) w.document.title = 'Opening secure checkout…';
+  ppPost('/square/create', { orderId })
+    .then(j => j.url || SQUARE_CHECKOUT, () => SQUARE_CHECKOUT)
+    .then(url => { if (w) w.location = url; else location.href = url; });
+});
+
 // ═════════════ PAYPAL CHECKOUT (on the page) ═════════════
 // The plain PayPal link says nothing about which order a payment is for, and
 // PayPal reports it about two hours late — a buyer paying from a different
