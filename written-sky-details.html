@@ -233,9 +233,11 @@
   <!-- STEP 1 · YOUR EMAIL -->
   <div class="card" id="gateCard">
     <h2>Step 1 · Where Your Star Map Arrives</h2>
-    <div class="sub">Your finished star map — and nothing else — will be sent to this address. If you've already ordered on our store, use the same email you paid with.</div>
+    <div class="sub">Your finished star map — and nothing else — will be sent to this address. Use the same email you pay with (your PayPal email, if you pay by PayPal) — it is how your payment is matched to your order.</div>
     <label for="orderEmail">Your email</label>
-    <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com">
+    <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com" oninput="resetEmailTypoCheck()">
+    <label for="orderEmailConfirm">Type it again, to be sure</label>
+    <input type="email" id="orderEmailConfirm" autocomplete="email" placeholder="you@example.com" oninput="resetEmailTypoCheck()">
     <button class="btn" id="unlockBtn" onclick="unlock()">Begin ✦ Choose Your Sky</button>
     <div class="status" id="gateStatus"></div>
   </div>
@@ -313,6 +315,10 @@
     <div id="receivedNote" style="display:none">
       <a class="btn" id="squareBtn" href="#" target="_blank" rel="noopener">Continue to Secure Checkout</a>
       <a class="btn ghost" id="paypalBtn" href="#" target="_blank" rel="noopener" style="display:none">Or Pay with PayPal</a>
+      <div class="fineprint" style="font-style:normal;border:1px solid var(--border2);border-radius:10px;padding:.9rem 1rem;text-align:left;line-height:1.6">
+        <strong style="color:var(--gold-lt);font-weight:500">This is not an instant download.</strong> Your star map is composed one chart at a time and arrives by email.<br>
+        After you pay, a confirmation email follows: within minutes by card, and up to a few hours by PayPal. If you pay from a different email than the one above, your confirmation can take longer while the two are matched.<br>
+        Questions at any point: <a href="mailto:hello@wayshowers88.com" style="color:var(--gold-lt)">hello@wayshowers88.com</a></div>
       <div class="fineprint">Your Written Sky arrives as <strong>print-ready fine-art files</strong> —
         the star map sized for framing at A4 and larger, and the reading as six A4 plates —
         delivered to <strong id="replyEmail"></strong>. Composed one chart at a time, in good time.<br><br>
@@ -405,18 +411,81 @@ function toggleTime(){
 // Details are collected BEFORE checkout — the reading desk matches this email
 // against the Square order that follows.
 let gate = { email:'', ref:'PRE-CHECKOUT', verified:false };
+let typoSuggestionDismissed = false;
+
+function resetEmailTypoCheck(){ typoSuggestionDismissed = false; }
+
+const COMMON_EMAIL_DOMAINS = ['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','live.com','aol.com','msn.com','me.com'];
+// Exact known misspellings first — precise, zero false positives.
+const EMAIL_DOMAIN_TYPOS = {
+  'gmial.com':'gmail.com', 'gmai.com':'gmail.com', 'gmail.co':'gmail.com', 'gmal.com':'gmail.com', 'gnail.com':'gmail.com', 'gamil.com':'gmail.com', 'gmailc.om':'gmail.com',
+  'yahooo.com':'yahoo.com', 'yaho.com':'yahoo.com', 'yahoo.co':'yahoo.com', 'yhoo.com':'yahoo.com', 'yahoo.cm':'yahoo.com',
+  'hotmial.com':'hotmail.com', 'hotmal.com':'hotmail.com', 'hotmai.com':'hotmail.com', 'hotmail.co':'hotmail.com', 'hotmil.com':'hotmail.com', 'hotmaill.com':'hotmail.com',
+  'outlok.com':'outlook.com', 'outlool.com':'outlook.com', 'outllok.com':'outlook.com', 'outlook.co':'outlook.com',
+  'iclod.com':'icloud.com', 'icoud.com':'icloud.com', 'icloud.co':'icloud.com'
+};
+
+// True if two strings are a single insertion/deletion/substitution apart —
+// enough to catch a fat-fingered domain without a full Levenshtein table.
+function withinOneEdit(a, b){
+  if (a === b) return true;
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length === b.length) { i++; j++; }        // substitution
+    else if (a.length > b.length) { i++; }          // extra char in a
+    else { j++; }                                    // extra char in b
+  }
+  if (i < a.length || j < b.length) edits++;
+  return edits <= 1;
+}
+
+function suggestEmailFix(email){
+  const at = email.lastIndexOf('@');
+  if (at < 0) return null;
+  const domain = email.slice(at + 1).toLowerCase();
+  if (EMAIL_DOMAIN_TYPOS[domain]) return email.slice(0, at + 1) + EMAIL_DOMAIN_TYPOS[domain];
+  if (COMMON_EMAIL_DOMAINS.includes(domain)) return null;
+  for (const good of COMMON_EMAIL_DOMAINS) {
+    if (withinOneEdit(domain, good)) return email.slice(0, at + 1) + good;
+  }
+  return null;
+}
+
+function acceptEmailFix(fix){
+  document.getElementById('orderEmail').value = fix;
+  document.getElementById('orderEmailConfirm').value = fix;
+  typoSuggestionDismissed = false;
+  unlock();
+}
 
 function unlock(){
   const email = document.getElementById('orderEmail').value.trim();
+  const confirmEmail = document.getElementById('orderEmailConfirm').value.trim();
   const st = document.getElementById('gateStatus');
   st.className = 'status';
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { st.className='status err'; st.textContent='That email doesn’t look complete — check for typos; it’s where your star map will arrive.'; return; }
+  if (email.toLowerCase() !== confirmEmail.toLowerCase()) {
+    st.className='status err';
+    st.textContent = 'Those two don’t match — please type your email the same way in both boxes. It’s the only address your star map will be sent to.';
+    return;
+  }
+  const fix = suggestEmailFix(email);
+  if (fix && !typoSuggestionDismissed) {
+    st.className = 'status err';
+    st.innerHTML = `Did you mean <b>${fix.replace(/</g,'&lt;')}</b>? ` +
+      `<button type="button" class="btn ghost" style="display:inline-block;width:auto;padding:4px 10px;margin:0 6px" onclick="acceptEmailFix('${fix.replace(/'/g,"\\'").replace(/</g,'&lt;')}')">Use this instead</button>` +
+      `<button type="button" class="btn ghost" style="display:inline-block;width:auto;padding:4px 10px" onclick="typoSuggestionDismissed=true;unlock()">No, that's right</button>`;
+    return;
+  }
   gate = { email, ref:'PRE-CHECKOUT', verified:false };
-  document.getElementById('elementCard').classList.remove('locked');
+  document.getElementById('detailsCard').classList.remove('locked');
   document.getElementById('gateCard').style.opacity = 0.6;
   st.className='status ok';
-  st.textContent = '✓ Thank you. Choose your sky below.';
-  document.getElementById('elementCard').scrollIntoView({behavior:'smooth', block:'start'});
+  st.textContent = '✓ Thank you. Your form is open below.';
+  document.getElementById('detailsCard').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 // ═════════════ STEP 2 · SKY ═════════════
@@ -663,7 +732,15 @@ function confirmDetails(){
 }
 
 // ═════════════ AUTOMATIC SEND (no client action) ═════════════
+let sending = false, lastSentKey = null;
 async function submitIntake(){
+  const key = JSON.stringify({ ...intake, submitted: null, client: null });
+  if (sending || key === lastSentKey) return;
+  sending = true;
+  try { if (await sendIntake()) lastSentKey = key; } finally { sending = false; }
+}
+
+async function sendIntake(){
   const st = document.getElementById('sendStatus');
   st.className = 'status'; st.textContent = 'Sending your details…';
   if (CATCHMENT !== 'PENDING'){
@@ -679,11 +756,11 @@ async function submitIntake(){
         st.textContent = '✓ Details received at the reading desk.';
         document.getElementById('replyEmail').textContent = intake.order.email;
         document.getElementById('receivedNote').style.display = 'block';
-        return;
+        return true;
       }
     } catch(e){ /* fall through to the email relay */ }
   }
-  await submitViaRelay(st);
+  return submitViaRelay(st);
 }
 
 async function submitViaRelay(st){
@@ -712,7 +789,7 @@ async function submitViaRelay(st){
       st.textContent = '✓ Details received at the reading desk.';
       document.getElementById('replyEmail').textContent = intake.order.email;
       document.getElementById('receivedNote').style.display = 'block';
-      return;
+      return true;
     }
     throw new Error(data.message || ('relay responded ' + res.status));
   } catch(e) { showFallback(st); }

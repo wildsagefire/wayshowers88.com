@@ -174,7 +174,7 @@
   <!-- STEP 2 · YOUR EMAIL -->
   <div class="card locked" id="gateCard">
     <h2>Step 2 · Where Your Reading Arrives</h2>
-    <div class="sub">Your finished reading — and nothing else — will be sent to this address. If you've already ordered on our store, use the same email you paid with.</div>
+    <div class="sub">Your finished reading — and nothing else — will be sent to this address. Use the same email you pay with (your PayPal email, if you pay by PayPal) — it is how your payment is matched to your order.</div>
     <label for="orderEmail">Your email</label>
     <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com" oninput="resetEmailTypoCheck()">
     <label for="orderEmailConfirm">Type it again, to be sure</label>
@@ -244,6 +244,10 @@
     <div id="receivedNote" style="display:none">
       <a class="btn" id="squareBtn" href="#" target="_blank" rel="noopener">Continue to Secure Checkout</a>
       <a class="btn ghost" id="paypalBtn" href="#" target="_blank" rel="noopener" style="display:none">Or Pay with PayPal</a>
+      <div class="fineprint" style="font-style:normal;border:1px solid var(--border2);border-radius:10px;padding:.9rem 1rem;text-align:left;line-height:1.6">
+        <strong style="color:var(--gold-lt);font-weight:500">This is not an instant download.</strong> Your reading is composed one chart at a time and arrives by email.<br>
+        After you pay, a confirmation email follows: within minutes by card, and up to a few hours by PayPal. If you pay from a different email than the one above, your confirmation can take longer while the two are matched.<br>
+        Questions at any point: <a href="mailto:hello@wayshowers88.com" style="color:var(--gold-lt)">hello@wayshowers88.com</a></div>
       <div class="fineprint">Introductory price — your reading arrives as two finished editions:
         the <strong>violet edition</strong> for the screen and the <strong>parchment edition</strong> for printing and keeping.<br><br>
         Payment is handled securely by Square<span id="orPaypal"></span>. Your reading arrives at
@@ -759,7 +763,15 @@ function confirmDetails(){
 // Primary: the catchment Worker — data goes straight into the order system,
 // no email is generated, and the Square webhook matches the payment to it.
 // Fallback 1: Web3Forms email to the reading desk. Fallback 2: manual send.
+let sending = false, lastSentKey = null;
 async function submitIntake(){
+  const key = JSON.stringify({ ...intake, submitted: null, client: null });
+  if (sending || key === lastSentKey) return;
+  sending = true;
+  try { if (await sendIntake()) lastSentKey = key; } finally { sending = false; }
+}
+
+async function sendIntake(){
   const st = document.getElementById('sendStatus');
   st.className = 'status'; st.textContent = 'Sending your details…';
   if (CATCHMENT !== 'PENDING'){
@@ -775,11 +787,11 @@ async function submitIntake(){
         st.textContent = '✓ Details received at the reading desk.';
         document.getElementById('replyEmail').textContent = intake.order.email;
         document.getElementById('receivedNote').style.display = 'block';
-        return;
+        return true;
       }
     } catch(e){ /* fall through to the email relay */ }
   }
-  await submitViaRelay(st);
+  return submitViaRelay(st);
 }
 
 async function submitViaRelay(st){
@@ -809,7 +821,7 @@ async function submitViaRelay(st){
       st.textContent = '✓ Details received at the reading desk.';
       document.getElementById('replyEmail').textContent = intake.order.email;
       document.getElementById('receivedNote').style.display = 'block';
-      return;
+      return true;
     }
     throw new Error(data.message || ('relay responded ' + res.status));
   } catch(e) { showFallback(st); }
