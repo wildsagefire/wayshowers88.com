@@ -184,7 +184,7 @@
   <!-- STEP 1 · YOUR EMAIL -->
   <div class="card" id="gateCard">
     <h2>Step 1 · Where Your Reading Arrives</h2>
-    <div class="sub">Your finished reading — and nothing else — will be sent to this address. Use the same email you pay with (your PayPal email, if you pay by PayPal) — it is how your payment is matched to your order.</div>
+    <div class="sub">Your finished reading — and nothing else — will be sent to this address. If you pay by card, use this same email at checkout — it is how a card payment is matched to your order.</div>
     <label for="orderEmail">Your email</label>
     <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com" oninput="resetEmailTypoCheck()">
     <label for="orderEmailConfirm">Type it again, to be sure</label>
@@ -253,7 +253,7 @@
         Your confirmation email is on its way to <strong id="paidEmail"></strong>. Nothing more is needed from you.</div>
       <div class="fineprint" style="font-style:normal;border:1px solid var(--border2);border-radius:10px;padding:.9rem 1rem;text-align:left;line-height:1.6">
         <strong style="color:var(--gold-lt);font-weight:500">This is not an instant download.</strong> Your reading is composed one chart at a time and arrives by email.<br>
-        After you pay, a confirmation email follows: within minutes by card, and up to a few hours by PayPal. If you pay from a different email than the one above, your confirmation can take longer while the two are matched.<br>
+        After you pay, a confirmation email follows, usually within minutes. Check your spam or promotions folder if you don&rsquo;t see it.<br>
         Questions at any point: <a href="mailto:hello@wayshowers88.com" style="color:var(--gold-lt)">hello@wayshowers88.com</a></div>
       <div class="fineprint">Your Turning Point reading — composed to the Balance Gate quarter, equinox
         to solstice — will arrive at <strong id="replyEmail"></strong> as a finished written reading,
@@ -748,8 +748,9 @@ function showFallback(st){
 // email heard nothing (2 Oct 2026). Here the reading desk starts the payment
 // itself, stamped with this order's id, and confirms it the moment it is
 // approved. If anything here fails to load, the plain link stays as it was.
-// TEST SWITCH: on only with ?ppc=1 until a real payment has been proven.
-const PP_CHECKOUT = /[?&]ppc=1(&|$)/.test(location.search);
+// Proven with a real payment 4 Oct 2026 (order b4292582, payer email different
+// from the intake email, confirmed in 1.3 s). ?ppc=0 falls back to the plain link.
+const PP_CHECKOUT = !/[?&]ppc=0(&|$)/.test(location.search);
 let orderId = null, ppArmed = false;
 
 function ppPost(path, body){
