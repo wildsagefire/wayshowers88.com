@@ -184,7 +184,7 @@
   <!-- STEP 1 · YOUR EMAIL -->
   <div class="card" id="gateCard">
     <h2>Step 1 · Where Your Reading Arrives</h2>
-    <div class="sub">Your finished reading — and nothing else — will be sent to this address. If you pay by card, use this same email at checkout — it is how a card payment is matched to your order.</div>
+    <div class="sub">Your finished reading — and nothing else — will be sent to this address.</div>
     <label for="orderEmail">Your email</label>
     <input type="email" id="orderEmail" autocomplete="email" placeholder="you@example.com" oninput="resetEmailTypoCheck()">
     <label for="orderEmailConfirm">Type it again, to be sure</label>
@@ -748,8 +748,9 @@ function showFallback(st){
 // price set, email pre-filled, payment stamped with the order id — so it is
 // matched by id, and Square returns the buyer to the order-received page.
 // The shared link stays as the fallback (no order id, or the desk unreachable).
-// TEST SWITCH: on only with ?sqc=1 until a real payment has been proven.
-const SQ_PER_ORDER = /[?&]sqc=1(&|$)/.test(location.search);
+// Proven with a real card payment 4 Oct 2026 (order 7cac40bf, a different email
+// typed at Square, matched by id, confirmed in under a second). ?sqc=0 uses the shared link.
+const SQ_PER_ORDER = !/[?&]sqc=0(&|$)/.test(location.search);
 document.getElementById('squareBtn').addEventListener('click', ev => {
   if (!SQ_PER_ORDER || !orderId) return;
   ev.preventDefault();
