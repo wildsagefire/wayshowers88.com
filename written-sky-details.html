@@ -486,11 +486,11 @@ function unlock(){
     return;
   }
   gate = { email, ref:'PRE-CHECKOUT', verified:false };
-  document.getElementById('detailsCard').classList.remove('locked');
+  document.getElementById('elementCard').classList.remove('locked');
   document.getElementById('gateCard').style.opacity = 0.6;
   st.className='status ok';
   st.textContent = '✓ Thank you. Your form is open below.';
-  document.getElementById('detailsCard').scrollIntoView({behavior:'smooth', block:'start'});
+  document.getElementById('elementCard').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 // ═════════════ STEP 2 · SKY ═════════════
