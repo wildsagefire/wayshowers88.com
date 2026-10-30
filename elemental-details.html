@@ -86,8 +86,8 @@
     .row > div { flex: 1; }
 
     /* element chooser (reuses the moon-opt tile pattern) */
-    .el-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1rem; }
-    @media (max-width: 480px){ .el-opts { grid-template-columns: 1fr; } }
+    .el-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-top: 1rem; }
+    @media (max-width: 560px){ .el-opts { grid-template-columns: 1fr; } }
     .el-opt { background: var(--bg4); border: 1px solid var(--border2);
       border-radius: 12px; padding: 1.15rem 1rem 1rem; cursor: pointer; text-align: center;
       transition: border-color .25s, box-shadow .25s; }
@@ -101,6 +101,7 @@
     .el-earth .kind { color: #B7BC7E; }
     .el-water .kind { color: #A9C4E0; }
     .el-air   .kind { color: #BFD8EE; }
+    .el-gold  .kind { color: #F2CF8A; }
 
     .check { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.9rem; cursor: pointer; }
     .check input { width: auto; accent-color: var(--gold); }
@@ -161,31 +162,38 @@
 <div class="page-hero">
   <div class="channel-label">✦ The Two Skies</div>
   <h1>Your Sky At Birth</h1>
-  <div class="tagline">Your natal star map, painted into a night sky — under the Moonrise, or carried by the Silver River.</div>
+  <div class="tagline">Your natal star map, painted into a sky of your choosing — under the Moonrise, carried by the Silver River, or turning in the Golden Tide.</div>
 </div>
 
 <main>
 
-  <!-- THE PRODUCT — both skies, side by side, so the choice is visual -->
+  <!-- THE PRODUCT — all three skies, side by side, so the choice is visual -->
   <div class="card" style="text-align:center">
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-      <div style="flex:1;min-width:240px;max-width:300px">
+      <div style="flex:1;min-width:150px;max-width:200px">
         <img src="elemental-example.jpg"
              alt="The Moonrise — a natal chart wheel set in a painted night sky, a silver tide of moonlight pouring through the stars"
              style="width:100%;height:auto;border-radius:6px;border:1px solid rgba(232,166,89,.5);box-shadow:0 10px 44px rgba(0,0,0,.5)"
              loading="eager" decoding="async">
         <div style="font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-lt);margin-top:.7rem">☽ The Moonrise</div>
       </div>
-      <div style="flex:1;min-width:240px;max-width:300px">
+      <div style="flex:1;min-width:150px;max-width:200px">
         <img src="silverriver-example.jpg"
              alt="The Silver River — a natal chart wheel set in a painted night sky, the Milky Way sweeping past like a river of starlight"
              style="width:100%;height:auto;border-radius:6px;border:1px solid rgba(232,166,89,.5);box-shadow:0 10px 44px rgba(0,0,0,.5)"
              loading="eager" decoding="async">
         <div style="font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-lt);margin-top:.7rem">✦ The Silver River</div>
       </div>
+      <div style="flex:1;min-width:150px;max-width:200px">
+        <img src="goldentide-example.jpg"
+             alt="The Golden Tide — a natal chart wheel set in a painted sky, a golden spiral galaxy turning over a sea of evening light"
+             style="width:100%;height:auto;border-radius:6px;border:1px solid rgba(232,166,89,.5);box-shadow:0 10px 44px rgba(0,0,0,.5)"
+             loading="eager" decoding="async">
+        <div style="font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-lt);margin-top:.7rem">☉ The Golden Tide</div>
+      </div>
     </div>
     <div style="font-size:.85rem;margin-top:1rem;font-style:italic;opacity:.8">
-      Two finished maps — the same chart in each sky. Your own natal wheel, two lines of your
+      Three finished maps — the same chart in each sky. Your own natal wheel, two lines of your
       chart&rsquo;s real geometry beneath it, the moon phase you were born under at its foot &mdash;
       and the <strong>Dragon&rsquo;s Line</strong>: your nodal axis marked in silver across the wheel,
       both nodes drawn. Yours is drawn from your chart alone.
@@ -211,7 +219,7 @@
   <!-- STEP 2 · SKY -->
   <div class="card locked" id="elementCard">
     <h2>Step 2 · Choose Your Sky</h2>
-    <div class="sub">Two painted night skies, one wheel — yours. Both carry the same chart, the same
+    <div class="sub">Three painted skies, one wheel — yours. Each carries the same chart, the same
       inscriptions; choose the sky that calls. Ordering as a gift? Choose the one that feels like them.</div>
     <div class="el-opts">
       <div class="el-opt el-water" data-el="moonrise" onclick="pickSky('moonrise')">
@@ -223,6 +231,11 @@
         <div class="glyph">✦</div>
         <div class="kind">The Silver River</div>
         <div class="whisper">the Milky Way sweeping past your wheel like a river of starlight</div>
+      </div>
+      <div class="el-opt el-gold" data-el="goldentide" onclick="pickSky('goldentide')">
+        <div class="glyph">☉</div>
+        <div class="kind">The Golden Tide</div>
+        <div class="whisper">a golden spiral turning over a sea of evening light</div>
       </div>
     </div>
     <div class="status" id="elementStatus"></div>
@@ -338,7 +351,7 @@ const RELAY = {
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const SIGNS = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
-const SKY_NAME = { moonrise:'The Moonrise', silverriver:'The Silver River' };
+const SKY_NAME = { moonrise:'The Moonrise', silverriver:'The Silver River', goldentide:'The Golden Tide' };
 // Natal moon phase — the same computation the finished map prints at its foot.
 const MOON_PHASES = ['new','waxing crescent','first quarter','waxing gibbous','full','waning gibbous','last quarter','waning crescent'];
 const moonPhaseName = (moonLon, sunLon) => MOON_PHASES[Math.floor((((moonLon - sunLon + 382.5) % 360)) / 45)];
