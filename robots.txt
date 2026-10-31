@@ -1,0 +1,43 @@
+# robots.txt for wayshowers88.com
+# Free knowledge is meant to be found. All crawlers welcome, including AI search.
+
+User-agent: *
+Allow: /
+
+# AI search / answer engines (citations): explicitly welcome
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Training crawlers: allowed by choice (change to Disallow: / to opt out;
+# opting out does not affect Google Search, AI Overviews, Siri or Safari)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://wayshowers88.com/sitemap.xml
