@@ -1,0 +1,44 @@
+# Writes today's Moon into moon-clock.html as plain text, so search and
+# AI crawlers can read the answer without running JavaScript.
+name: Sky today
+
+on:
+  schedule:
+    - cron: '5 0 * * *'   # 00:05 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: sky-today
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Write today's sky
+        run: node tools/sky-today.cjs
+
+      - name: Commit and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Sky today: $(date -u +%Y-%m-%d)"
+          git push
+          # Pushes made with the workflow token don't always trigger a Pages build.
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" || true

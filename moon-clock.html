@@ -223,6 +223,31 @@ h1 em{font-style:italic;font-weight:300;color:var(--halo)}
 .btn-ghost{border:1px solid var(--hair-gold);color:var(--mist);background:transparent}
 .btn-ghost:hover{border-color:var(--gold);color:var(--halo);background:rgba(232,166,89,.06)}
 
+/* today's sky, as plain text — written daily by tools/sky-today.cjs;
+   the live clock hides it once it turns */
+.sky-today{max-width:560px;margin:44px auto 0;font-size:16px;color:var(--cloud)}
+.sky-today p+p{margin-top:10px}
+.sky-today .st-k{font-family:var(--font-ritual);font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.sky-today .st-v{font-family:var(--font-display);font-size:clamp(24px,3.4vw,32px);line-height:1.25;color:var(--mist)}
+.sky-today b{font-weight:500;color:var(--halo)}
+.sky-today a{color:var(--halo);text-decoration:none}
+
+/* the twelve — the weather of every sign */
+.twelve{max-width:980px;margin:96px auto 0;text-align:left}
+.twelve h2{font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4.2vw,42px);color:var(--mist);text-align:center}
+.twelve-lede{max-width:560px;margin:14px auto 0;text-align:center;font-style:italic;color:var(--cloud)}
+.twelve-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:40px}
+.sign-card{
+  background:rgba(18,35,58,.4);border:1px solid var(--hair-dark);border-radius:18px;
+  padding:26px 26px 22px;scroll-margin-top:90px;transition:border-color .4s,box-shadow .4s;
+}
+.sign-card.now{border-color:var(--sign);box-shadow:0 0 34px rgba(7,12,21,.5),inset 0 0 0 1px var(--sign)}
+.sign-card h3{font-family:var(--font-display);font-weight:400;font-size:24px;color:var(--mist)}
+.sign-card h3 span{color:var(--sign);margin-right:4px}
+.sign-meta{margin-top:4px;font-family:var(--font-ritual);font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--violet-soft)}
+.sign-card p:not(.sign-meta){margin-top:12px;font-size:15px;color:#C6CCD9}
+.sign-card .sign-poem{font-family:var(--font-display);font-style:italic;font-size:18px;line-height:1.45;color:var(--violet-soft)}
+
 /* footer mini */
 footer{position:relative;z-index:2;margin-top:90px;border-top:1px solid var(--hair-dark);padding:38px 0 44px;text-align:center}
 footer p{font-family:var(--font-ui);font-size:11.5px;letter-spacing:.12em;color:rgba(167,175,192,.55)}
@@ -259,6 +284,14 @@ noscript p{margin-top:52px}
 
     <div id="loading">✦ &nbsp;Reading the sky…&nbsp; ✦</div>
     <noscript><p>The Moon Clock computes the real sky in your browser — it needs JavaScript switched on to turn.</p></noscript>
+    <!-- SKY-TODAY:START -->
+    <section id="sky-today" class="sky-today" aria-label="The Moon today">
+      <p class="st-k">The Moon today · Saturday, 31 October 2026, 12:13 UTC</p>
+      <p class="st-v">The Moon is in <b>Cancer</b>, at 20°30′ — Waning Gibbous, 65% of her face lit.</p>
+      <p>She enters <b>Leo</b> on Sunday 1 November at 04:18 UTC. Next New Moon: Monday 9 November. Next Full Moon: Tuesday 24 November.</p>
+      <p><a href="#moon-in-cancer">The weather while the Moon walks Cancer ↓</a></p>
+    </section>
+    <!-- SKY-TODAY:END -->
 
     <div id="clock" hidden>
       <div class="dial-stage">
@@ -306,6 +339,87 @@ noscript p{margin-top:52px}
         </div>
       </div>
     </div>
+
+    <!-- TWELVE:START -->
+    <section class="twelve" id="the-twelve" aria-labelledby="twelve-h">
+      <h2 id="twelve-h">The Moon in each sign</h2>
+      <p class="twelve-lede">The Moon moves about thirteen degrees a day, so she spends roughly two and a half days in each sign and walks all twelve in a little over 27 days. This is the weather of each.</p>
+      <div class="twelve-grid">
+        <article class="sign-card" id="moon-in-aries" style="--sign:#D98A6A">
+          <h3><span aria-hidden="true">♈︎</span> The Moon in Aries</h3>
+          <p class="sign-meta">Fire · Cardinal</p>
+          <p>The tide runs hot and fast. Feelings arrive before the reasons for them, and waiting for perfect conditions is just fear wearing patience’s coat — begin the thing, even badly, because under this Moon the doing is the medicine. Keep your fuse long with the people you love; they are not the obstacle.</p>
+          <p class="sign-poem">“A match struck in the dark is still a sunrise, briefly.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-taurus" style="--sign:#8FA98C">
+          <h3><span aria-hidden="true">♉︎</span> The Moon in Taurus</h3>
+          <p class="sign-meta">Earth · Fixed</p>
+          <p>The sky asks you to slow to the speed of the body. Feed yourself properly, touch real things, finish nothing in a hurry — what you steady now stays steadied. Comfort is not laziness under this Moon; it is repair, and you are allowed it.</p>
+          <p class="sign-poem">“The mountain does not hurry, and yet nothing is left undone.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-gemini" style="--sign:#E8A659">
+          <h3><span aria-hidden="true">♊︎</span> The Moon in Gemini</h3>
+          <p class="sign-meta">Air · Mutable</p>
+          <p>Words carry the weather now. Conversations start themselves, questions multiply, and the mind flits from window to window — let it. Just notice the difference between being curious and being scattered, and before the day closes, come home to one true sentence.</p>
+          <p class="sign-poem">“A thousand doors swing open at once; you only need to walk through one.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-cancer" style="--sign:#4E89A4">
+          <h3><span aria-hidden="true">♋︎</span> The Moon in Cancer</h3>
+          <p class="sign-meta">Water · Cardinal</p>
+          <p>The Moon is home in Cancer, and everything softens. The tide pulls inward — toward kitchens, old photographs, the people who knew you before you were anyone. Tend something today. And let yourself be tended; that half is harder, and it counts double.</p>
+          <p class="sign-poem">“The shell exists because something tender was worth keeping.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-leo" style="--sign:#D98A6A">
+          <h3><span aria-hidden="true">♌︎</span> The Moon in Leo</h3>
+          <p class="sign-meta">Fire · Fixed</p>
+          <p>The heart wants witnessing under this Moon. Make something, show someone, take up the space you usually apologise for — warmth given generously comes back doubled here. Watch only for pride wearing courage’s colours; the real thing never needs applause to keep burning.</p>
+          <p class="sign-poem">“Even the sun needs somewhere to shine — today it borrows you.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-virgo" style="--sign:#8FA98C">
+          <h3><span aria-hidden="true">♍︎</span> The Moon in Virgo</h3>
+          <p class="sign-meta">Earth · Mutable</p>
+          <p>The weather turns precise. The small repairs call to you — the drawer, the inbox, the promise you half-made — and tending them quiets the mind like nothing else can. Serve what you love without vanishing into the serving; you are on the list of things worth tending.</p>
+          <p class="sign-poem">“Holiness hides in small things done with whole attention.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-libra" style="--sign:#E8A659">
+          <h3><span aria-hidden="true">♎︎</span> The Moon in Libra</h3>
+          <p class="sign-meta">Air · Cardinal</p>
+          <p>The tide leans toward the other. Conversations want balancing, rooms want beauty, and the scales in you weigh every word twice before spending it. Seek the fair thing, not the pleasing thing — they are not always the same, and only one of them lets you sleep.</p>
+          <p class="sign-poem">“Two lanterns on one bridge cast a steadier light.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-scorpio" style="--sign:#4E89A4">
+          <h3><span aria-hidden="true">♏︎</span> The Moon in Scorpio</h3>
+          <p class="sign-meta">Water · Fixed</p>
+          <p>The water runs deep now, and it will not pretend. Whatever has been circling beneath the surface asks to be looked at — not fixed, not fled, just looked at honestly. Intensity is not an emergency under this Moon. It is information.</p>
+          <p class="sign-poem">“What the depths keep, the depths transform.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-sagittarius" style="--sign:#D98A6A">
+          <h3><span aria-hidden="true">♐︎</span> The Moon in Sagittarius</h3>
+          <p class="sign-meta">Fire · Mutable</p>
+          <p>The weather opens wide. Restlessness under this Moon is a compass, not a flaw — follow the question further than you usually let yourself, read the map, book the thing. And tell the truth warmly; truth with warmth in it travels furthest.</p>
+          <p class="sign-poem">“The horizon is not an ending. It is an invitation with no fine print.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-capricorn" style="--sign:#8FA98C">
+          <h3><span aria-hidden="true">♑︎</span> The Moon in Capricorn</h3>
+          <p class="sign-meta">Earth · Cardinal</p>
+          <p>The tide turns structural. What you build under this Moon tends to hold — so choose the brick worth laying and do the unglamorous next step, the one nobody claps for. Just don’t mistake being useful for being loved. You are already both.</p>
+          <p class="sign-poem">“The lighthouse stands because someone kept laying stones in the cold.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-aquarius" style="--sign:#E8A659">
+          <h3><span aria-hidden="true">♒︎</span> The Moon in Aquarius</h3>
+          <p class="sign-meta">Air · Fixed</p>
+          <p>The weather cools and clarifies. Step back far enough and the pattern shows itself — in your life, your people, your times — and under this Moon the kindest thing you can offer is sometimes a little distance and a long view. Belong to the future without abandoning the room you’re in.</p>
+          <p class="sign-poem">“From far enough up, every border disappears — and every light still shows.”</p>
+        </article>
+        <article class="sign-card" id="moon-in-pisces" style="--sign:#4E89A4">
+          <h3><span aria-hidden="true">♓︎</span> The Moon in Pisces</h3>
+          <p class="sign-meta">Water · Mutable</p>
+          <p>The veil thins. Dreams get louder, music lands differently, and other people’s feelings drift through you like weather fronts — name what is yours, bless what isn’t, and hand the rest back to the sea. Rest is a spiritual practice under this Moon, not an admission of defeat.</p>
+          <p class="sign-poem">“The ocean never asks the river to explain itself.”</p>
+        </article>
+      </div>
+    </section>
+    <!-- TWELVE:END -->
   </div>
 </main>
 
@@ -559,7 +673,11 @@ function turn(){
   document.getElementById('tide-new').textContent = fmtDay(nextNew);
   document.getElementById('tide-full').textContent = fmtDay(nextFull);
 
+  document.querySelectorAll('.sign-card').forEach((c, i) => c.classList.toggle('now', i === signIdx));
+
   document.getElementById('loading').hidden = true;
+  const today = document.getElementById('sky-today');
+  if (today) today.hidden = true;
   document.getElementById('clock').hidden = false;
 }
 
