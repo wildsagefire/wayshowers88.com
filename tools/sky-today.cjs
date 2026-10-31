@@ -5,7 +5,9 @@
    in moon-clock.html with plain HTML:
      SKY-TODAY   today's sign, degree, phase, next ingress, lunations
      TWELVE      the weather of all twelve signs (from the page's SIGNS)
-   and bumps the Moon Clock's <lastmod> in sitemap.xml.
+   and bumps the Moon Clock's <lastmod> in sitemap.xml. It also fills
+   NEXT-MOONS in luminary.html: the next four New and Full Moons,
+   their signs, any eclipse, and the last day to order.
    Run daily by .github/workflows/sky-today.yml.
    Usage: node tools/sky-today.cjs [--at 2026-10-31T00:05:00Z]
    ══════════════════════════════════════════════════════════════ */
@@ -111,7 +113,7 @@ const twelve = [
 function fill(src, name, lines){
   const re = new RegExp(`([ \\t]*)<!-- ${name}:START -->[\\s\\S]*?<!-- ${name}:END -->`);
   const m = src.match(re);
-  if (!m) throw new Error(`${name} markers not found in moon-clock.html`);
+  if (!m) throw new Error(`${name} markers not found`);
   const ind = m[1];
   const body = lines.map(l => ind + l).join(EOL);
   return src.replace(re, `${ind}<!-- ${name}:START -->${EOL}${body}${EOL}${ind}<!-- ${name}:END -->`);
@@ -125,6 +127,45 @@ const day = now.toISOString().slice(0, 10);
 const map = fs.readFileSync(SITEMAP, 'utf8')
   .replace(/(moon-clock\.html<\/loc><lastmod>)[^<]*/, `$1${day}`);
 fs.writeFileSync(SITEMAP, map);
+
+/* ── the next moons, for the Luminary page ──
+   A moon stays open for orders until three days after it peaks. */
+const LUMINARY = path.join(ROOT, 'luminary.html');
+const DAY = 86400000;
+function eclipseNear(kind, when){
+  // an eclipse within a day of the lunation makes it an eclipse moon
+  const e = kind === 'full'
+    ? Astronomy.SearchLunarEclipse(new Date(when.getTime() - 2 * DAY))
+    : Astronomy.SearchGlobalSolarEclipse(new Date(when.getTime() - 2 * DAY));
+  const t = (e.peak.date || e.peak).getTime();
+  if (Math.abs(t - when.getTime()) > DAY) return '';
+  const a = /^[aeiou]/.test(e.kind) ? 'an' : 'a';
+  return `${a} ${e.kind} ${kind === 'full' ? 'lunar' : 'solar'} eclipse`;
+}
+const moons = [];
+for (let t = new Date(now.getTime() - 3 * DAY); moons.length < 4; ){
+  const nm = Astronomy.SearchMoonPhase(0, t, 40).date;
+  const fm = Astronomy.SearchMoonPhase(180, t, 40).date;
+  const [kind, when] = nm < fm ? ['new', nm] : ['full', fm];
+  const closes = new Date(when.getTime() + 3 * DAY);
+  if (closes > now) moons.push({ kind, when, closes, sign: SIGNS[Math.floor(moonLon(when) / 30)], eclipse: eclipseNear(kind, when) });
+  t = new Date(when.getTime() + DAY);
+}
+const nextMoons = [
+  `<ul class="moon-list">`,
+  ...moons.map(m => [
+    `  <li>`,
+    `    <span class="ml-name">${m.kind === 'new' ? 'New' : 'Full'} Moon in ${m.sign.name}</span>`,
+    `    <span class="ml-when">${fmtDay(m.when)}${m.when.getUTCFullYear() !== now.getUTCFullYear() ? ' ' + m.when.getUTCFullYear() : ''}${m.eclipse ? ' · ' + m.eclipse : ''}</span>`,
+    `    <span class="ml-open">${m.when <= now ? 'Peaked; still open' : 'Open'} for orders until ${fmtDay(m.closes)}</span>`,
+    `  </li>`,
+  ]).flat(),
+  `</ul>`,
+];
+if (fs.existsSync(LUMINARY)){
+  const lum = fs.readFileSync(LUMINARY, 'utf8');
+  fs.writeFileSync(LUMINARY, fill(lum, 'NEXT-MOONS', nextMoons));
+}
 
 console.log(`${day}: Moon ${dd}°${mm}′ ${sign.name}, ${phaseName(elong)} ${Math.round(illum * 100)}%` +
   (ing ? `, enters ${ing.sign.name} ${ing.when.toISOString()}` : ''));
