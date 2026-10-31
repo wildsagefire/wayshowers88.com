@@ -977,7 +977,7 @@
         <label>Birth Location</label>
         <div class="loc-row">
           <div class="ac-wrap">
-            <input type="text" id="cityInput" placeholder="Type your birth town or city…" autocomplete="off" />
+            <input type="text" id="cityInput" aria-label="Birth town or city" placeholder="Type your birth town or city…" autocomplete="off" />
             <div class="ac-list" id="acList"></div>
           </div>
           <button class="btn-lookup" onclick="geocodeCity()">Search Online</button>
@@ -1162,7 +1162,7 @@
       <div class="dw-eyebrow">✦ The Threshold Letter</div>
       <p class="dw-sub" style="margin-bottom:0;">A short letter at each threshold — every New and Full Moon — with what the sky is doing and what it's asking. Free, occasional, written for the moment. Your chart stays in your browser; only your email travels.</p>
       <form class="tl-row" id="tlForm">
-        <input type="email" id="tlEmail" placeholder="your@email.com" required>
+        <input type="email" id="tlEmail" aria-label="Email address" placeholder="your@email.com" required>
         <button type="submit">Receive the letter</button>
       </form>
       <div class="tl-note" id="tlNote">No spam, no selling of anything you didn't ask for. Leave whenever you like.</div>
@@ -2308,7 +2308,7 @@ document.getElementById('tlForm').addEventListener('submit', async function (ev)
       note.textContent = 'Something slipped — please try once more.';
     }
   } else {
-    window.location.href = 'mailto:wildsagefire@gmail.com'
+    window.location.href = 'mailto:wayshowers88@gmail.com'
       + '?subject=' + encodeURIComponent('The Threshold Letter — count me in')
       + '&body=' + encodeURIComponent('Please add me to the Threshold Letter.\n\nEmail: ' + email);
     note.textContent = '✦ Your email app should open — send it as-is and you’re on the list.';

@@ -863,7 +863,7 @@ footer .eightyeight{font-size:280px;right:-30px;bottom:-70px;opacity:.7}
 
   <!-- the wayshowers — two Sagittarian archers, Akashic Sketch, loosing arrows over the horizon -->
   <div class="archers-scene" aria-hidden="true">
-    <img src="hero-archers.webp" alt="" loading="eager" decoding="async">
+    <img width="1600" height="933" fetchpriority="high" src="hero-archers.webp" alt="" loading="eager" decoding="async">
     <svg viewBox="0 0 1400 816" preserveAspectRatio="xMinYMax slice">
       <defs>
         <filter id="cometGlow" x="-80%" y="-80%" width="260%" height="260%">
@@ -911,7 +911,7 @@ footer .eightyeight{font-size:280px;right:-30px;bottom:-70px;opacity:.7}
 <section class="lg-band" id="turningpoint" aria-label="The Turning Point — a three-month transit reading for the season ahead">
   <div class="wrap lg-inner">
     <a class="lg-art" href="turningpoint-details.html" aria-hidden="true" tabindex="-1">
-      <img src="turningpoint-cover.jpg" alt="The Turning Point — a three-month reading of the season ahead, composed on its own watercolour paper" loading="lazy" decoding="async">
+      <img width="794" height="1123" src="turningpoint-cover.jpg" alt="The Turning Point — a three-month reading of the season ahead, composed on its own watercolour paper" loading="lazy" decoding="async">
     </a>
     <div class="lg-copy">
       <div class="lg-eyebrow">✦ First Edition · The Balance Gate ✦</div>
@@ -931,7 +931,7 @@ footer .eightyeight{font-size:280px;right:-30px;bottom:-70px;opacity:.7}
 <section class="lg-band" id="twoskies" aria-label="The Painted Skies — your natal star map in a painted sky">
   <div class="wrap lg-inner">
     <a class="lg-art" href="elemental-details.html" aria-hidden="true" tabindex="-1">
-      <img src="elemental-example.jpg" alt="A Painted Skies star map — a natal chart wheel set in a painted night sky of silver moonlight" loading="lazy" decoding="async">
+      <img width="840" height="1188" src="elemental-example.jpg" alt="A Painted Skies star map — a natal chart wheel set in a painted night sky of silver moonlight" loading="lazy" decoding="async">
     </a>
     <div class="lg-copy">
       <div class="lg-eyebrow">✦ Three Painted Skies ✦</div>
@@ -953,7 +953,7 @@ footer .eightyeight{font-size:280px;right:-30px;bottom:-70px;opacity:.7}
 <section class="lg-band" id="writtensky" aria-label="The Written Sky — your star map with its full reading">
   <div class="wrap lg-inner">
     <a class="lg-art" href="written-sky-details.html" aria-hidden="true" tabindex="-1">
-      <img src="written-sky-plate1.jpg" alt="The Written Sky cover plate — Your Sky at Birth: the Big Three, the shape of the chart and its balance, on the indigo night" loading="lazy" decoding="async">
+      <img width="620" height="877" src="written-sky-plate1.jpg" alt="The Written Sky cover plate — Your Sky at Birth: the Big Three, the shape of the chart and its balance, on the indigo night" loading="lazy" decoding="async">
     </a>
     <div class="lg-copy">
       <div class="lg-eyebrow">✦ New · The Painted Skies, Expanded ✦</div>
@@ -1109,7 +1109,7 @@ footer .eightyeight{font-size:280px;right:-30px;bottom:-70px;opacity:.7}
 
       function renderCarousel(vids) {
         const card = v => `<a class="vcard" href="https://www.youtube.com/watch?v=${v[0]}" target="_blank" rel="noopener">
-          <div class="vthumb"><img src="https://i.ytimg.com/vi/${v[0]}/mqdefault.jpg" alt="" loading="lazy"></div>
+          <div class="vthumb"><img width="320" height="180" src="https://i.ytimg.com/vi/${v[0]}/mqdefault.jpg" alt="" loading="lazy"></div>
           <div class="vtitle">${v[1]}</div></a>`;
         const html = vids.map(card).join('');
         document.getElementById('vtrack').innerHTML = html + html; // doubled for the seamless drift
