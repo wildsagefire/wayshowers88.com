@@ -574,8 +574,37 @@
     }
     .btn-save:hover { border-color: var(--gold); color: var(--gold); }
 
+    /* ── QUESTIONS (always visible, under the results) ──
+       Drawn from the Astrology Library: 01 Glossary, 02 Planets and Points,
+       03 Signs, 04 Houses. Keep it true to what this calculator does. */
+    .faq { margin-top: 3rem; }
+    .faq h2 {
+      font-family: 'Cormorant Garamond', serif; font-weight: 400;
+      font-size: clamp(1.7rem, 4vw, 2.2rem); color: var(--text); text-align: center;
+    }
+    .faq-lede { text-align: center; color: var(--dim); font-size: 0.9rem; margin: 0.5rem auto 1.6rem; max-width: 520px; line-height: 1.7; }
+    .faq details {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      margin-bottom: 0.7rem; transition: border-color 0.25s;
+    }
+    .faq details[open] { border-color: var(--border2); }
+    .faq summary {
+      cursor: pointer; list-style: none; padding: 1rem 2.6rem 1rem 1.2rem; position: relative;
+      font-family: 'Lora', serif; font-size: 1rem; color: var(--text);
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after {
+      content: '+'; position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);
+      color: var(--gold); font-size: 1.2rem; transition: transform 0.25s;
+    }
+    .faq details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+    .faq summary:hover { color: var(--gold-lt); }
+    .faq-a { padding: 0 1.2rem 1.1rem; color: var(--dim); font-size: 0.92rem; line-height: 1.75; }
+    .faq-a p + p { margin-top: 0.7rem; }
+    .faq-a strong { color: var(--text); font-weight: 500; }
+
     @media print {
-      header, .page-hero, .form-card, .btn-save, .wheel-legend, footer, .cta-card, .doorway, .dw-teaser, .threshold, .ac-list, .explain-hint { display: none !important; }
+      header, .page-hero, .form-card, .btn-save, .wheel-legend, footer, .cta-card, .doorway, .dw-teaser, .threshold, .ac-list, .explain-hint, .faq { display: none !important; }
       body { background: #fff; color: #111; }
       main { padding: 0; max-width: 100%; }
       .results-header h2 { color: #111; }
@@ -1175,6 +1204,99 @@
       <a class="cta-btn" href="https://www.youtube.com/@WayShowers88" target="_blank" rel="noopener">Visit WayShowers88 →</a>
     </div>
   </div>
+
+  <!-- QUESTIONS — always visible, before and after a chart is cast -->
+  <section class="faq" id="questions" aria-labelledby="faq-h">
+    <h2 id="faq-h">Questions about your birth chart</h2>
+    <p class="faq-lede">What the chart is, what you need to cast it, and why another app might show something different.</p>
+
+    <details>
+      <summary>What is a birth chart?</summary>
+      <div class="faq-a">
+        <p>A birth chart, also called a natal chart, is a map of the sky at the exact moment and place you were born. It is a fixed snapshot. It never changes, though the moving sky keeps passing over it for the rest of your life.</p>
+        <p>Every placement in it has three layers. The <strong>planet</strong> is a drive, something in you that wants or does: love, courage, thought, feeling. The <strong>sign</strong> is the manner, how that drive moves: boldly, slowly, tenderly, cleverly. The <strong>house</strong> is the stage, the area of life where it plays out: home, work, money, love. So Mars in Taurus in the 2nd house reads as courage and drive, moving steadily and patiently, in the realm of money and what you value.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>What are the Sun, Moon and Rising sign?</summary>
+      <div class="faq-a">
+        <p>Together they are often called the Big Three, and they are the best place to start.</p>
+        <p>Your <strong>Sun</strong> is the centre of your sense of "this is me": the purpose that drives you and the way you want to shine. Your <strong>Moon</strong> is your inner weather: what you need to feel safe, how you react before you have time to think, and what feels like home. Your <strong>Rising sign</strong> (the Ascendant) is the sign that was coming up over the eastern horizon as you were born. It describes how you meet the world: first impressions, your manner, and the way you begin things.</p>
+        <p>Nobody is only one sign. Everyone has the Sun, the Moon and eight planets, each in its own sign, so every chart carries something of the whole zodiac.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Why does my exact birth time matter?</summary>
+      <div class="faq-a">
+        <p>The planets' signs depend mostly on the date. Your Rising sign and your houses depend on the minute and the place, because they map the sky as it looked from one spot on Earth at one moment.</p>
+        <p>As the Earth turns, a new sign rises roughly every two hours, so a few minutes moves the Rising point and a few hours changes the whole house layout. A time that is right only to the hour usually keeps the planets in the right signs, but it can shift a planet across a house line, especially one near the edge of a house. If a house placement only almost fits, check how reliable the birth time is before doubting the chart.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>I don't know my birth time. What can I still use?</summary>
+      <div class="faq-a">
+        <p>Enter 12:00 and read the planets' signs and the aspects between them. Set aside the Rising sign, the houses and the Midheaven: without a birth time they cannot be known, and a guess would mislead you more than it helps.</p>
+        <p>Most planets move slowly enough that their signs hold across a whole day. The exception is the Moon, which travels about 13° a day. If the noon chart puts your Moon within about 7° of either edge of its sign, it may belong in the neighbouring sign, and its aspects may change too. A birth certificate, hospital record or family memory is worth chasing; even a rough time narrows things a great deal.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Placidus or Whole Sign: which house system should I choose?</summary>
+      <div class="faq-a">
+        <p>Both are ways of dividing the sky into twelve houses, and neither has been proven right by observation.</p>
+        <p><strong>Placidus</strong> divides the sky by time. It measures how long each part of the sky takes to travel between the horizon and its highest point, and marks the houses at the thirds of that journey, so its houses come out unequal in size. It is the most widely used system in modern Western astrology and on chart websites, so choose it if you are comparing with another site. Our readings use Placidus too.</p>
+        <p><strong>Whole Sign</strong> is the oldest system: each sign is one whole house, beginning with the sign on your Ascendant.</p>
+        <p>Your planets' signs and degrees are the same either way. Only the house a planet falls in can change, and mostly for planets near the edge of a house. Near and beyond the polar circles (above about 66° latitude) Placidus cannot be calculated at all, so the calculator switches to Whole Sign automatically.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Why does another app show something different?</summary>
+      <div class="faq-a">
+        <p>Usually it is one of these:</p>
+        <p><strong>The house system.</strong> The planets have not moved; the other app is drawing the houses another way (see above).</p>
+        <p><strong>The time zone.</strong> Historic daylight saving rules trip up many apps. This calculator looks up the rules for your birth place and date, and you can override the offset if your records say otherwise.</p>
+        <p><strong>The lunar nodes.</strong> We use the true node, as astro.com and most mainstream apps do. Apps using the mean node usually differ only slightly, but near the edge of a sign the two can name different signs.</p>
+        <p><strong>Black Moon Lilith.</strong> We use the mean position. Apps that show the "true" Lilith can differ by many degrees.</p>
+        <p><strong>The zodiac itself.</strong> A sidereal app will often put your planets one sign earlier (see below).</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>What do the aspects mean?</summary>
+      <div class="faq-a">
+        <p>An aspect is a particular angle between two planets, read as the kind of conversation they have. The calculator shows the five major ones:</p>
+        <p><strong>Conjunction</strong>, together in the same spot, acting as one blended force. <strong>Sextile</strong>, 60° apart, an easy opening that still needs a small push. <strong>Square</strong>, 90° apart, friction that forces action. <strong>Trine</strong>, 120° apart, a natural flow. <strong>Opposition</strong>, 180° apart, two ends of a seesaw, each showing what the other lacks.</p>
+        <p>An aspect does not have to be exact. The calculator counts conjunctions and oppositions within 8°, squares and trines within 6°, and sextiles within 4°, and lists the closest first, because a tighter aspect is felt more strongly. Squares and oppositions are not bad aspects; they are where a chart asks for effort, and often where it grows most.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Is this the tropical or the sidereal zodiac?</summary>
+      <div class="faq-a">
+        <p>Tropical, as in nearly all Western astrology. It begins the zodiac at the March equinox and divides the year into twelve equal signs from there, so the signs follow the seasons.</p>
+        <p>The sidereal zodiac, used mainly in Indian astrology, is anchored to the stars instead. Because the Earth's axis slowly wobbles, the two have drifted apart by close to a whole sign over about two thousand years, so sidereal placements often fall one sign earlier. Neither is a mistake. They are two frames for the same sky.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Is my birth data private?</summary>
+      <div class="faq-a">
+        <p>Yes. Your browser computes the chart itself, using the astronomy library built into this page. Your birth date, time and chart are never sent to us or anyone else. Your details are saved only in this browser, so the form is ready next time you visit.</p>
+        <p>If your town isn't in the built-in list, <strong>Search Online</strong> sends the place name, and nothing else, to Open-Meteo's free place-name lookup to find its coordinates. Your email is used only if you choose to receive the Threshold Letter.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>How accurate is it?</summary>
+      <div class="faq-a">
+        <p>Planet positions come from the astronomy-engine library and are checked against the Swiss Ephemeris, the standard behind professional astrology software. Placidus house cusps agree with it to within a few thousandths of a degree. In practice the chart is as precise as the birth time and place you give it.</p>
+      </div>
+    </details>
+  </section>
 
 </main>
 
