@@ -167,5 +167,42 @@ if (fs.existsSync(LUMINARY)){
   fs.writeFileSync(LUMINARY, fill(lum, 'NEXT-MOONS', nextMoons));
 }
 
+/* ── the homepage band: the moon that is open for orders now ──
+   moons[0] is the earliest New or Full Moon whose three-day window has not
+   closed. The [data-lum] spans are refreshed on load by the script at the foot
+   of index.html (same rule, same UTC date), so the band turns over the moment
+   a window closes, not only when this job next runs. */
+const INDEX = path.join(ROOT, 'index.html');
+if (fs.existsSync(INDEX)){
+  const m = moons[0];
+  const kind = m.kind === 'new' ? 'New Moon' : 'Full Moon';
+  const name = `${kind} in ${m.sign.name}`;
+  const date = new Intl.DateTimeFormat('en-GB', { day:'numeric', month:'long', timeZone:'UTC' }).format(m.when);
+  const verb = m.kind === 'new' ? 'begins' : 'completes';
+  const band = [
+    `<section class="lg-band" id="luminary-now" aria-label="The Luminary — a personal reading of the ${name}">`,
+    `  <div class="wrap lg-inner">`,
+    `    <a class="lg-art" href="luminary.html" aria-hidden="true" tabindex="-1">`,
+    `      <img width="900" height="1400" src="luminary-sample-cover.webp" alt="The cover of a Luminary — a personal moon reading composed for one birth chart" loading="lazy" decoding="async">`,
+    `    </a>`,
+    `    <div class="lg-copy">`,
+    `      <div class="lg-eyebrow">✦ <span data-lum="name">${name}</span> · <span data-lum="date">${date}</span> ✦</div>`,
+    `      <h2>THE <span class="lg-year">LUMINARY</span></h2>`,
+    `      <p class="lg-lede">The <span data-lum="name">${name}</span> rises over everyone, but it does not land in the same`,
+    `        place for everyone. In your chart it falls in one house, one area of your life, and it may`,
+    `        touch planets of your own. The Luminary reads this one moon in your chart alone: where it`,
+    `        lands, what it <span data-lum="verb">${verb}</span>, and what it asks of you.</p>`,
+    `      <div class="lg-cta-row">`,
+    `        <a class="btn btn-beam lg-btn" href="luminary.html">Begin your <span data-lum="kind">${kind}</span> reading ✦ $33 AUD</a>`,
+    `        <span class="lg-retire">Composed one chart at a time. Open until three days after the <span data-lum="kind">${kind}</span>.</span>`,
+    `      </div>`,
+    `    </div>`,
+    `  </div>`,
+    `</section>`,
+  ];
+  const idx = fs.readFileSync(INDEX, 'utf8');
+  fs.writeFileSync(INDEX, fill(idx, 'LUMINARY-BAND', band));
+}
+
 console.log(`${day}: Moon ${dd}°${mm}′ ${sign.name}, ${phaseName(elong)} ${Math.round(illum * 100)}%` +
   (ing ? `, enters ${ing.sign.name} ${ing.when.toISOString()}` : ''));

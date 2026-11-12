@@ -905,27 +905,33 @@ footer .eightyeight{font-size:280px;right:-30px;bottom:-70px;opacity:.7}
 
 <!-- ═════════ THE LUMINARY — THIS MOON BAND (7 Nov 2026, Adrian: "push the luminary
      report on the website"). Replaces the Turning Point band (first edition closed
-     26 Oct). Top slot rotates with the current moon; update the eyebrow and lede
-     for each New/Full Moon. ═════════ -->
-<section class="lg-band" id="luminary-now" aria-label="The Luminary — a personal reading of the New Moon in Scorpio">
+     26 Oct). The band names the moon that is open for orders now: the earliest New
+     or Full Moon whose three-day window has not closed. Since 12 Nov 2026 nobody
+     edits it by hand: tools/sky-today.cjs rewrites the block between the markers
+     every day, and the script at the foot of this page refreshes the [data-lum]
+     spans on load, so it turns over the moment a window closes. To change the
+     wording, change it in tools/sky-today.cjs (the block here is overwritten). ═════════ -->
+<!-- LUMINARY-BAND:START -->
+<section class="lg-band" id="luminary-now" aria-label="The Luminary — a personal reading of the Full Moon in Gemini">
   <div class="wrap lg-inner">
     <a class="lg-art" href="luminary.html" aria-hidden="true" tabindex="-1">
-      <img width="900" height="1400" src="luminary-sample-cover.webp" alt="The cover of a Luminary — a personal New Moon reading composed for one birth chart" loading="lazy" decoding="async">
+      <img width="900" height="1400" src="luminary-sample-cover.webp" alt="The cover of a Luminary — a personal moon reading composed for one birth chart" loading="lazy" decoding="async">
     </a>
     <div class="lg-copy">
-      <div class="lg-eyebrow">✦ New Moon in Scorpio · 9 November ✦</div>
+      <div class="lg-eyebrow">✦ <span data-lum="name">Full Moon in Gemini</span> · <span data-lum="date">24 November</span> ✦</div>
       <h2>THE <span class="lg-year">LUMINARY</span></h2>
-      <p class="lg-lede">The New Moon in Scorpio rises over everyone, but it does not land in the same
+      <p class="lg-lede">The <span data-lum="name">Full Moon in Gemini</span> rises over everyone, but it does not land in the same
         place for everyone. In your chart it falls in one house, one area of your life, and it may
         touch planets of your own. The Luminary reads this one moon in your chart alone: where it
-        lands, what it begins, and what it asks of you.</p>
+        lands, what it <span data-lum="verb">completes</span>, and what it asks of you.</p>
       <div class="lg-cta-row">
-        <a class="btn btn-beam lg-btn" href="luminary.html">Begin your New Moon reading ✦ $33 AUD</a>
-        <span class="lg-retire">Composed one chart at a time. Open until three days after the New Moon.</span>
+        <a class="btn btn-beam lg-btn" href="luminary.html">Begin your <span data-lum="kind">Full Moon</span> reading ✦ $33 AUD</a>
+        <span class="lg-retire">Composed one chart at a time. Open until three days after the <span data-lum="kind">Full Moon</span>.</span>
       </div>
     </div>
   </div>
 </section>
+<!-- LUMINARY-BAND:END -->
 
 <!-- ═════════ THE TWO SKIES — YOUR SKY AT BIRTH (map first, its reading beneath) ═════════ -->
 <section class="lg-band" id="twoskies" aria-label="The Painted Skies — your natal star map in a painted sky">
@@ -1554,6 +1560,20 @@ document.getElementById('yr').textContent = new Date().getFullYear();
         ? `the <b>${m.k} in ${m.sign}</b> just peaked — its window is open until ${fmt(new Date(m.d.getTime()+GRACE))}`
         : `the <b>${m.k} in ${m.sign}</b> arrives ${fmt(m.d)}`;
       note.innerHTML = `✦ &nbsp;The Luminary is written to the moon <b>you choose</b>: ${bit(moons[0])}, and ${bit(moons[1])}.`;
+      // The top band: the earliest moon whose three-day window is still open.
+      // Same rule and same UTC date as tools/sky-today.cjs, which writes the static text daily.
+      const band = document.getElementById('luminary-now');
+      const open = moons.find(m => m.d.getTime() + GRACE > now.getTime());
+      if (band && open){
+        const v = {
+          name: `${open.k} in ${open.sign}`,
+          kind: open.k,
+          date: open.d.toLocaleDateString('en-GB', { day:'numeric', month:'long', timeZone:'UTC' }),
+          verb: open.k === 'New Moon' ? 'begins' : 'completes'
+        };
+        band.querySelectorAll('[data-lum]').forEach(el => { if (v[el.dataset.lum]) el.textContent = v[el.dataset.lum]; });
+        band.setAttribute('aria-label', `The Luminary — a personal reading of the ${v.name}`);
+      }
     } catch(e){ /* static fallback text stays */ }
     // the hero moon — her true phase, live in the sky
     try {
